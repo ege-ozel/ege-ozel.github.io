@@ -18,7 +18,7 @@ export const profile = {
     secondary: ['Angular', 'Node.js', 'NestJS'],
   },
   email: 'egeozeldev@gmail.com',
-  github: 'https://github.com/psymore',
+  github: 'https://github.com/ege-ozel',
   linkedin: 'https://www.linkedin.com/in/ege-%C3%B6zel-a721231bb',
 };
 
