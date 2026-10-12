@@ -7,7 +7,7 @@ const POSTER = {
   mobile: { widths: [400, 800], width: 800, height: 1733, sizes: '(min-width: 960px) 240px, 45vw' },
 } as const;
 
-/** "https://psymore.github.io/metronome/" → "psymore.github.io/metronome" */
+/** "https://ege-ozel.github.io/metronome/" → "ege-ozel.github.io/metronome" */
 export function displayUrl(href: string): string {
   const url = new URL(href);
   return `${url.host}${url.pathname}`.replace(/\/$/, '');

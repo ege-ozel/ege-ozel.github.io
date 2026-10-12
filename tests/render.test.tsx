@@ -40,7 +40,7 @@ describe('prerendered page', () => {
   });
 
   it('links to the verified profiles', () => {
-    expect(en.html).toContain('href="https://github.com/psymore"');
+    expect(en.html).toContain('href="https://github.com/ege-ozel"');
     expect(en.html).toContain('href="https://www.linkedin.com/in/ege-%C3%B6zel-a721231bb"');
   });
 

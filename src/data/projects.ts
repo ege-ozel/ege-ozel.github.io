@@ -36,8 +36,8 @@ export const projects: Project[] = [
       },
     },
     links: [
-      { kind: 'demo', href: 'https://psymore.github.io/woodcraft-prototype/' },
-      { kind: 'code', href: 'https://github.com/psymore/woodcraft-prototype' },
+      { kind: 'demo', href: 'https://ege-ozel.github.io/woodcraft-prototype/' },
+      { kind: 'code', href: 'https://github.com/ege-ozel/woodcraft-prototype' },
     ],
   },
   {
@@ -79,8 +79,8 @@ export const projects: Project[] = [
       },
     },
     links: [
-      { kind: 'demo', href: 'https://psymore.github.io/metronome/' },
-      { kind: 'code', href: 'https://github.com/psymore/metronome' },
+      { kind: 'demo', href: 'https://ege-ozel.github.io/metronome/' },
+      { kind: 'code', href: 'https://github.com/ege-ozel/metronome' },
     ],
   },
   {
@@ -122,7 +122,7 @@ export const projects: Project[] = [
         kind: 'marketplace',
         href: 'https://marketplace.visualstudio.com/items?itemName=egeozel.workspace-agent-session-manager',
       },
-      { kind: 'code', href: 'https://github.com/psymore/workspace-agent-session-manager' },
+      { kind: 'code', href: 'https://github.com/ege-ozel/workspace-agent-session-manager' },
     ],
   },
   {
@@ -152,7 +152,7 @@ export const projects: Project[] = [
     },
     tags: ['TypeScript', 'React Native', 'Expo', 'Zustand', 'Reanimated', 'Jest'],
     poster: null,
-    links: [{ kind: 'code', href: 'https://github.com/psymore/world-of-cards' }],
+    links: [{ kind: 'code', href: 'https://github.com/ege-ozel/world-of-cards' }],
   },
   {
     id: 'grocery',
@@ -197,9 +197,9 @@ export const projects: Project[] = [
     tags: ['JavaScript', 'Electron', 'PWA'],
     poster: null,
     links: [
-      { kind: 'site', href: 'https://psymore.github.io/interval-timer/' },
-      { kind: 'release', href: 'https://github.com/psymore/interval-timer/releases/latest' },
-      { kind: 'code', href: 'https://github.com/psymore/interval-timer' },
+      { kind: 'site', href: 'https://ege-ozel.github.io/interval-timer/' },
+      { kind: 'release', href: 'https://github.com/ege-ozel/interval-timer/releases/latest' },
+      { kind: 'code', href: 'https://github.com/ege-ozel/interval-timer' },
     ],
   },
 ];

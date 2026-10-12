@@ -4,7 +4,7 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-const SITE = 'https://psymore.github.io';
+const SITE = 'https://ege-ozel.github.io';
 const root = resolve(fileURLToPath(import.meta.url), '../..');
 const dist = join(root, 'dist');
 const template = await readFile(join(dist, 'index.html'), 'utf8');
