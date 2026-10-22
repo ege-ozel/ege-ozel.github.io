@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { canAutoPreview, createPreviewGroup, type Playable } from '../src/preview';
+import { createPreviewGroup, previewMode, type Playable } from '../src/preview';
 
 function fakeVideo(fails = false) {
   const video = {
@@ -43,11 +43,11 @@ describe('preview group', () => {
   });
 });
 
-describe('canAutoPreview', () => {
-  it('allows hover previews only with a precise pointer and no motion or data limits', () => {
-    expect(canAutoPreview({ hover: true, reducedMotion: false, saveData: false })).toBe(true);
-    expect(canAutoPreview({ hover: false, reducedMotion: false, saveData: false })).toBe(false);
-    expect(canAutoPreview({ hover: true, reducedMotion: true, saveData: false })).toBe(false);
-    expect(canAutoPreview({ hover: true, reducedMotion: false, saveData: true })).toBe(false);
+describe('previewMode', () => {
+  it('uses hover on precise pointers, in-view play on touch, a button when motion or data is limited', () => {
+    expect(previewMode({ hover: true, reducedMotion: false, saveData: false })).toBe('hover');
+    expect(previewMode({ hover: false, reducedMotion: false, saveData: false })).toBe('inView');
+    expect(previewMode({ hover: false, reducedMotion: true, saveData: false })).toBe('button');
+    expect(previewMode({ hover: true, reducedMotion: false, saveData: true })).toBe('button');
   });
 });
