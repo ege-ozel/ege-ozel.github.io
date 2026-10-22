@@ -10,19 +10,33 @@ const tr = renderPage('tr');
 const anchors = (html: string) => [...html.matchAll(/<a\b[^>]*>/g)].map((m) => m[0]);
 
 describe('prerendered page', () => {
-  it('leads with the name and role', () => {
-    expect(en.html).toMatch(/<h1 class="profile__name">Ege Özel<\/h1>/);
-    expect(en.html).toContain('Frontend Developer');
-    expect(tr.html).toContain('Frontend Geliştirici');
-    expect(en.title).toBe('Ege Özel, Frontend Developer');
+  it('leads with the name, role and availability', () => {
+    expect(en.html).toMatch(/<h1 class="quick__name">Ege Özel<\/h1>/);
+    expect(en.html).toContain('Software Developer · React &amp; TypeScript');
+    expect(en.html).toContain('Open to work');
+    expect(tr.html).toContain('İşe açık');
+    expect(en.title).toBe('Ege Özel, Software Developer');
   });
 
-  it('never publishes a phone number, a CV file or broken values', () => {
+  it('never publishes a phone number or broken values, and links only the public CVs as PDFs', () => {
     for (const html of [en.html, tr.html]) {
-      for (const banned of ['5544321601', '554 432', '+90', 'tel:', '.pdf', 'undefined', '[object Object]']) {
+      for (const banned of ['5544321601', '554 432', '+90', 'tel:', 'undefined', '[object Object]']) {
         expect(html, banned).not.toContain(banned);
       }
+      const pdfs = [...html.matchAll(/href="([^"]+\.pdf)"/g)].map((m) => m[1]);
+      expect(pdfs.length).toBeGreaterThan(0);
+      expect(pdfs.every((p) => /^\/cv\/ege-ozel-cv-(en|tr)\.pdf$/.test(p))).toBe(true);
     }
+  });
+
+  it('offers the CV in the page language', () => {
+    expect(en.html).toContain('href="/cv/ege-ozel-cv-en.pdf"');
+    expect(tr.html).toContain('href="/cv/ege-ozel-cv-tr.pdf"');
+    expect(en.html).not.toContain('subject=CV');
+  });
+
+  it('shows three stats in the header', () => {
+    expect(en.html.match(/class="stat"/g)?.length).toBe(3);
   });
 
   it('opens external links safely in a new tab', () => {
@@ -32,11 +46,6 @@ describe('prerendered page', () => {
       expect(a).toContain('target="_blank"');
       expect(a).toContain('rel="noopener noreferrer"');
     }
-  });
-
-  it('offers a CV request by email, never a file', () => {
-    expect(en.html).toContain('href="mailto:egeozeldev@gmail.com?subject=CV%20request"');
-    expect(tr.html).toContain('href="mailto:egeozeldev@gmail.com?subject=CV%20talebi"');
   });
 
   it('links to the verified profiles', () => {
@@ -78,7 +87,8 @@ describe('prerendered page', () => {
   });
 
   it('has a skip link to the projects', () => {
-    expect(en.html.indexOf('class="skip" href="#work"')).toBeLessThan(en.html.indexOf('<aside'));
+    expect(en.html.indexOf('class="skip" href="#work"')).toBeLessThan(en.html.indexOf('<header class="quick"'));
+    expect(en.html.indexOf('<header class="quick"')).toBeGreaterThan(-1);
     expect(en.html).toContain('<section id="work"');
   });
 });

@@ -1,6 +1,6 @@
 import { Contact, EducationList, ExperienceList, MoreWork } from './components/Lists';
-import { ProfileAside } from './components/ProfileAside';
 import { ProjectCard } from './components/ProjectCard';
+import { QuickScan } from './components/QuickScan';
 import { Section } from './components/Section';
 import { featuredProjects } from './data/projects';
 import { createT } from './i18n';
@@ -14,7 +14,7 @@ export function App({ locale }: { locale: Locale }) {
         {t('skip')}
       </a>
       <div className="shell">
-        <ProfileAside locale={locale} />
+        <QuickScan locale={locale} />
         <main className="content">
           <Section id="work" title={t('work.title')}>
             <div className="cards">

@@ -79,10 +79,7 @@ export function Contact({ locale }: { locale: Locale }) {
       </a>
       <ul className="actions">
         <li>
-          <a
-            className="btn btn--primary"
-            href={`mailto:${profile.email}?subject=${encodeURIComponent(t('link.cvSubject'))}`}
-          >
+          <a className="btn btn--primary" href={profile.publicCv[locale]} type="application/pdf">
             {t('link.cv')}
           </a>
         </li>
