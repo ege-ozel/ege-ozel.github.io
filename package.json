@@ -8,7 +8,8 @@
     "test": "vitest run",
     "media": "node scripts/build-media.mjs",
     "check": "node scripts/browser-check.mjs",
-    "video": "node scripts/build-video.mjs"
+    "video": "node scripts/build-video.mjs",
+    "og": "node scripts/og-image.mjs"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.5",

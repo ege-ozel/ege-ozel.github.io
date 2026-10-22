@@ -4,7 +4,8 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-const SITE = 'https://ege-ozel.github.io';
+// SITE_URL lets another host (for example Vercel) build canonical and preview links for itself.
+const SITE = (process.env.SITE_URL ?? 'https://ege-ozel.github.io').replace(/\/$/, '');
 const root = resolve(fileURLToPath(import.meta.url), '../..');
 const dist = join(root, 'dist');
 const template = await readFile(join(dist, 'index.html'), 'utf8');
@@ -31,6 +32,12 @@ for (const [locale, path] of Object.entries(pages)) {
     `<meta property="og:url" content="${SITE}${path}" />`,
     `<meta property="og:title" content="${escapeAttr(title)}" />`,
     `<meta property="og:description" content="${escapeAttr(description)}" />`,
+    `<meta property="og:image" content="${SITE}/og.png" />`,
+    `<meta property="og:image:width" content="1200" />`,
+    `<meta property="og:image:height" content="630" />`,
+    `<meta name="twitter:card" content="summary_large_image" />`,
+    `<meta name="twitter:title" content="${escapeAttr(title)}" />`,
+    `<meta name="twitter:description" content="${escapeAttr(description)}" />`,
   ].join('\n    ');
 
   let page = template;
