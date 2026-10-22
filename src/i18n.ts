@@ -35,6 +35,7 @@ const en = {
   'card.approach': 'Approach',
   'card.status': 'Status',
   'status.live': 'Live',
+  'status.preview': 'Early preview',
   'status.prototype': 'Prototype',
   'status.inDevelopment': 'In development',
   'media.empty': 'Screenshots coming soon',
@@ -80,6 +81,7 @@ const tr: Record<UiKey, string> = {
   'card.approach': 'Yaklaşım',
   'card.status': 'Durum',
   'status.live': 'Yayında',
+  'status.preview': 'Erken önizleme',
   'status.prototype': 'Prototip',
   'status.inDevelopment': 'Geliştiriliyor',
   'media.empty': 'Ekran görüntüleri yakında',
@@ -92,6 +94,7 @@ export const dictionaries: Record<Locale, Record<UiKey, string>> = { en, tr };
 
 export const statusKey: Record<Status, UiKey> = {
   live: 'status.live',
+  preview: 'status.preview',
   prototype: 'status.prototype',
   inDevelopment: 'status.inDevelopment',
 };

@@ -1,8 +1,17 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { hero } from '../src/data/hero';
 import { degrees, jobs, profile } from '../src/data/profile';
-import { featuredProjects, projects } from '../src/data/projects';
+import { featuredProjects, moreProjects, projects, shippedCount } from '../src/data/projects';
+
+/**
+ * Featured projects whose recordings wait on Ege (desktop shoot, Grocery local demo,
+ * Interval Timer fixes). Empty this list as the media lands; it must be empty before release.
+ */
+const PENDING_MEDIA = ['grocery', 'desktuk', 'interval-timer'];
+/** Public CVs wait on Ege's approval (Plan 3 Task 6). Set to false once both PDFs exist. */
+const PENDING_CV = true;
 
 const isText = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && Object.keys(value).sort().join() === 'en,tr';
@@ -24,12 +33,17 @@ describe('project data', () => {
   });
 
   it('features five projects in the agreed order', () => {
-    expect(featuredProjects.map((p) => p.id)).toEqual(['woodcraft', 'metronome', 'wsm', 'world-of-cards', 'grocery']);
+    expect(featuredProjects.map((p) => p.id)).toEqual(['trackmesh', 'grocery', 'metronome', 'desktuk', 'interval-timer']);
+  });
+
+  it('lists the smaller projects in the agreed order and drops World of Cards', () => {
+    expect(moreProjects.map((p) => p.id)).toEqual(['pdf-reader', 'wsm', 'woodcraft', 'voice-type', 'mert-ozkan', 'trackmesh-film']);
+    expect(projects.some((p) => p.id === 'world-of-cards')).toBe(false);
   });
 
   it('fills every English and Turkish string', () => {
-    const all = texts({ profile, jobs, degrees, projects });
-    expect(all.length).toBeGreaterThan(40);
+    const all = texts({ profile, jobs, degrees, projects, hero });
+    expect(all.length).toBeGreaterThan(60);
     for (const [path, text] of all) {
       expect(String(text.en).trim(), `${path}.en`).not.toBe('');
       expect(String(text.tr).trim(), `${path}.tr`).not.toBe('');
@@ -39,6 +53,16 @@ describe('project data', () => {
   it('links only to https addresses', () => {
     for (const project of projects) {
       for (const link of project.links) expect(link.href, project.id).toMatch(/^https:\/\//);
+    }
+    for (const job of jobs) if (job.companyUrl) expect(job.companyUrl).toMatch(/^https:\/\//);
+    for (const degree of degrees) if (degree.link) expect(degree.link.href).toMatch(/^https:\/\//);
+  });
+
+  it('never links a private repository', () => {
+    const privateRepos = ['track-mesh', 'grocery', 'cv', 'your-plugin-stack-react', 'poker-tracker'];
+    const hrefs = projects.flatMap((p) => p.links.map((l) => l.href));
+    for (const repo of privateRepos) {
+      expect(hrefs.filter((h) => h.replace(/\/$/, '').endsWith(`github.com/ege-ozel/${repo}`))).toEqual([]);
     }
   });
 
@@ -55,21 +79,38 @@ describe('project data', () => {
     }
   });
 
-  it('keeps the agreed empty slots empty', () => {
-    expect(profile.portrait).toBeNull();
-    const byId = Object.fromEntries(projects.map((p) => [p.id, p]));
-    expect(byId['world-of-cards'].poster).toBeNull();
-    expect(byId.grocery.poster).toBeNull();
-    expect(byId.grocery.links).toEqual([]);
+  it('gives every featured project a poster and a preview clip that exist', () => {
+    for (const p of featuredProjects) {
+      if (PENDING_MEDIA.includes(p.id)) continue;
+      expect(p.poster, p.id).not.toBeNull();
+      expect(Boolean(p.video && existsSync(join('public', p.video))), p.id).toBe(true);
+    }
   });
 
-  it('has preview videos only for the approved projects, each with a poster and a file', () => {
-    const withVideo = projects.filter((p) => p.video).map((p) => p.id);
-    expect(withVideo).toEqual(['metronome', 'wsm']);
-    for (const project of projects) {
-      if (!project.video) continue;
-      expect(project.poster, project.id).not.toBeNull();
-      expect(existsSync(join('public', project.video)), project.video).toBe(true);
-    }
+  it('has a clip file for every project that names one', () => {
+    for (const p of projects) if (p.video) expect(existsSync(join('public', p.video)), p.video).toBe(true);
+  });
+});
+
+describe('hero and profile data', () => {
+  it('has the hero films and posters', () => {
+    for (const file of [hero.landscape.video, hero.portrait.video]) expect(existsSync(join('public', file)), file).toBe(true);
+    expect(existsSync(join('public', `${hero.landscape.poster}-1600.avif`))).toBe(true);
+    expect(existsSync(join('public', `${hero.portrait.poster}-800.avif`))).toBe(true);
+  });
+
+  it('has three stats, the last one counting shipped projects', () => {
+    expect(profile.stats).toHaveLength(3);
+    expect(profile.stats[2].value.en).toBe(String(shippedCount));
+    expect(shippedCount).toBeGreaterThanOrEqual(6);
+  });
+
+  it('points the public CVs at /cv/ and has both files once approved', () => {
+    expect(profile.publicCv).toEqual({ en: '/cv/ege-ozel-cv-en.pdf', tr: '/cv/ege-ozel-cv-tr.pdf' });
+    if (!PENDING_CV) for (const file of Object.values(profile.publicCv)) expect(existsSync(join('public', file)), file).toBe(true);
+  });
+
+  it('links the thesis project from the master degree', () => {
+    expect(degrees[0].link?.href).toBe('https://github.com/ege-ozel/gencomparator-frontend');
   });
 });

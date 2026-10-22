@@ -1,48 +1,82 @@
-import type { Project } from '../types';
+import type { LinkKind, Project } from '../types';
 
 /** Featured projects render in this order; `placement: 'more'` goes to the compact list. */
 export const projects: Project[] = [
   {
-    id: 'woodcraft',
-    title: 'Woodcraft 3D Workshop',
+    id: 'trackmesh',
+    title: 'TrackMesh',
     placement: 'featured',
     device: 'desktop',
-    accent: '#D9A066',
-    status: 'prototype',
+    accent: '#7FDCB4',
+    status: 'preview',
     summary: {
-      en: 'A browser-based woodworking modeler: build furniture from typed wood parts that snap together at connection points.',
-      tr: 'Tarayıcıda çalışan ahşap modelleme aracı: türleri belli ahşap parçalar bağlantı noktalarından birbirine oturarak mobilyaya dönüşür.',
+      en: 'A Windows app that sends Ableton Live and FL Studio project folders PC to PC: signed versions, only the changed parts travel, and every device joins with an explicit approval.',
+      tr: 'Ableton Live ve FL Studio proje klasörlerini bilgisayardan bilgisayara gönderen Windows uygulaması: imzalı sürümler, yalnızca değişen parçalar gider ve her cihaz açık onayla katılır.',
     },
     myPart: {
-      en: 'Solo project: engine choice, data model, snapping logic, the React Three Fiber scene and the UI.',
-      tr: 'Tek kişilik proje: motor seçimi, veri modeli, yakalama mantığı, React Three Fiber sahnesi ve arayüz.',
+      en: 'Solo project: product definition, architecture, the Tauri desktop app with its React interface, the transfer and pairing services, the VST3 status plugin, the installer and the product film.',
+      tr: 'Tek kişilik proje: ürün tanımı, mimari, React arayüzlü Tauri masaüstü uygulaması, aktarım ve eşleştirme servisleri, VST3 durum eklentisi, kurulum dosyası ve ürün filmi.',
     },
     notes: {
       challenge: {
-        en: 'Making parts snap predictably in 3D with mouse and touch, without turning the editor into a generic 3D tool.',
-        tr: 'Parçaların fare ve dokunmayla 3B’de öngörülebilir biçimde birbirine oturması; editörü sıradan bir 3B araca çevirmeden.',
+        en: 'Moving multi-gigabyte projects between home studios without a cloud copy, and without one side silently overwriting the other.',
+        tr: 'Çok gigabaytlık projeleri ev stüdyoları arasında bulut kopyası olmadan taşımak; bir tarafın diğerinin üzerine sessizce yazmasına izin vermeden.',
       },
       approach: {
-        en: 'The engine core is plain TypeScript with unit tests: connection points, snapping, exploded view and structural checks. A registry adds part types, a Zustand store holds the session, and React Three Fiber only renders. Three.js won over Godot in a benchmark because type checks and tests run in seconds.',
-        tr: 'Motor çekirdeği birim testli saf TypeScript: bağlantı noktaları, yakalama, patlatılmış görünüm ve yapısal kontroller. Parça türleri bir kayıt (registry) ile eklenir, oturumu Zustand tutar, React Three Fiber yalnızca çizer. Karşılaştırmada Three.js, tip kontrolü ve testler saniyeler içinde çalıştığı için Godot’nun önüne geçti.',
+        en: 'A share saves the folder as a signed version. Files are split into 4 MiB chunks checked with BLAKE3, so a small edit sends only what changed and a stopped download resumes. Before anything is replaced, the collaborator sees which files change, and the old files are kept as a backup. There is no automatic merge: if both sides changed, the app asks which version to keep. CI type-checks the frontend and runs rustfmt and clippy on Windows.',
+        tr: 'Paylaşım, klasörü imzalı bir sürüm olarak kaydeder. Dosyalar BLAKE3 ile doğrulanan 4 MiB’lık parçalara bölünür; küçük bir değişiklikte yalnızca değişen kısım gider ve yarıda kalan indirme kaldığı yerden sürer. Bir şey değiştirilmeden önce iş arkadaşı hangi dosyaların değişeceğini görür ve eski dosyalar yedek olarak saklanır. Otomatik birleştirme yoktur: iki taraf da değiştirdiyse uygulama hangi sürümün kalacağını sorar. CI, frontend’in tip kontrolünü yapar; Windows’ta rustfmt ve clippy çalıştırır.',
+      },
+      status: {
+        en: 'Early preview 0.1.0: sharing has been checked live on one network; separate networks have had little live testing.',
+        tr: 'Erken önizleme 0.1.0: paylaşım tek bir ağda canlı olarak denendi; farklı ağlarda henüz az test edildi.',
       },
     },
-    tags: ['React', 'TypeScript', 'Three.js', 'React Three Fiber', 'Zustand', 'Vitest'],
+    tags: ['Rust', 'Tauri 2', 'React', 'TypeScript', 'VST3', 'BLAKE3'],
+    video: '/media/trackmesh.mp4',
     poster: {
-      base: '/media/woodcraft',
+      base: '/media/trackmesh',
       alt: {
-        en: 'Woodcraft scene with wooden boards and a dowel on a grid, green connection points marked on one board.',
-        tr: 'Izgara üzerinde ahşap tahtalar ve bir çubuk; bir tahtada yeşil bağlantı noktaları işaretli Woodcraft sahnesi.',
+        en: 'TrackMesh panel over a DAW: project Neon Forest, connected to Studio B, with a Share current version button.',
+        tr: 'DAW üzerinde TrackMesh paneli: Neon Forest projesi, Studio B’ye bağlı, Mevcut sürümü paylaş düğmesiyle.',
       },
     },
     links: [
-      { kind: 'demo', href: 'https://ege-ozel.github.io/woodcraft-prototype/' },
-      { kind: 'code', href: 'https://github.com/ege-ozel/woodcraft-prototype' },
+      { kind: 'release', href: 'https://github.com/ege-ozel/trackmesh/releases/latest' },
+      { kind: 'code', href: 'https://github.com/ege-ozel/trackmesh' },
     ],
   },
   {
+    id: 'grocery',
+    title: 'Grocery',
+    placement: 'featured',
+    device: 'desktop',
+    accent: '#9BCB6B',
+    status: 'live',
+    summary: {
+      en: 'A shopping list and meal-planning app for households, synced across devices, with nutrition guidance.',
+      tr: 'Haneler için cihazlar arasında eşitlenen alışveriş listesi ve yemek planlama uygulaması; beslenme rehberliğiyle.',
+    },
+    myPart: {
+      en: 'Built the whole app: client, API functions and data model.',
+      tr: 'Uygulamanın tamamını geliştirdim: istemci, API fonksiyonları ve veri modeli.',
+    },
+    notes: {
+      challenge: {
+        en: 'Keeping one household’s lists in sync across devices and members, with clear ownership.',
+        tr: 'Bir hanenin listelerini cihazlar ve üyeler arasında, sahipliği net tutarak eşitlemek.',
+      },
+      approach: {
+        en: 'Preact with shadcn/ui running through preact/compat, Supabase for data and auth, one Vercel function per API route. Google sign-in, sessions, account deletion, household sharing by email and owner/member permissions.',
+        tr: 'shadcn/ui’ın preact/compat üzerinden çalıştığı Preact, veri ve kimlik doğrulama için Supabase, her API rotası için bir Vercel fonksiyonu. Google ile giriş, oturumlar, hesap silme, e-postayla hane paylaşımı ve sahip/üye yetkileri.',
+      },
+    },
+    tags: ['Preact', 'TypeScript', 'Tailwind CSS', 'Supabase', 'PostgreSQL', 'Vercel Functions'],
+    poster: null,
+    links: [{ kind: 'demo', href: 'https://grocery-five-ecru.vercel.app' }],
+  },
+  {
     id: 'metronome',
-    title: 'Metronome',
+    title: 'Chronobeat',
     placement: 'featured',
     device: 'desktop',
     accent: '#69D8CC',
@@ -74,8 +108,8 @@ export const projects: Project[] = [
     poster: {
       base: '/media/metronome',
       alt: {
-        en: 'Metronome in 4/4 at 120 BPM: a circular beat visualiser above the tempo dial.',
-        tr: '4/4 ve 120 BPM’de metronom: tempo kadranının üstünde dairesel vuruş görselleştiricisi.',
+        en: 'Chronobeat in 4/4 at 120 BPM: a circular beat visualiser above the tempo dial.',
+        tr: '4/4 ve 120 BPM’de Chronobeat: tempo kadranının üstünde dairesel vuruş görselleştiricisi.',
       },
     },
     links: [
@@ -84,9 +118,91 @@ export const projects: Project[] = [
     ],
   },
   {
+    id: 'desktuk',
+    title: 'DeskTuk',
+    placement: 'featured',
+    device: 'desktop',
+    accent: '#E8B86B',
+    status: 'inDevelopment',
+    summary: {
+      en: 'Groups Windows desktop files into movable circles that open on hover. Files stay where they are; circles only hold references to them.',
+      tr: 'Windows masaüstündeki dosyaları üzerine gelince açılan, taşınabilir çemberlerde toplar. Dosyalar yerinde kalır; çemberler yalnızca onlara referans tutar.',
+    },
+    myPart: {
+      en: 'Solo project: product idea, desktop window hosting, Explorer-matching icons and file opening, DPI handling and the installer.',
+      tr: 'Tek kişilik proje: ürün fikri, masaüstü pencere yerleşimi, Explorer ile aynı simgeler ve dosya açma, DPI yönetimi ve kurulum dosyası.',
+    },
+    notes: {
+      challenge: {
+        en: 'Living on the Windows desktop next to Explorer’s own icons without fighting it: z-order, Show desktop and per-monitor DPI.',
+        tr: 'Windows masaüstünde Explorer’ın kendi simgelerinin yanında, onunla çatışmadan yaşamak: pencere sırası, Masaüstünü göster ve monitör başına DPI.',
+      },
+      approach: {
+        en: 'Written in Rust against the raw Win32 API, with no GUI framework or WebView. Items open through ShellExecuteEx exactly as Explorer would and are only referenced by path, never moved, renamed or changed. The way the window attaches to the desktop is swappable, so different hosting strategies can be compared.',
+        tr: 'GUI framework’ü ya da WebView olmadan, doğrudan Win32 API ile Rust’ta yazıldı. Öğeler Explorer’ın yaptığı gibi ShellExecuteEx ile açılır ve yalnızca yollarıyla referans alınır; asla taşınmaz, yeniden adlandırılmaz ya da değiştirilmez. Pencerenin masaüstüne bağlanma biçimi değiştirilebilir; böylece farklı yerleşim stratejileri karşılaştırılabilir.',
+      },
+      status: {
+        en: 'Builds, unit tests and fixture checks pass; the manual checks of the circles view are not finished yet.',
+        tr: 'Derleme, birim testleri ve fixture kontrolleri geçiyor; çember görünümünün elle yapılan kontrolleri henüz bitmedi.',
+      },
+    },
+    tags: ['Rust', 'Win32 API', 'Windows Shell'],
+    poster: null,
+    links: [{ kind: 'code', href: 'https://github.com/ege-ozel/desktuk' }],
+  },
+  {
+    id: 'interval-timer',
+    title: 'Interval Timer',
+    placement: 'featured',
+    device: 'desktop',
+    accent: '#F08A5D',
+    status: 'live',
+    summary: {
+      en: 'A work/break timer for Windows and the web, with presets, an always-on-top mini window and alarms from local files, YouTube or Spotify.',
+      tr: 'Hazır ayarlar, her zaman üstte duran mini pencere ve yerel dosya, YouTube ya da Spotify alarmlarıyla Windows ve web için çalışma/mola zamanlayıcısı.',
+    },
+    myPart: {
+      en: 'Solo project: timer logic, alarm sources, the Electron app, the PWA and the release pipeline.',
+      tr: 'Tek kişilik proje: zamanlayıcı mantığı, alarm kaynakları, Electron uygulaması, PWA ve sürüm hattı.',
+    },
+    notes: {
+      challenge: {
+        en: 'Three very different alarm sources have to behave the same way: pause, resume and a duration cap.',
+        tr: 'Birbirinden çok farklı üç alarm kaynağı aynı şekilde davranmalı: duraklatma, devam etme ve süre sınırı.',
+      },
+      approach: {
+        en: 'One shared core runs as an Electron desktop app and as an installable PWA. Alarms play a local file, a YouTube video or a Spotify track and fall back to the local sound when a source fails. The mini window stays above fullscreen apps, and the timer keeps ticking from the tray with background throttling disabled and a power-save blocker.',
+        tr: 'Ortak bir çekirdek hem Electron masaüstü uygulaması hem de kurulabilir PWA olarak çalışır. Alarmlar yerel dosya, YouTube videosu ya da Spotify parçası çalar; bir kaynak başarısız olursa yerel sese döner. Mini pencere tam ekran uygulamaların üstünde kalır; arka plan kısıtlaması kapatılıp güç tasarrufu engellenerek zamanlayıcı sistem tepsisinden çalışmaya devam eder.',
+      },
+    },
+    tags: ['JavaScript', 'Electron', 'PWA', 'YouTube IFrame API', 'Spotify Web API'],
+    poster: null,
+    links: [
+      { kind: 'site', href: 'https://ege-ozel.github.io/interval-timer/' },
+      { kind: 'release', href: 'https://github.com/ege-ozel/interval-timer/releases/latest' },
+      { kind: 'code', href: 'https://github.com/ege-ozel/interval-timer' },
+    ],
+  },
+  {
+    id: 'pdf-reader',
+    title: 'PDF Reader',
+    placement: 'more',
+    device: 'desktop',
+    accent: '#8AB4F8',
+    status: 'inDevelopment',
+    summary: {
+      en: 'A lightweight PDF and Word reader for Windows and Android that only renders the pages in view and caps canvas memory.',
+      tr: 'Windows ve Android için yalnızca görünen sayfaları çizen ve canvas belleğini sınırlayan hafif bir PDF ve Word okuyucu.',
+    },
+    myPart: { en: 'Solo project.', tr: 'Tek kişilik proje.' },
+    tags: ['Tauri 2', 'JavaScript', 'PDF.js', 'Rust', 'Vitest'],
+    poster: null,
+    links: [{ kind: 'code', href: 'https://github.com/ege-ozel/pdf-reader' }],
+  },
+  {
     id: 'wsm',
     title: 'Workspace Agent Session Manager',
-    placement: 'featured',
+    placement: 'more',
     device: 'desktop',
     accent: '#A992FF',
     status: 'live',
@@ -97,16 +213,6 @@ export const projects: Project[] = [
     myPart: {
       en: 'Solo project, published on the VS Code Marketplace.',
       tr: 'Tek kişilik proje; VS Code Marketplace’te yayında.',
-    },
-    notes: {
-      challenge: {
-        en: 'Matching each terminal to the right agent session across multi-root workspaces, without any network access.',
-        tr: 'Çok köklü çalışma alanlarında her terminali doğru ajan oturumuyla eşleştirmek; hiç ağ erişimi olmadan.',
-      },
-      approach: {
-        en: 'It reads only the files the agents already keep on disk and runs their own CLIs. Terminals are matched by resumed session id, by process id for Claude, or by start time for Codex; otherwise the newest session in that folder is shown, never one from another repo.',
-        tr: 'Yalnızca ajanların diskte zaten tuttuğu dosyaları okur ve onların kendi CLI’larını çalıştırır. Terminaller devam ettirilen oturum kimliğiyle, Claude için süreç kimliğiyle ya da Codex için başlangıç zamanıyla eşleşir; eşleşme yoksa o klasördeki en yeni oturum gösterilir, asla başka bir deponunki değil.',
-      },
     },
     tags: ['TypeScript', 'VS Code Extension API', 'Node.js'],
     video: '/media/wsm.mp4',
@@ -126,83 +232,92 @@ export const projects: Project[] = [
     ],
   },
   {
-    id: 'world-of-cards',
-    title: 'World of Cards',
-    placement: 'featured',
-    device: 'mobile',
-    accent: '#E07A7A',
-    status: 'inDevelopment',
-    summary: {
-      en: 'A mobile collection of traditional card games on one shared engine. Pişti, Batak and Pis Yedili are playable offline against AI opponents.',
-      tr: 'Ortak bir motor üzerinde geleneksel kart oyunları koleksiyonu. Pişti, Batak ve Pis Yedili yapay zekâ rakiplere karşı çevrimdışı oynanabiliyor.',
-    },
-    myPart: {
-      en: 'Solo project: game engine, rules, AI opponents and the mobile UI.',
-      tr: 'Tek kişilik proje: oyun motoru, kurallar, yapay zekâ rakipler ve mobil arayüz.',
-    },
-    notes: {
-      challenge: {
-        en: 'Adding a new game should mean writing its rules, not building a new app.',
-        tr: 'Yeni bir oyun eklemek yeni bir uygulama yazmak değil, yalnızca kurallarını yazmak olmalı.',
-      },
-      approach: {
-        en: 'An npm-workspaces monorepo with a shared engine package (cards, rules, AI interface, statistics, persistence) and a shared UI package. Each game registers its own rules and plugs into the same screens. Jest covers the engine and the mobile app.',
-        tr: 'Ortak motor paketi (kartlar, kurallar, yapay zekâ arayüzü, istatistik, kalıcılık) ve ortak UI paketi olan bir npm workspaces monoreposu. Her oyun kendi kurallarını kaydeder ve aynı ekranlara bağlanır. Motor ve mobil uygulama Jest ile test edilir.',
-      },
-    },
-    tags: ['TypeScript', 'React Native', 'Expo', 'Zustand', 'Reanimated', 'Jest'],
-    poster: null,
-    links: [{ kind: 'code', href: 'https://github.com/ege-ozel/world-of-cards' }],
-  },
-  {
-    id: 'grocery',
-    title: 'Grocery',
-    placement: 'featured',
-    device: 'desktop',
-    accent: '#9BCB6B',
-    summary: {
-      en: 'A shopping list and meal-planning app for households, synced across devices, with nutrition guidance.',
-      tr: 'Haneler için cihazlar arasında eşitlenen alışveriş listesi ve yemek planlama uygulaması; beslenme rehberliğiyle.',
-    },
-    myPart: {
-      en: 'Built the whole app: client, API functions and data model.',
-      tr: 'Uygulamanın tamamını geliştirdim: istemci, API fonksiyonları ve veri modeli.',
-    },
-    notes: {
-      challenge: {
-        en: 'Keeping one household’s lists in sync across devices and members, with clear ownership.',
-        tr: 'Bir hanenin listelerini cihazlar ve üyeler arasında, sahipliği net tutarak eşitlemek.',
-      },
-      approach: {
-        en: 'Preact with shadcn/ui running through preact/compat, Supabase for data and auth, one Vercel function per API route. Google sign-in, sessions, account deletion, household sharing by email and owner/member permissions.',
-        tr: 'shadcn/ui’ın preact/compat üzerinden çalıştığı Preact, veri ve kimlik doğrulama için Supabase, her API rotası için bir Vercel fonksiyonu. Google ile giriş, oturumlar, hesap silme, e-postayla hane paylaşımı ve sahip/üye yetkileri.',
-      },
-    },
-    tags: ['Preact', 'TypeScript', 'Tailwind CSS', 'Supabase', 'PostgreSQL', 'Vercel Functions'],
-    poster: null,
-    links: [],
-  },
-  {
-    id: 'interval-timer',
-    title: 'Interval Timer',
+    id: 'woodcraft',
+    title: 'Woodcraft 3D Workshop',
     placement: 'more',
     device: 'desktop',
-    accent: '#69D8CC',
+    accent: '#D9A066',
+    status: 'prototype',
+    summary: {
+      en: 'A browser-based woodworking modeler: build furniture from typed wood parts that snap together at connection points.',
+      tr: 'Tarayıcıda çalışan ahşap modelleme aracı: türleri belli ahşap parçalar bağlantı noktalarından birbirine oturarak mobilyaya dönüşür.',
+    },
+    myPart: {
+      en: 'Solo project: engine choice, data model, snapping logic, the React Three Fiber scene and the UI.',
+      tr: 'Tek kişilik proje: motor seçimi, veri modeli, yakalama mantığı, React Three Fiber sahnesi ve arayüz.',
+    },
+    tags: ['React', 'TypeScript', 'Three.js', 'React Three Fiber', 'Zustand', 'Vitest'],
+    poster: {
+      base: '/media/woodcraft',
+      alt: {
+        en: 'Woodcraft scene with wooden boards and a dowel on a grid, green connection points marked on one board.',
+        tr: 'Izgara üzerinde ahşap tahtalar ve bir çubuk; bir tahtada yeşil bağlantı noktaları işaretli Woodcraft sahnesi.',
+      },
+    },
+    links: [
+      { kind: 'demo', href: 'https://ege-ozel.github.io/woodcraft-prototype/' },
+      { kind: 'code', href: 'https://github.com/ege-ozel/woodcraft-prototype' },
+    ],
+  },
+  {
+    id: 'voice-type',
+    title: 'VoiceType',
+    placement: 'more',
+    device: 'desktop',
+    accent: '#2EF2D0',
     status: 'live',
     summary: {
-      en: 'A Windows work/break timer with presets, an always-on-top mini window and alarms from local files, YouTube or Spotify.',
-      tr: 'Hazır ayarlar, her zaman üstte duran mini pencere ve yerel dosya, YouTube ya da Spotify alarmlarıyla Windows çalışma/mola zamanlayıcısı.',
+      en: 'Press a hotkey, speak, and the text is pasted into the focused window. A single ~460 KB Rust app using OpenAI speech-to-text, good with mixed Turkish and English.',
+      tr: 'Kısayola bas, konuş; metin odaktaki pencereye yapıştırılır. OpenAI konuşmadan metne servisini kullanan, karışık Türkçe ve İngilizceyi iyi işleyen ~460 KB’lık tek bir Rust uygulaması.',
     },
     myPart: { en: 'Solo project.', tr: 'Tek kişilik proje.' },
-    tags: ['JavaScript', 'Electron', 'PWA'],
+    tags: ['Rust', 'Windows', 'OpenAI API'],
+    poster: null,
+    links: [{ kind: 'code', href: 'https://github.com/ege-ozel/voice-type' }],
+  },
+  {
+    id: 'mert-ozkan',
+    title: 'Mert Özkan site concept',
+    placement: 'more',
+    device: 'desktop',
+    accent: '#C9A227',
+    summary: {
+      en: 'A personal site design for an economics writer: desk, lab and card layouts sharing one settings sheet and theme picker.',
+      tr: 'Bir ekonomi yazarı için kişisel site tasarımı: tek bir ayar paneli ve tema seçiciyi paylaşan masa, laboratuvar ve kart düzenleri.',
+    },
+    myPart: { en: 'Solo project: design and build.', tr: 'Tek kişilik proje: tasarım ve geliştirme.' },
+    tags: ['HTML', 'CSS', 'JavaScript'],
     poster: null,
     links: [
-      { kind: 'site', href: 'https://ege-ozel.github.io/interval-timer/' },
-      { kind: 'release', href: 'https://github.com/ege-ozel/interval-timer/releases/latest' },
-      { kind: 'code', href: 'https://github.com/ege-ozel/interval-timer' },
+      { kind: 'demo', href: 'https://ege-ozel.github.io/mert-ozkan/' },
+      { kind: 'code', href: 'https://github.com/ege-ozel/mert-ozkan' },
     ],
+  },
+  {
+    id: 'trackmesh-film',
+    title: 'TrackMesh product film',
+    placement: 'more',
+    device: 'desktop',
+    accent: '#7FDCB4',
+    summary: {
+      en: 'A 30-second product film made in Blender: two studios, the real app screens inside the scene, split-screen link shots, in horizontal and vertical cuts.',
+      tr: 'Blender’da hazırlanan 30 saniyelik ürün filmi: iki stüdyo, sahnenin içinde uygulamanın gerçek ekranları, bölünmüş ekran bağlantı planları; yatay ve dikey kurgu.',
+    },
+    myPart: {
+      en: 'Solo project: scenes, lighting, cameras, screen captures, edit and render pipeline.',
+      tr: 'Tek kişilik proje: sahneler, ışık, kameralar, ekran kayıtları, kurgu ve render hattı.',
+    },
+    tags: ['Blender', 'Python', 'Playwright', 'FFmpeg'],
+    poster: null,
+    links: [{ kind: 'code', href: 'https://github.com/ege-ozel/track-mesh-blender-product-video' }],
   },
 ];
 
 export const featuredProjects = projects.filter((p) => p.placement === 'featured');
 export const moreProjects = projects.filter((p) => p.placement === 'more');
+
+/** Links that let a visitor open or install the project, not only read its code. */
+const SHIPPED: readonly LinkKind[] = ['demo', 'site', 'release', 'marketplace'];
+
+/** How many projects a visitor can open or download right now. */
+export const shippedCount = projects.filter((p) => p.links.some((l) => SHIPPED.includes(l.kind))).length;

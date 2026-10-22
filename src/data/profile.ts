@@ -1,18 +1,38 @@
-import type { Degree, Job, Text } from '../types';
+import type { Degree, Job, Locale, Stat, Text } from '../types';
+import { shippedCount } from './projects';
+
+const stats: Stat[] = [
+  {
+    value: { en: '2 years', tr: '2 yıl' },
+    label: { en: 'professional frontend work', tr: 'profesyonel frontend deneyimi' },
+  },
+  {
+    value: { en: '1 SaaS', tr: '1 SaaS' },
+    label: { en: 'frontend built on my own', tr: 'ürünün frontend’ini tek başıma geliştirdim' },
+  },
+  {
+    value: { en: String(shippedCount), tr: String(shippedCount) },
+    label: { en: 'projects you can open or download', tr: 'açıp deneyebileceğiniz ya da indirebileceğiniz proje' },
+  },
+];
 
 export const profile = {
   name: 'Ege Özel',
   initials: 'EÖ',
   /** Path under public/ once a portrait exists; null shows the initials. */
   portrait: null as string | null,
+  openToWork: true,
   tagline: {
-    en: 'Building interactive interfaces and thoughtful web experiences.',
-    tr: 'Etkileşimli arayüzler ve özenli web deneyimleri geliştiriyorum.',
+    en: 'React and TypeScript developer who ships complete products.',
+    tr: 'Uçtan uca ürün çıkaran React ve TypeScript geliştiricisi.',
   } satisfies Text,
   intro: {
-    en: 'Two years of professional React and Angular work, from the complete frontend of a released security platform to a browser-based 3D workshop and a Web Audio metronome.',
-    tr: 'React ve Angular ile iki yıllık profesyonel deneyim: yayına alınan bir güvenlik platformunun frontend’inin tamamından tarayıcıda çalışan bir 3B atölyeye ve Web Audio metronoma kadar.',
+    en: 'Two years of professional React and Angular work, including the complete frontend of a released security platform. On my own I build and ship products across web, desktop and audio, from first idea to installer.',
+    tr: 'React ve Angular ile iki yıllık profesyonel deneyim; buna yayına alınan bir güvenlik platformunun frontend’inin tamamı dahil. Kendi başıma web, masaüstü ve ses alanında, ilk fikirden kurulum dosyasına kadar ürünler geliştirip yayınlıyorum.',
   } satisfies Text,
+  stats,
+  /** Public CVs without phone number or address; the application CVs stay private. */
+  publicCv: { en: '/cv/ege-ozel-cv-en.pdf', tr: '/cv/ege-ozel-cv-tr.pdf' } satisfies Record<Locale, string>,
   strengths: {
     primary: ['React', 'TypeScript', 'JavaScript', 'CSS'],
     secondary: ['Angular', 'Node.js', 'NestJS'],
@@ -25,6 +45,7 @@ export const profile = {
 export const jobs: Job[] = [
   {
     company: 'Patika Global Technology',
+    companyUrl: 'https://patikaglobal.com',
     role: { en: 'Full Stack Software Developer', tr: 'Full Stack Yazılım Geliştirici' },
     period: { en: 'March 2024 – January 2025, remote', tr: 'Mart 2024 – Ocak 2025, uzaktan' },
     bullets: [
@@ -48,6 +69,7 @@ export const jobs: Job[] = [
   },
   {
     company: 'Traderlands',
+    companyUrl: 'https://www.traderlands.com',
     role: { en: 'Frontend Developer', tr: 'Frontend Geliştirici' },
     period: { en: 'October 2022 – September 2023, hybrid', tr: 'Ekim 2022 – Eylül 2023, hibrit' },
     bullets: [
@@ -68,6 +90,10 @@ export const degrees: Degree[] = [
     title: { en: 'MSc in Software Engineering', tr: 'Yazılım Mühendisliği yüksek lisans' },
     school: { en: 'Atılım University', tr: 'Atılım Üniversitesi' },
     year: '2024',
+    link: {
+      label: { en: 'Thesis project: Gencomparator', tr: 'Bitirme projesi: Gencomparator' },
+      href: 'https://github.com/ege-ozel/gencomparator-frontend',
+    },
   },
   {
     title: { en: 'BSc in Environmental Engineering', tr: 'Çevre Mühendisliği lisans' },
