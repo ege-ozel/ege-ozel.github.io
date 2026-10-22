@@ -53,12 +53,14 @@ describe('prerendered page', () => {
     expect(en.html).toContain('href="https://www.linkedin.com/in/ege-%C3%B6zel-a721231bb"');
   });
 
-  it('loads only the first poster eagerly', () => {
+  it('prerenders the hero poster first and eagerly, and every card poster lazily', () => {
     const images = [...en.html.matchAll(/<img\b[^>]*>/g)].map((m) => m[0]);
-    expect(images.length).toBe(3);
+    expect(images.length).toBe(1 + featuredProjects.filter((p) => p.poster).length);
+    expect(images[0]).toContain('/media/hero');
     expect(images[0]).toContain('loading="eager"');
     expect(images[0]).toMatch(/fetchPriority="high"|fetchpriority="high"/);
     for (const img of images.slice(1)) expect(img).toContain('loading="lazy"');
+    expect(en.html).toContain('media="(orientation: portrait)"');
   });
 
   it('marks the current language and links to the other', () => {
@@ -67,15 +69,23 @@ describe('prerendered page', () => {
     expect(tr.html).toMatch(/<a href="\/tr\/" hrefLang="tr" lang="tr" aria-current="page">TR<\/a>/);
   });
 
-  it('shows placeholders for projects without screenshots', () => {
-    expect(en.html.match(/class="media__empty"/g)?.length).toBe(2);
-    expect(tr.html).toContain('Ekran görüntüleri yakında');
+  it('shows a placeholder only for featured projects still waiting for media', () => {
+    const waiting = featuredProjects.filter((p) => !p.poster).length;
+    expect(en.html.match(/class="media__empty"/g)?.length ?? 0).toBe(waiting);
   });
 
-  it('marks exactly the two cards with a preview video for hydration', () => {
-    expect(en.html.match(/data-hydrate/g)?.length).toBe(2);
-    expect(en.html.match(/<video\b/g)?.length).toBe(2);
+  it('marks the hero and every featured clip for hydration and never preloads a video', () => {
+    const clips = featuredProjects.filter((p) => p.poster && p.video).length;
+    expect(en.html.match(/data-hydrate/g)?.length).toBe(1 + clips);
     expect(en.html).not.toContain('.mp4');
+    for (const video of en.html.match(/<video\b[^>]*>/g) ?? []) expect(video).toContain('preload="none"');
+  });
+
+  it('offers a watch button for the hero and each featured clip, and renders the lightbox closed', () => {
+    const clips = featuredProjects.filter((p) => p.poster && p.video).length;
+    expect(en.html.match(/class="watch/g)?.length).toBe(1 + clips);
+    expect(en.html).toMatch(/<dialog\b[^>]*class="lightbox"/);
+    expect(en.html).not.toMatch(/<dialog\b[^>]*\sopen[\s=>]/);
   });
 
   it('marks a card with a video for hydration and never preloads it', () => {

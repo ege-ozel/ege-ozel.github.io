@@ -42,6 +42,10 @@ const en = {
   'media.empty': 'Screenshots coming soon',
   'media.play': 'Play preview',
   'media.pause': 'Pause preview',
+  'media.watch': 'Watch video',
+  'hero.watch': 'Watch the film',
+  'hero.toProject': 'See the project',
+  'lightbox.close': 'Close video',
   'footer.note': '© 2026 Ege Özel. Built with React, TypeScript and Vite.',
 } as const;
 
@@ -89,6 +93,10 @@ const tr: Record<UiKey, string> = {
   'media.empty': 'Ekran görüntüleri yakında',
   'media.play': 'Önizlemeyi oynat',
   'media.pause': 'Önizlemeyi durdur',
+  'media.watch': 'Videoyu izle',
+  'hero.watch': 'Filmi izle',
+  'hero.toProject': 'Projeye git',
+  'lightbox.close': 'Videoyu kapat',
   'footer.note': '© 2026 Ege Özel. React, TypeScript ve Vite ile geliştirildi.',
 };
 
