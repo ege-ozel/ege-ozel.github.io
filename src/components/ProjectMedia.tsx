@@ -75,7 +75,7 @@ export function ProjectMedia({ project, locale, eager }: Props) {
                 <path d="M4 2l10 6-10 6z" />
               </svg>
               {t('media.watch')}
-              <span className="visually-hidden">: {project.title}</span>
+              <span className="sr-only">: {project.title}</span>
             </button>
           )}
         </div>

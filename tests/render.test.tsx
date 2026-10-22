@@ -48,6 +48,13 @@ describe('prerendered page', () => {
     }
   });
 
+  it('links the employers and the thesis project', () => {
+    expect(en.html).toContain('href="https://patikaglobal.com"');
+    expect(en.html).toContain('href="https://www.traderlands.com"');
+    expect(en.html).toContain('href="https://github.com/ege-ozel/gencomparator-frontend"');
+    expect(tr.html).toContain('Bitirme projesi: Gencomparator');
+  });
+
   it('links to the verified profiles', () => {
     expect(en.html).toContain('href="https://github.com/ege-ozel"');
     expect(en.html).toContain('href="https://www.linkedin.com/in/ege-%C3%B6zel-a721231bb"');

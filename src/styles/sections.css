@@ -125,3 +125,19 @@
   color: var(--text-2);
   font-size: var(--fs-small);
 }
+
+.degree__link {
+  color: var(--accent);
+  font-size: var(--fs-small);
+  text-underline-offset: 3px;
+}
+
+.job__company a {
+  color: inherit;
+  text-decoration-color: var(--line-strong);
+  text-underline-offset: 4px;
+}
+
+.job__company a:hover {
+  text-decoration-color: var(--accent);
+}
