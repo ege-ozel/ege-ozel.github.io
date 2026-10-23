@@ -183,6 +183,23 @@ for (const [locale, path] of Object.entries(pages)) {
   await context.close();
 }
 
+// Phone rotation: the hero swaps between the 9:16 and 16:9 films and keeps playing
+{
+  const where = 'en phone rotation';
+  const { context, page } = await open('/', viewports.phone, { hasTouch: true, isMobile: true });
+  await page.waitForTimeout(1200);
+  const film = () => page.evaluate(() => document.querySelector('.hero__video').getAttribute('src'));
+  if (!(await film())?.includes('9x16')) fail(where, `portrait loads ${await film()}`);
+  await page.setViewportSize({ width: 812, height: 375 });
+  await page.waitForTimeout(1200);
+  if (!(await film())?.includes('16x9')) fail(where, `landscape still shows ${await film()}`);
+  if (await page.evaluate(() => document.querySelector('.hero__video').paused)) fail(where, 'film stopped after rotating');
+  await page.setViewportSize(viewports.phone);
+  await page.waitForTimeout(800);
+  if (!(await film())?.includes('9x16')) fail(where, `back to portrait shows ${await film()}`);
+  await context.close();
+}
+
 // Reduced motion: no lift, no animations, no autoplay
 {
   const where = 'en reduced motion';

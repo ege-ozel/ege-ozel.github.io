@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { hero } from '../data/hero';
-import { heroOrientation } from '../hero';
 import { createT } from '../i18n';
 import { useLightbox } from '../lightbox';
 import type { Locale } from '../types';
@@ -20,16 +19,25 @@ export function HeroVideo({ locale }: { locale: Locale }) {
 
   useEffect(() => setReady(true), []);
 
-  const currentFile = () =>
-    heroOrientation(window.innerWidth, window.innerHeight) === 'portrait' ? hero.portrait.video : hero.landscape.video;
+  // Same rule as the poster <source media>, so the film always matches the picture.
+  const currentFile = () => (window.matchMedia(PORTRAIT).matches ? hero.portrait.video : hero.landscape.video);
 
   useEffect(() => {
     const video = ref.current;
     if (!video || mode === null || mode === 'button') return;
-    video.src = currentFile();
-    video.play().catch(() => {
-      // Autoplay refused: the poster stays and the watch button still works.
-    });
+    const load = () => {
+      const next = currentFile();
+      if (video.getAttribute('src') === next) return;
+      video.src = next;
+      video.play().catch(() => {
+        // Autoplay refused: the poster stays and the watch button still works.
+      });
+    };
+    load();
+    // Turning the phone switches between the 9:16 and 16:9 films.
+    const query = window.matchMedia(PORTRAIT);
+    query.addEventListener('change', load);
+    return () => query.removeEventListener('change', load);
   }, [mode]);
 
   return (
