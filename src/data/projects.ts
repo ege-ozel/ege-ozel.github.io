@@ -298,7 +298,7 @@ export const projects: Project[] = [
   },
   {
     id: 'mert-ozkan',
-    title: 'Mert Özkan site concept',
+    title: 'Concept site',
     placement: 'more',
     device: 'desktop',
     accent: '#C9A227',
