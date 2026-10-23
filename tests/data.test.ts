@@ -9,7 +9,7 @@ import { featuredProjects, moreProjects, projects, shippedCount } from '../src/d
  * Featured projects whose recordings wait on Ege (desktop shoot, Grocery local demo,
  * Interval Timer fixes). Empty this list as the media lands; it must be empty before release.
  */
-const PENDING_MEDIA = ['grocery', 'desktuk', 'interval-timer'];
+const PENDING_MEDIA = ['desktuk', 'interval-timer'];
 /** Public CVs wait on Ege's approval (Plan 3 Task 6). Set to false once both PDFs exist. */
 const isText = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && Object.keys(value).sort().join() === 'en,tr';

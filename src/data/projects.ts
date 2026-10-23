@@ -49,7 +49,7 @@ export const projects: Project[] = [
     id: 'grocery',
     title: 'Grocery',
     placement: 'featured',
-    device: 'desktop',
+    device: 'mobile',
     accent: '#9BCB6B',
     status: 'live',
     summary: {
@@ -71,7 +71,14 @@ export const projects: Project[] = [
       },
     },
     tags: ['Preact', 'TypeScript', 'Tailwind CSS', 'Supabase', 'PostgreSQL', 'Vercel Functions'],
-    poster: null,
+    video: '/media/grocery.mp4',
+    poster: {
+      base: '/media/grocery',
+      alt: {
+        en: 'Grocery meal plan on a phone: daily macro rings for calories, protein, carbs, fat and fibre above the day’s meals.',
+        tr: 'Telefonda Grocery yemek planı: günün öğünlerinin üstünde kalori, protein, karbonhidrat, yağ ve lif için günlük makro halkaları.',
+      },
+    },
     links: [{ kind: 'demo', href: 'https://grocery-five-ecru.vercel.app' }],
   },
   {
