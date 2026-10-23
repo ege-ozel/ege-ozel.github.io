@@ -9,7 +9,6 @@ import { featuredProjects, moreProjects, projects, shippedCount } from '../src/d
  * Featured projects whose recordings wait on Ege (desktop shoot, Grocery local demo,
  * Interval Timer fixes). Empty this list as the media lands; it must be empty before release.
  */
-const PENDING_MEDIA = ['interval-timer'];
 /** Public CVs wait on Ege's approval (Plan 3 Task 6). Set to false once both PDFs exist. */
 const isText = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && Object.keys(value).sort().join() === 'en,tr';
@@ -79,7 +78,6 @@ describe('project data', () => {
 
   it('gives every featured project a poster and a preview clip that exist', () => {
     for (const p of featuredProjects) {
-      if (PENDING_MEDIA.includes(p.id)) continue;
       expect(p.poster, p.id).not.toBeNull();
       expect(Boolean(p.video && existsSync(join('public', p.video))), p.id).toBe(true);
     }

@@ -190,7 +190,14 @@ export const projects: Project[] = [
       },
     },
     tags: ['JavaScript', 'Electron', 'PWA', 'YouTube IFrame API', 'Spotify Web API'],
-    poster: null,
+    video: '/media/interval-timer.mp4',
+    poster: {
+      base: '/media/interval-timer',
+      alt: {
+        en: 'Interval Timer web app running: 00:16 left in the work phase of loop 1, with Start, Pause, Continue and Reset.',
+        tr: 'Çalışan Interval Timer web uygulaması: 1. turun çalışma aşamasında 00:16 kaldı; Start, Pause, Continue ve Reset düğmeleri.',
+      },
+    },
     links: [
       { kind: 'site', href: 'https://ege-ozel.github.io/interval-timer/' },
       { kind: 'release', href: 'https://github.com/ege-ozel/interval-timer/releases/latest' },
