@@ -154,7 +154,14 @@ export const projects: Project[] = [
       },
     },
     tags: ['Rust', 'Win32 API', 'Windows Shell'],
-    poster: null,
+    video: '/media/desktuk.mp4',
+    poster: {
+      base: '/media/desktuk',
+      alt: {
+        en: 'DeskTuk on the desktop: the Music circle open with eight files around a search field, Recent and Apps circles on the left, the DeskTuk panel on the right.',
+        tr: 'Masaüstünde DeskTuk: arama alanının çevresinde sekiz dosyayla açık Music dairesi, solda Recent ve Apps daireleri, sağda DeskTuk paneli.',
+      },
+    },
     links: [{ kind: 'code', href: 'https://github.com/ege-ozel/desktuk' }],
   },
   {
