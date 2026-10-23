@@ -34,11 +34,20 @@ export function MoreWork({ locale }: { locale: Locale }) {
 }
 
 export function ExperienceList({ locale }: { locale: Locale }) {
+  const t = createT(locale);
   return (
     <ol className="jobs">
       {jobs.map((job) => (
         <li key={job.company} className="job">
-          <h3 className="job__company">{job.company}</h3>
+          <h3 className="job__company">
+            {job.companyUrl ? (
+              <ExternalLink href={job.companyUrl} hint={` (${t('link.newTab')})`}>
+                {job.company}
+              </ExternalLink>
+            ) : (
+              job.company
+            )}
+          </h3>
           <p className="job__meta">
             {job.role[locale]}, {job.period[locale]}
           </p>
@@ -54,6 +63,7 @@ export function ExperienceList({ locale }: { locale: Locale }) {
 }
 
 export function EducationList({ locale }: { locale: Locale }) {
+  const t = createT(locale);
   return (
     <ul className="degrees">
       {degrees.map((degree) => (
@@ -62,6 +72,11 @@ export function EducationList({ locale }: { locale: Locale }) {
           <span className="degree__meta">
             {degree.school[locale]}, {degree.year}
           </span>
+          {degree.link && (
+            <ExternalLink className="degree__link" href={degree.link.href} hint={` (${t('link.newTab')})`}>
+              {degree.link.label[locale]}
+            </ExternalLink>
+          )}
         </li>
       ))}
     </ul>
@@ -79,10 +94,7 @@ export function Contact({ locale }: { locale: Locale }) {
       </a>
       <ul className="actions">
         <li>
-          <a
-            className="btn btn--primary"
-            href={`mailto:${profile.email}?subject=${encodeURIComponent(t('link.cvSubject'))}`}
-          >
+          <a className="btn btn--primary" href={profile.publicCv[locale]} type="application/pdf">
             {t('link.cv')}
           </a>
         </li>

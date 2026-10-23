@@ -36,7 +36,11 @@ export interface PreviewEnv {
   saveData: boolean;
 }
 
-/** Hover previews only on precise pointers, never with reduced motion or Save-Data. */
-export function canAutoPreview(env: PreviewEnv): boolean {
-  return env.hover && !env.reducedMotion && !env.saveData;
+/** How a card preview starts: on hover, when it scrolls into view, or only from a button. */
+export type PreviewMode = 'hover' | 'inView' | 'button';
+
+/** Reduced motion or Save-Data always means a button; otherwise hover on precise pointers, in-view on touch. */
+export function previewMode(env: PreviewEnv): PreviewMode {
+  if (env.reducedMotion || env.saveData) return 'button';
+  return env.hover ? 'hover' : 'inView';
 }

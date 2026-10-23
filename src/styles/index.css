@@ -2,7 +2,8 @@
 @import './tokens.css';
 @import './base.css';
 @import './layout.css';
-@import './profile.css';
+@import './quickscan.css';
 @import './card.css';
+@import './hero.css';
 @import './sections.css';
 @import './motion.css';

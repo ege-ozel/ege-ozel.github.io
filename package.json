@@ -7,7 +7,9 @@
     "build": "tsc --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/prerender.mjs",
     "test": "vitest run",
     "media": "node scripts/build-media.mjs",
-    "check": "node scripts/browser-check.mjs"
+    "check": "node scripts/browser-check.mjs",
+    "video": "node scripts/build-video.mjs",
+    "og": "node scripts/og-image.mjs"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.5",
@@ -19,9 +21,14 @@
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "@vitejs/plugin-react": "^4.4.1",
+    "ffmpeg-static": "^5.2.0",
+    "playwright": "^1.56.1",
     "sharp": "^0.34.1",
     "typescript": "~5.8.3",
     "vite": "^6.3.5",
     "vitest": "^3.1.2"
+  },
+  "allowScripts": {
+    "ffmpeg-static@5.2.0": true
   }
 }

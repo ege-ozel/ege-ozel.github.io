@@ -15,8 +15,8 @@ describe('i18n', () => {
   });
 
   it('translates per locale', () => {
-    expect(createT('en')('profile.role')).toBe('Frontend Developer');
-    expect(createT('tr')('profile.role')).toBe('Frontend Geliştirici');
+    expect(createT('en')('profile.role')).toBe('Software Developer · React & TypeScript');
+    expect(createT('tr')('profile.role')).toBe('Yazılım Geliştirici · React & TypeScript');
   });
 
   it('recognises only supported locales', () => {

@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react';
 import { createT } from '../i18n';
+import { useLightbox } from '../lightbox';
 import type { Device, Locale, Poster as PosterData, Project } from '../types';
 import { PreviewVideo } from './PreviewVideo';
 
@@ -41,7 +43,12 @@ interface Props {
 
 export function ProjectMedia({ project, locale, eager }: Props) {
   const t = createT(locale);
+  const openLightbox = useLightbox();
+  // The watch button only works after hydration, so it stays hidden in the prerendered page.
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
   const demo = project.links.find((link) => link.kind === 'demo');
+  const video = project.poster ? project.video : undefined;
   return (
     <div className={`media media--${project.device}`}>
       <div className="media__frame">
@@ -56,8 +63,20 @@ export function ProjectMedia({ project, locale, eager }: Props) {
           ) : (
             <p className="media__empty">{t('media.empty')}</p>
           )}
-          {project.poster && project.video && (
-            <PreviewVideo src={project.video} labels={{ play: t('media.play'), pause: t('media.pause') }} />
+          {video && <PreviewVideo src={video} labels={{ play: t('media.play'), pause: t('media.pause') }} />}
+          {video && (
+            <button
+              type="button"
+              className="watch"
+              hidden={!ready}
+              onClick={() => openLightbox({ src: video, title: project.title })}
+            >
+              <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                <path d="M4 2l10 6-10 6z" />
+              </svg>
+              {t('media.watch')}
+              <span className="sr-only">: {project.title}</span>
+            </button>
           )}
         </div>
       </div>
