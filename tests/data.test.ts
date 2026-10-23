@@ -11,8 +11,6 @@ import { featuredProjects, moreProjects, projects, shippedCount } from '../src/d
  */
 const PENDING_MEDIA = ['grocery', 'desktuk', 'interval-timer'];
 /** Public CVs wait on Ege's approval (Plan 3 Task 6). Set to false once both PDFs exist. */
-const PENDING_CV = true;
-
 const isText = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && Object.keys(value).sort().join() === 'en,tr';
 
@@ -107,7 +105,7 @@ describe('hero and profile data', () => {
 
   it('points the public CVs at /cv/ and has both files once approved', () => {
     expect(profile.publicCv).toEqual({ en: '/cv/ege-ozel-cv-en.pdf', tr: '/cv/ege-ozel-cv-tr.pdf' });
-    if (!PENDING_CV) for (const file of Object.values(profile.publicCv)) expect(existsSync(join('public', file)), file).toBe(true);
+    for (const file of Object.values(profile.publicCv)) expect(existsSync(join('public', file)), file).toBe(true);
   });
 
   it('links the thesis project from the master degree', () => {
