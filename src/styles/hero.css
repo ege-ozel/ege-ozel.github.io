@@ -208,3 +208,11 @@
   height: 16px;
   fill: currentColor;
 }
+
+/* The 9:16 film keeps a credit line at its bottom edge; the controls sit just above it. */
+@media (orientation: portrait) {
+  .watch--hero,
+  .hero__toggle {
+    bottom: calc(var(--s-4) + 40px);
+  }
+}
