@@ -57,8 +57,8 @@ export const projects: Project[] = [
       tr: 'Haneler için cihazlar arasında eşitlenen alışveriş listesi ve yemek planlama uygulaması; beslenme rehberliğiyle.',
     },
     myPart: {
-      en: 'Built the whole app: client, API functions and data model.',
-      tr: 'Uygulamanın tamamını geliştirdim: istemci, API fonksiyonları ve veri modeli.',
+      en: 'Built with Ozan Özel. My part: the meal-planning and nutrition features, per-user data access behind Supabase row-level security, the account deletion flow and most of the interface.',
+      tr: 'Ozan Özel ile birlikte geliştirildi. Benim payım: yemek planlama ve besin özellikleri, Supabase satır düzeyi güvenliğiyle kullanıcıya özel veri erişimi, hesap silme akışı ve arayüzün büyük bölümü.',
     },
     notes: {
       challenge: {

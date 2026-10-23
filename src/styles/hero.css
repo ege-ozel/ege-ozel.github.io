@@ -176,3 +176,35 @@
 .status--preview::before {
   background: #e8b86b;
 }
+
+/* Pause and resume the background film (WCAG 2.2.2) */
+.hero__toggle {
+  position: absolute;
+  right: var(--s-4);
+  bottom: var(--s-4);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: rgb(13 15 18 / 0.85);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.hero__toggle:hover {
+  border-color: var(--accent);
+}
+
+.hero__toggle[hidden] {
+  display: none;
+}
+
+.hero__toggle svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}

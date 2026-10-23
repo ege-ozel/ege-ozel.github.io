@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { hero } from '../data/hero';
 import { createT } from '../i18n';
-import { useLightbox } from '../lightbox';
+import { useLightbox, useLightboxOpen } from '../lightbox';
 import type { Locale } from '../types';
 import { usePreviewMode } from './PreviewVideo';
 
@@ -14,21 +14,30 @@ export function HeroVideo({ locale }: { locale: Locale }) {
   const ref = useRef<HTMLVideoElement>(null);
   const mode = usePreviewMode();
   const openLightbox = useLightbox();
-  const [playing, setPlaying] = useState(false);
+  const lightboxOpen = useLightboxOpen();
+  // Once the film has shown a frame it stays visible, paused or not, instead of jumping back to the poster.
+  const [started, setStarted] = useState(false);
   const [ready, setReady] = useState(false);
+  // The viewer pressed pause; nothing restarts the film until they press play.
+  const [userPaused, setUserPaused] = useState(false);
 
   useEffect(() => setReady(true), []);
 
   // Same rule as the poster <source media>, so the film always matches the picture.
   const currentFile = () => (window.matchMedia(PORTRAIT).matches ? hero.portrait.video : hero.landscape.video);
+  const motionAllowed = mode !== null && mode !== 'button';
+  const shouldPlay = motionAllowed && !userPaused && !lightboxOpen;
 
   useEffect(() => {
     const video = ref.current;
-    if (!video || mode === null || mode === 'button') return;
+    if (!video) return;
+    if (!shouldPlay) {
+      video.pause();
+      return;
+    }
     const load = () => {
       const next = currentFile();
-      if (video.getAttribute('src') === next) return;
-      video.src = next;
+      if (video.getAttribute('src') !== next) video.src = next;
       video.play().catch(() => {
         // Autoplay refused: the poster stays and the watch button still works.
       });
@@ -38,7 +47,7 @@ export function HeroVideo({ locale }: { locale: Locale }) {
     const query = window.matchMedia(PORTRAIT);
     query.addEventListener('change', load);
     return () => query.removeEventListener('change', load);
-  }, [mode]);
+  }, [shouldPlay]);
 
   return (
     <section className="hero" aria-labelledby="hero-title">
@@ -61,15 +70,14 @@ export function HeroVideo({ locale }: { locale: Locale }) {
         </picture>
         <video
           ref={ref}
-          className={playing ? 'hero__video is-playing' : 'hero__video'}
+          className={started ? 'hero__video is-playing' : 'hero__video'}
           muted
           loop
           playsInline
           preload="none"
           aria-hidden="true"
           data-hydrate=""
-          onPlaying={() => setPlaying(true)}
-          onPause={() => setPlaying(false)}
+          onPlaying={() => setStarted(true)}
         />
         <button
           type="button"
@@ -81,6 +89,18 @@ export function HeroVideo({ locale }: { locale: Locale }) {
             <path d="M4 2l10 6-10 6z" />
           </svg>
           {t('hero.watch')}
+        </button>
+        <button
+          type="button"
+          className="hero__toggle"
+          hidden={!ready || !motionAllowed}
+          aria-pressed={!userPaused}
+          aria-label={userPaused ? t('hero.play') : t('hero.pause')}
+          onClick={() => setUserPaused((paused) => !paused)}
+        >
+          <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+            {userPaused ? <path d="M4 2l10 6-10 6z" /> : <path d="M3 2h4v12H3zM9 2h4v12H9z" />}
+          </svg>
         </button>
       </div>
       <div className="hero__text">

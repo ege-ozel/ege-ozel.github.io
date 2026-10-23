@@ -9,20 +9,29 @@ interface Props {
 /** Share of the clip that must be on screen before an in-view preview starts. */
 const IN_VIEW_THRESHOLD = 0.6;
 
-/** Reads the viewer's pointer, motion and data settings once, after hydration. */
+const HOVER = '(hover: hover) and (pointer: fine)';
+const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
+
+/** Reads the viewer's pointer, motion and data settings after hydration and follows changes. */
 export function usePreviewMode(): PreviewMode | null {
   // null during prerender and the first client render, so hydration matches.
   const [mode, setMode] = useState<PreviewMode | null>(null);
   useEffect(() => {
-    const matches = (query: string) => window.matchMedia(query).matches;
+    const queries = [HOVER, REDUCED_MOTION].map((query) => window.matchMedia(query));
     const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
-    setMode(
-      previewMode({
-        hover: matches('(hover: hover) and (pointer: fine)'),
-        reducedMotion: matches('(prefers-reduced-motion: reduce)'),
-        saveData: Boolean(connection?.saveData),
-      }),
-    );
+    const update = () =>
+      setMode(
+        previewMode({
+          hover: queries[0].matches,
+          reducedMotion: queries[1].matches,
+          saveData: Boolean(connection?.saveData),
+        }),
+      );
+    update();
+    for (const query of queries) query.addEventListener('change', update);
+    return () => {
+      for (const query of queries) query.removeEventListener('change', update);
+    };
   }, []);
   return mode;
 }
@@ -46,6 +55,11 @@ export function PreviewVideo({ src, labels }: Props) {
   const stop = useCallback(() => {
     if (ref.current) previewGroup.stop(ref.current);
   }, []);
+
+  // Turning on reduced motion while a clip plays stops it; the button then takes over.
+  useEffect(() => {
+    if (mode === 'button') stop();
+  }, [mode, stop]);
 
   useEffect(() => {
     const card = ref.current?.closest('article');

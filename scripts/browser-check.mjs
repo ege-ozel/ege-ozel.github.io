@@ -82,7 +82,7 @@ for (const [locale, path] of Object.entries(pages)) {
     const cvBottom = await page.evaluate(() => document.querySelector('.quick .btn--primary').getBoundingClientRect().bottom);
     if (cvBottom > viewport.height) fail(where, `CV button below the fold (${Math.round(cvBottom)}px)`);
     const smallTargets = await page.evaluate(() =>
-      [...document.querySelectorAll('a.btn, .lang a, .notes summary, .watch:not([hidden])')]
+      [...document.querySelectorAll('a.btn, .lang a, .notes summary, .watch:not([hidden]), .hero__toggle:not([hidden])')]
         .filter((el) => el.getBoundingClientRect().height < 40)
         .map((el) => el.textContent.trim()),
     );
@@ -132,6 +132,43 @@ for (const [locale, path] of Object.entries(pages)) {
   if (!(await page.evaluate(() => document.activeElement?.classList.contains('watch--hero')))) {
     fail(where, 'focus did not return to the hero watch button');
   }
+
+  // Normal speed: the film advances with the clock and does not stall.
+  const heroTime = () => page.evaluate(() => document.querySelector('.hero__video').currentTime);
+  const paused = () => page.evaluate(() => document.querySelector('.hero__video').paused);
+  const t0 = await heroTime();
+  await page.waitForTimeout(3000);
+  const advanced = (await heroTime()) - t0;
+  if (advanced < 2.5 || advanced > 3.5) fail(where, `hero advanced ${advanced.toFixed(2)} s in 3 s`);
+
+  // While the lightbox shows the film, the background copy waits.
+  await watch.click();
+  await page.waitForTimeout(400);
+  if (!(await paused())) fail(where, 'hero keeps playing behind the lightbox');
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(600);
+  if (await paused()) fail(where, 'hero did not resume after the lightbox closed');
+
+  // Pause and resume from the keyboard (WCAG 2.2.2).
+  const toggle = page.locator('.hero__toggle');
+  if (!(await toggle.isVisible())) fail(where, 'hero pause button missing');
+  await toggle.focus();
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(300);
+  if (!(await paused())) fail(where, 'pause button did not pause the hero');
+  if ((await toggle.getAttribute('aria-pressed')) !== 'false') fail(where, 'pause button aria-pressed not false when paused');
+  await page.keyboard.press('Space');
+  await page.waitForTimeout(500);
+  if (await paused()) fail(where, 'play button did not resume the hero');
+
+  // Turning on reduced motion while the page is open stops the film and hides the toggle.
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.waitForTimeout(500);
+  if (!(await paused())) fail(where, 'hero keeps playing after reduced motion was turned on');
+  if (await toggle.isVisible()) fail(where, 'pause button still shown under reduced motion');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.waitForTimeout(800);
+  if (await paused()) fail(where, 'hero did not restart after reduced motion was turned off');
 
   const card = page.locator('.card').first();
   await card.scrollIntoViewIfNeeded();
@@ -206,6 +243,7 @@ for (const [locale, path] of Object.entries(pages)) {
   const { context, page } = await open('/', viewports.desktop, { reducedMotion: 'reduce' });
   await page.waitForTimeout(1200);
   if (await page.evaluate(() => !document.querySelector('.hero__video').paused)) fail(where, 'hero film autoplays');
+  if (await page.locator('.hero__toggle').isVisible()) fail(where, 'pause button shown without motion');
   const card = page.locator('.card').first();
   await card.scrollIntoViewIfNeeded();
   await card.hover();
