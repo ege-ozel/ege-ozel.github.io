@@ -48,6 +48,28 @@ export function QuickScan({ locale }: { locale: Locale }) {
       </div>
 
       <p className="quick__tagline">{profile.tagline[locale]}</p>
+      <ul className="actions">
+        <li>
+          <a className="btn btn--primary" href={profile.publicCv[locale]} type="application/pdf">
+            {t('link.cv')}
+          </a>
+        </li>
+        <li>
+          <a className="btn" href={`mailto:${profile.email}`}>
+            {t('link.email')}
+          </a>
+        </li>
+        <li>
+          <ExternalLink className="btn" href={profile.linkedin} hint={newTab}>
+            {t('link.linkedin')}
+          </ExternalLink>
+        </li>
+        <li>
+          <ExternalLink className="btn" href={profile.github} hint={newTab}>
+            {t('link.github')}
+          </ExternalLink>
+        </li>
+      </ul>
       <p className="quick__intro">{profile.intro[locale]}</p>
 
       <dl className="stats" aria-label={t('profile.stats')}>
@@ -70,29 +92,6 @@ export function QuickScan({ locale }: { locale: Locale }) {
             {name}
           </li>
         ))}
-      </ul>
-
-      <ul className="actions">
-        <li>
-          <a className="btn btn--primary" href={profile.publicCv[locale]} type="application/pdf">
-            {t('link.cv')}
-          </a>
-        </li>
-        <li>
-          <a className="btn" href={`mailto:${profile.email}`}>
-            {t('link.email')}
-          </a>
-        </li>
-        <li>
-          <ExternalLink className="btn" href={profile.linkedin} hint={newTab}>
-            {t('link.linkedin')}
-          </ExternalLink>
-        </li>
-        <li>
-          <ExternalLink className="btn" href={profile.github} hint={newTab}>
-            {t('link.github')}
-          </ExternalLink>
-        </li>
       </ul>
     </header>
   );

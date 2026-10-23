@@ -1,7 +1,7 @@
 // Usage: npm run build && npm run check
 // Serves dist/ locally and checks the built pages in Chrome through Playwright.
 // PLAYWRIGHT_MODULE: path to a playwright package (default: "playwright").
-// CHROME_PATH: Chrome executable (default: Playwright's bundled Chromium).
+// CHROME_PATH: Chrome executable (default: the installed Google Chrome on Windows).
 import { createReadStream, existsSync, statSync } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 import { createServer } from 'node:http';
@@ -22,6 +22,9 @@ const types = {
   '.woff2': 'font/woff2',
   '.avif': 'image/avif',
   '.webp': 'image/webp',
+  '.png': 'image/png',
+  '.mp4': 'video/mp4',
+  '.pdf': 'application/pdf',
 };
 
 const server = createServer((req, res) => {
@@ -39,7 +42,9 @@ await new Promise((done) => server.listen(0, '127.0.0.1', done));
 const base = `http://127.0.0.1:${server.address().port}`;
 
 await mkdir(shots, { recursive: true });
-const browser = await chromium.launch(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {});
+const browser = await chromium.launch({
+  executablePath: process.env.CHROME_PATH ?? 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+});
 const failures = [];
 const fail = (where, message) => failures.push(`${where}: ${message}`);
 
@@ -54,8 +59,12 @@ async function open(path, viewport, options = {}) {
   return { context, page, errors };
 }
 
-const viewports = { phone: { width: 360, height: 780 }, tablet: { width: 768, height: 1024 }, desktop: { width: 1280, height: 800 } };
+const viewports = { phone: { width: 375, height: 812 }, tablet: { width: 768, height: 1024 }, desktop: { width: 1440, height: 900 } };
 const pages = { en: '/', tr: '/tr/' };
+const cardClipRequests = (page) =>
+  page.evaluate(() =>
+    performance.getEntriesByType('resource').filter((r) => r.name.endsWith('.mp4') && !r.name.includes('/hero-')).length,
+  );
 
 for (const [locale, path] of Object.entries(pages)) {
   for (const [name, viewport] of Object.entries(viewports)) {
@@ -65,19 +74,20 @@ for (const [locale, path] of Object.entries(pages)) {
     if ((await page.textContent('h1'))?.trim() !== 'Ege Özel') fail(where, 'h1 is not "Ege Özel"');
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     if (overflow > 0) fail(where, `horizontal overflow ${overflow}px`);
-    const firstPoster = await page.evaluate(() => {
-      const img = document.querySelector('.card img');
+    const poster = await page.evaluate(() => {
+      const img = document.querySelector('.hero__poster');
       return img instanceof HTMLImageElement && img.complete && img.naturalWidth > 0;
     });
-    if (!firstPoster) fail(where, 'first poster did not load');
+    if (!poster) fail(where, 'hero poster did not load');
+    const cvBottom = await page.evaluate(() => document.querySelector('.quick .btn--primary').getBoundingClientRect().bottom);
+    if (cvBottom > viewport.height) fail(where, `CV button below the fold (${Math.round(cvBottom)}px)`);
     const smallTargets = await page.evaluate(() =>
-      [...document.querySelectorAll('a.btn, .lang a, .notes summary')]
+      [...document.querySelectorAll('a.btn, .lang a, .notes summary, .watch:not([hidden])')]
         .filter((el) => el.getBoundingClientRect().height < 40)
         .map((el) => el.textContent.trim()),
     );
     if (smallTargets.length) fail(where, `touch targets under 40px: ${smallTargets.join(', ')}`);
     await page.screenshot({ path: join(shots, `${locale}-${name}-fold.png`) });
-    // Scroll-driven reveals must finish once a card is in view.
     const hidden = [];
     for (const card of await page.locator('.card').all()) {
       await card.evaluate((el) => el.scrollIntoView({ block: 'center' }));
@@ -86,7 +96,6 @@ for (const [locale, path] of Object.entries(pages)) {
       if (opacity < 0.99) hidden.push(await card.locator('h3').textContent());
     }
     if (hidden.length) fail(where, `cards not revealed in view: ${hidden.join(', ')}`);
-    // A full-page capture never scrolls, so freeze reveals for that picture only.
     await page.addStyleTag({ content: '.card { animation: none !important; }' });
     await page.screenshot({ path: join(shots, `${locale}-${name}.png`), fullPage: true });
     if (errors.length) fail(where, `console errors: ${errors.join(' | ')}`);
@@ -94,7 +103,7 @@ for (const [locale, path] of Object.entries(pages)) {
   }
 }
 
-// Desktop: sticky profile, hover lift, details, language switch, keyboard, JS weight
+// Desktop: skip link, JS weight, no card clip before intent, hero loop, lightbox focus, hover, language switch
 {
   const where = 'en desktop';
   const { context, page, errors } = await open('/', viewports.desktop);
@@ -105,36 +114,37 @@ for (const [locale, path] of Object.entries(pages)) {
   await page.evaluate(() => window.scrollTo(0, 0));
 
   const js = await page.evaluate(() =>
-    performance
-      .getEntriesByType('resource')
-      .filter((r) => r.name.endsWith('.js'))
-      .reduce((sum, r) => sum + r.encodedBodySize, 0),
+    performance.getEntriesByType('resource').filter((r) => r.name.endsWith('.js')).reduce((sum, r) => sum + r.encodedBodySize, 0),
   );
-  // Two preview-video cards hydrate React: ~250 KB raw (this server does not gzip), ~80 KB on Pages.
-  if (js > 300_000) fail(where, `${js} bytes of JS loaded`);
-  const videosLoaded = await page.evaluate(
-    () => performance.getEntriesByType('resource').filter((r) => r.name.endsWith('.mp4')).length,
-  );
-  if (videosLoaded) fail(where, `${videosLoaded} preview video(s) requested before any interaction`);
+  if (js > 320_000) fail(where, `${js} bytes of JS loaded`);
+  if (await cardClipRequests(page)) fail(where, 'a card clip was requested before any interaction');
+  await page.waitForTimeout(1500);
+  if (!(await page.evaluate(() => !document.querySelector('.hero__video').paused))) fail(where, 'hero film is not playing');
 
-  const lastAction = await page.evaluate(() => document.querySelector('.profile .lang').getBoundingClientRect().bottom);
-  if (lastAction > viewports.desktop.height) fail(where, `profile does not fit: ends at ${Math.round(lastAction)}px`);
-  await page.mouse.wheel(0, 2500);
-  await page.waitForTimeout(400);
-  const asideTop = await page.evaluate(() => document.querySelector('.profile').getBoundingClientRect().top);
-  if (Math.abs(asideTop) > 1) fail(where, `profile not sticky (top ${asideTop})`);
-  await page.evaluate(() => window.scrollTo(0, 0));
+  const watch = page.locator('.watch--hero');
+  await watch.focus();
+  await watch.press('Enter');
+  await page.waitForTimeout(500);
+  if (!(await page.evaluate(() => document.querySelector('dialog.lightbox').open))) fail(where, 'lightbox did not open');
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+  if (await page.evaluate(() => document.querySelector('dialog.lightbox').open)) fail(where, 'Escape did not close the lightbox');
+  if (!(await page.evaluate(() => document.activeElement?.classList.contains('watch--hero')))) {
+    fail(where, 'focus did not return to the hero watch button');
+  }
 
   const card = page.locator('.card').first();
+  await card.scrollIntoViewIfNeeded();
   await card.hover();
-  await page.waitForTimeout(450);
+  await page.waitForTimeout(700);
   const lift = await card.evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m42);
   if (Math.round(lift) !== -4) fail(where, `hover lift ${lift}, expected -4`);
+  if (!(await card.evaluate((el) => !el.querySelector('.media__video')?.paused))) fail(where, 'hover did not start the card clip');
 
   await page.locator('.notes summary').first().click();
   if (!(await page.locator('.notes').first().evaluate((el) => el.open))) fail(where, 'technical notes did not open');
 
-
+  await page.evaluate(() => window.scrollTo(0, 0));
   await page.click('.lang a[hreflang="tr"]');
   await page.waitForLoadState('networkidle');
   if (new URL(page.url()).pathname !== '/tr/') fail(where, `language link went to ${page.url()}`);
@@ -143,44 +153,51 @@ for (const [locale, path] of Object.entries(pages)) {
   await context.close();
 }
 
-// Smallest sticky screen: the whole profile must fit
+// Touch phone: a card clip plays when it scrolls into view, and only one at a time
 {
-  const { context, page } = await open('/tr/', { width: 1280, height: 720 });
-  const bottom = await page.evaluate(() => document.querySelector('.profile .lang').getBoundingClientRect().bottom);
-  if (bottom > 720) fail('tr 1280x720', `sticky profile is cut off at ${Math.round(bottom)}px`);
+  const where = 'en touch phone';
+  const { context, page, errors } = await open('/', viewports.phone, { hasTouch: true, isMobile: true });
+  const cards = await page.locator('.card:has(.media__video)').all();
+  for (const card of cards) {
+    await card.locator('.media__video').evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    await page.waitForTimeout(1200);
+    const playing = await page.evaluate(() => [...document.querySelectorAll('.media__video')].filter((v) => !v.paused).length);
+    const own = await card.evaluate((el) => !el.querySelector('.media__video').paused);
+    if (!own) fail(where, `${await card.locator('h3').textContent()} clip did not play in view`);
+    if (playing !== 1) fail(where, `${playing} card clips playing at once`);
+  }
+  if (errors.length) fail(where, `console errors: ${errors.join(' | ')}`);
   await context.close();
 }
 
-// JavaScript off: the prerendered page is complete
+// JavaScript off: the prerendered page is complete and shows no dead buttons
 {
   const { context, page } = await open('/', viewports.phone, { javaScriptEnabled: false });
   const ok = await page.evaluate(
-    () => document.querySelectorAll('.card').length === 5 && document.querySelector('h1')?.textContent === 'Ege Özel',
+    () =>
+      document.querySelectorAll('.card').length === 5 &&
+      document.querySelector('h1')?.textContent === 'Ege Özel' &&
+      [...document.querySelectorAll('.watch')].every((b) => b.hidden),
   );
-  if (!ok) fail('en no-JS', 'content missing without JavaScript');
+  if (!ok) fail('en no-JS', 'content missing or a watch button visible without JavaScript');
   await context.close();
 }
 
-// Short laptop screen: profile scrolls away instead of being cut off
-{
-  const { context, page } = await open('/', { width: 1366, height: 680 });
-  if ((await page.evaluate(() => getComputedStyle(document.querySelector('.profile')).position)) !== 'static') {
-    fail('en 1366x680', 'profile should not be sticky on short screens');
-  }
-  await context.close();
-}
-
-// Reduced motion: no lift, no entrance or reveal animations
+// Reduced motion: no lift, no animations, no autoplay
 {
   const where = 'en reduced motion';
   const { context, page } = await open('/', viewports.desktop, { reducedMotion: 'reduce' });
+  await page.waitForTimeout(1200);
+  if (await page.evaluate(() => !document.querySelector('.hero__video').paused)) fail(where, 'hero film autoplays');
   const card = page.locator('.card').first();
+  await card.scrollIntoViewIfNeeded();
   await card.hover();
   await page.waitForTimeout(450);
   const lift = await card.evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m42);
   if (lift !== 0) fail(where, `card still lifts (${lift})`);
-  const animated = await page.evaluate(() =>
-    [...document.querySelectorAll('.enter, .card')].filter((el) => getComputedStyle(el).animationName !== 'none').length,
+  if (await cardClipRequests(page)) fail(where, 'a card clip loaded without a click');
+  const animated = await page.evaluate(
+    () => [...document.querySelectorAll('.enter, .card')].filter((el) => getComputedStyle(el).animationName !== 'none').length,
   );
   if (animated) fail(where, `${animated} elements still animate`);
   await context.close();
