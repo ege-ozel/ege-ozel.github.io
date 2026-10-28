@@ -1,72 +1,133 @@
-/* Hero film, watch buttons and the shared lightbox. */
+/* Featured project (Grocery) on a warm-paper panel, then the shared watch buttons and lightbox. */
 .hero {
+  --paper: #f4f0e7;
+  --ink: #20332e;
+  --ink-2: #4a5a54;
+  --label-red: #b64a40;
   display: grid;
-  gap: var(--s-4);
+  gap: var(--s-6);
+  align-items: center;
   margin-bottom: var(--s-8);
-}
-
-.hero__frame {
-  position: relative;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-  border: 1px solid var(--line-strong);
+  padding: var(--s-6) var(--s-5);
   border-radius: var(--r-lg);
-  background: var(--surface-2);
+  background: var(--paper);
+  color: var(--ink);
+  overflow: hidden;
 }
 
-.hero__poster,
-.hero__video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.hero__video {
-  opacity: 0;
-  transition: opacity var(--t-base) var(--ease);
-}
-
-.hero__video.is-playing {
-  opacity: 1;
-}
-
-/* Tall screens show the 9:16 cut, capped so the projects stay one scroll away. */
-@media (orientation: portrait) {
-  .hero__frame {
-    aspect-ratio: 9 / 16;
-    width: min(100%, calc(78svh * 9 / 16));
-    margin-inline: auto;
+@media (min-width: 860px) {
+  .hero {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    padding: var(--s-7) var(--s-6);
   }
 }
 
 .hero__text {
   display: grid;
-  gap: var(--s-1);
+  gap: var(--s-3);
+}
+
+.hero__kicker {
+  color: var(--label-red);
+  font-family: var(--mono);
+  font-size: var(--fs-tag);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .hero__title {
-  font-size: var(--fs-h3);
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-size: clamp(1.625rem, 1.2rem + 1.4vw, 2.25rem);
+  font-weight: 650;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
 }
 
-.hero__caption {
-  max-width: 62ch;
-  color: var(--text-2);
+.hero__summary {
+  max-width: 54ch;
+  color: var(--ink-2);
 }
 
-.hero__link {
-  justify-self: start;
-  margin-top: var(--s-1);
-  color: var(--accent);
-  font-weight: 500;
-  text-underline-offset: 3px;
+.hero__actions {
+  margin-top: var(--s-2);
 }
 
-.hero__link:hover {
-  color: var(--accent-hover);
+.hero .btn {
+  border-color: rgb(32 51 46 / 0.35);
+  background: transparent;
+  color: var(--ink);
+}
+
+.hero .btn:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.hero .btn--primary {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.hero .btn--primary:hover {
+  background: #2d4740;
+  color: var(--paper);
+}
+
+.hero :focus-visible {
+  outline-color: var(--label-red);
+}
+
+.hero__note {
+  color: var(--ink-2);
+  font-size: var(--fs-small);
+}
+
+/* Three real screens, the middle one in front. */
+.hero__screens {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero__screens .phone {
+  width: 34%;
+  max-width: 200px;
+}
+
+.hero__screens .phone--0,
+.hero__screens .phone--2 {
+  translate: 0 6%;
+  opacity: 0.92;
+}
+
+.hero__screens .phone--0 {
+  margin-right: -7%;
+}
+
+.hero__screens .phone--1 {
+  position: relative;
+  z-index: 1;
+  width: 42%;
+  max-width: 240px;
+}
+
+.hero__screens .phone--2 {
+  margin-left: -7%;
+}
+
+/* A phone frame for the 390×844 screens, shared with the case study. */
+.phone {
+  overflow: hidden;
+  border: 5px solid #20332e;
+  border-radius: 22px;
+  background: #fafafa;
+  box-shadow: 0 18px 40px -18px rgb(23 35 44 / 0.55);
+}
+
+.phone img {
+  width: 100%;
+  height: auto;
 }
 
 .watch {
@@ -101,18 +162,6 @@
   width: 12px;
   height: 12px;
   fill: currentColor;
-}
-
-.watch--hero {
-  left: var(--s-4);
-  bottom: var(--s-4);
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--on-accent);
-}
-
-.watch--hero:hover {
-  background: var(--accent-hover);
 }
 
 .lightbox {
@@ -175,44 +224,4 @@
 
 .status--preview::before {
   background: #e8b86b;
-}
-
-/* Pause and resume the background film (WCAG 2.2.2) */
-.hero__toggle {
-  position: absolute;
-  right: var(--s-4);
-  bottom: var(--s-4);
-  z-index: 2;
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 1px solid var(--line-strong);
-  border-radius: 50%;
-  background: rgb(13 15 18 / 0.85);
-  color: var(--text);
-  cursor: pointer;
-}
-
-.hero__toggle:hover {
-  border-color: var(--accent);
-}
-
-.hero__toggle[hidden] {
-  display: none;
-}
-
-.hero__toggle svg {
-  width: 16px;
-  height: 16px;
-  fill: currentColor;
-}
-
-/* The 9:16 film keeps a credit line at its bottom edge; the controls sit just above it. */
-@media (orientation: portrait) {
-  .watch--hero,
-  .hero__toggle {
-    bottom: calc(var(--s-4) + 40px);
-  }
 }

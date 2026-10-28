@@ -60,14 +60,25 @@ describe('prerendered page', () => {
     expect(en.html).toContain('href="https://www.linkedin.com/in/ege-%C3%B6zel-a721231bb"');
   });
 
-  it('prerenders the hero poster first and eagerly, and every card poster lazily', () => {
+  it('prerenders the three Grocery screens first and eagerly, one with high priority, and every card poster lazily', () => {
     const images = [...en.html.matchAll(/<img\b[^>]*>/g)].map((m) => m[0]);
-    expect(images.length).toBe(1 + featuredProjects.filter((p) => p.poster).length);
-    expect(images[0]).toContain('/media/hero');
-    expect(images[0]).toContain('loading="eager"');
-    expect(images[0]).toMatch(/fetchPriority="high"|fetchpriority="high"/);
-    for (const img of images.slice(1)) expect(img).toContain('loading="lazy"');
-    expect(en.html).toContain('media="(orientation: portrait)"');
+    expect(images.length).toBe(3 + featuredProjects.filter((p) => p.poster).length);
+    for (const img of images.slice(0, 3)) {
+      expect(img).toContain('/media/grocery-case/');
+      expect(img).toContain('loading="eager"');
+    }
+    expect(images.filter((img) => /fetchPriority="high"|fetchpriority="high"/i.test(img))).toHaveLength(1);
+    for (const img of images.slice(3)) expect(img).toContain('loading="lazy"');
+  });
+
+  it('opens with Grocery and links its case study in the page language', () => {
+    expect(en.html.indexOf('id="hero-title"')).toBeLessThan(en.html.indexOf('<section id="work"'));
+    expect(en.html).toContain('Grocery — From Meal Planning to Shared Shopping');
+    expect(en.html).toContain('href="/projects/grocery/"');
+    expect(tr.html).toContain('href="/tr/projects/grocery/"');
+    expect(en.html).not.toContain('TrackMesh: DAW projects');
+    expect(en.html.match(/<article class="card"/g)?.length).toBe(featuredProjects.length);
+    expect(en.html.indexOf('id="grocery-title"')).toBeLessThan(en.html.indexOf('id="trackmesh-title"'));
   });
 
   it('marks the current language and links to the other', () => {
@@ -81,16 +92,16 @@ describe('prerendered page', () => {
     expect(en.html.match(/class="media__empty"/g)?.length ?? 0).toBe(waiting);
   });
 
-  it('marks the hero and every featured clip for hydration and never preloads a video', () => {
+  it('marks every featured clip for hydration and never preloads a video', () => {
     const clips = featuredProjects.filter((p) => p.poster && p.video).length;
-    expect(en.html.match(/data-hydrate/g)?.length).toBe(1 + clips);
+    expect(en.html.match(/data-hydrate/g)?.length).toBe(clips);
     expect(en.html).not.toContain('.mp4');
     for (const video of en.html.match(/<video\b[^>]*>/g) ?? []) expect(video).toContain('preload="none"');
   });
 
-  it('offers a watch button for the hero and each featured clip, and renders the lightbox closed', () => {
+  it('offers a watch button for each featured clip, and renders the lightbox closed', () => {
     const clips = featuredProjects.filter((p) => p.poster && p.video).length;
-    expect(en.html.match(/class="watch/g)?.length).toBe(1 + clips);
+    expect(en.html.match(/class="watch/g)?.length).toBe(clips);
     expect(en.html).toMatch(/<dialog\b[^>]*class="lightbox"/);
     expect(en.html).not.toMatch(/<dialog\b[^>]*\sopen[\s=>]/);
   });
@@ -107,5 +118,76 @@ describe('prerendered page', () => {
     expect(en.html.indexOf('class="skip" href="#work"')).toBeLessThan(en.html.indexOf('<header class="quick"'));
     expect(en.html.indexOf('<header class="quick"')).toBeGreaterThan(-1);
     expect(en.html).toContain('<section id="work"');
+  });
+});
+
+describe('Grocery case study', () => {
+  const caseEn = renderPage('en', 'grocery');
+  const caseTr = renderPage('tr', 'grocery');
+
+  it('has its own title, description and one h1', () => {
+    expect(caseEn.title).toBe('Grocery — From Meal Planning to Shared Shopping · Ege Özel');
+    expect(caseTr.title).toBe('Grocery — Yemek planından ortak alışverişe · Ege Özel');
+    expect(caseEn.description.length).toBeGreaterThan(80);
+    expect(caseEn.description.length).toBeLessThan(260);
+    for (const html of [caseEn.html, caseTr.html]) expect(html.match(/<h1\b/g)).toHaveLength(1);
+  });
+
+  it('has the nine sections in order, each with a heading', () => {
+    const ids = ['problem', 'walkthrough', 'architecture', 'nutrition', 'ai', 'tradeoffs', 'status', 'credits', 'contact'];
+    const positions = ids.map((id) => caseEn.html.indexOf(`<section id="${id}"`));
+    expect(positions.every((p) => p > 0)).toBe(true);
+    expect([...positions].sort((a, b) => a - b)).toEqual(positions);
+    for (const id of ids) expect(caseEn.html).toContain(`id="${id}-title"`);
+  });
+
+  it('links the public source, the live app, the portfolio and the other language', () => {
+    expect(caseEn.html).toContain('href="https://github.com/ozan-ozel/grocery"');
+    expect(caseEn.html).toContain('href="https://grocery-five-ecru.vercel.app"');
+    expect(caseEn.html).toContain('href="/"');
+    expect(caseEn.html).toMatch(/<a href="\/tr\/projects\/grocery\/" hrefLang="tr" lang="tr">TR<\/a>/);
+    expect(caseTr.html).toMatch(/<a href="\/tr\/projects\/grocery\/" hrefLang="tr" lang="tr" aria-current="page">TR<\/a>/);
+    expect(caseTr.html).toContain('href="/tr/"');
+  });
+
+  it('says the live app needs a sign-in and does not offer a demo that does not exist', () => {
+    expect(caseEn.html).toContain('needs a Google sign-in');
+    expect(caseTr.html).toContain('Google ile giriş ister');
+    expect(caseEn.html).not.toMatch(/Explore demo|Live demo/);
+  });
+
+  it('never calls the suggestions AI or the nutrition logic clinically validated', () => {
+    const text = caseEn.html.replace(/<[^>]+>/g, ' ');
+    expect(text).toContain('no language model');
+    expect(text).toContain('Not clinically validated');
+    expect(text).not.toMatch(/AI-powered|AI recommendation|clinically proven|medical-grade/i);
+  });
+
+  it('credits the co-developer in both languages', () => {
+    expect(caseEn.html).toContain('Ozan Özel started it');
+    expect(caseTr.html).toContain('Ozan Özel projeyi');
+  });
+
+  it('loads the first screen eagerly, the rest lazily, and never preloads the recording', () => {
+    const images = [...caseEn.html.matchAll(/<img\b[^>]*>/g)].map((m) => m[0]);
+    expect(images[0]).toContain('loading="eager"');
+    for (const img of images.slice(1)) expect(img).toContain('loading="lazy"');
+    for (const img of images) expect(img).toMatch(/alt="[^"]{20,}"/);
+    expect(caseEn.html).toMatch(/<video\b[^>]*preload="none"/);
+    expect(caseEn.html).toMatch(/<video\b[^>]*controls/);
+  });
+
+  it('needs no JavaScript: nothing on the page asks to be hydrated', () => {
+    expect(caseEn.html).not.toContain('data-hydrate');
+  });
+
+  it('opens external links safely and reuses the portfolio contact details', () => {
+    for (const a of anchors(caseEn.html).filter((tag) => /href="https?:/.test(tag))) {
+      expect(a).toContain('target="_blank"');
+      expect(a).toContain('rel="noopener noreferrer"');
+    }
+    expect(caseEn.html).toContain('href="mailto:egeozeldev@gmail.com"');
+    expect(caseEn.html).toContain('href="/cv/ege-ozel-cv-en.pdf"');
+    expect(caseTr.html).toContain('href="/cv/ege-ozel-cv-tr.pdf"');
   });
 });

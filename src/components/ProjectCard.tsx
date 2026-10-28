@@ -1,4 +1,5 @@
 import { createT, statusKey, type UiKey } from '../i18n';
+import { pagePath } from '../pages';
 import { cssVars } from '../css';
 import type { LinkKind, Locale, Project } from '../types';
 import { ExternalLink } from './ExternalLink';
@@ -6,6 +7,7 @@ import { ProjectMedia } from './ProjectMedia';
 
 export const linkLabel: Record<LinkKind, UiKey> = {
   demo: 'link.demo',
+  app: 'link.app',
   code: 'link.code',
   marketplace: 'link.marketplace',
   release: 'link.release',
@@ -45,8 +47,15 @@ export function ProjectCard({ project, locale, eager }: Props) {
         <p className="card__part">
           <span className="card__label">{t('card.myPart')}:</span> {project.myPart[locale]}
         </p>
-        {project.links.length > 0 && (
+        {(project.caseStudy || project.links.length > 0) && (
           <ul className="links" aria-label={t('card.links')}>
+            {project.caseStudy && (
+              <li>
+                <a className="btn btn--small btn--primary" href={pagePath(project.caseStudy, locale)}>
+                  {t('link.case')}
+                </a>
+              </li>
+            )}
             {project.links.map((link) => (
               <li key={link.href}>
                 <ExternalLink className="btn btn--small" href={link.href} hint={hint}>
@@ -55,6 +64,11 @@ export function ProjectCard({ project, locale, eager }: Props) {
               </li>
             ))}
           </ul>
+        )}
+        {project.links.some((link) => link.kind === 'app') && (
+          <p className="card__note">
+            {t('link.app')}: {t('link.signIn')}
+          </p>
         )}
         {project.notes && (
           <details className="notes">

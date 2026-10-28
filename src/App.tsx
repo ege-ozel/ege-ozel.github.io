@@ -1,4 +1,4 @@
-import { HeroVideo } from './components/HeroVideo';
+import { FeaturedHero } from './components/FeaturedHero';
 import { Contact, EducationList, ExperienceList, MoreWork } from './components/Lists';
 import { ProjectCard } from './components/ProjectCard';
 import { QuickScan } from './components/QuickScan';
@@ -8,6 +8,7 @@ import { createT } from './i18n';
 import { LightboxProvider } from './lightbox';
 import type { Locale } from './types';
 
+/** The portfolio page. Case studies render on their own (see entry-server.tsx). */
 export function App({ locale }: { locale: Locale }) {
   const t = createT(locale);
   return (
@@ -18,11 +19,11 @@ export function App({ locale }: { locale: Locale }) {
       <div className="shell">
         <QuickScan locale={locale} />
         <main className="content">
-          <HeroVideo locale={locale} />
+          <FeaturedHero locale={locale} />
           <Section id="work" title={t('work.title')}>
             <div className="cards">
               {featuredProjects.map((project) => (
-                // The hero poster is the largest image, so every card poster loads lazily.
+                // The hero screens are above the fold, so every card poster loads lazily.
                 <ProjectCard key={project.id} project={project} locale={locale} eager={false} />
               ))}
             </div>

@@ -1,15 +1,38 @@
-import type { HeroMedia } from '../types';
+import type { Hero } from '../types';
 
-export const hero: HeroMedia = {
-  projectId: 'trackmesh',
+/** Grocery leads the portfolio: a short pitch next to three real screens (sample household data). */
+export const hero: Hero = {
+  projectId: 'grocery',
+  kicker: { en: 'Featured case study', tr: 'Öne çıkan vaka çalışması' },
   title: {
-    en: 'TrackMesh: DAW projects, PC to PC',
-    tr: 'TrackMesh: DAW projeleri, bilgisayardan bilgisayara',
+    en: 'Grocery — From Meal Planning to Shared Shopping',
+    tr: 'Grocery — Yemek planından ortak alışverişe',
   },
-  caption: {
-    en: 'TrackMesh sends DAW project folders PC to PC. Product film made in Blender.',
-    tr: 'TrackMesh, DAW proje klasörlerini bilgisayardan bilgisayara gönderir. Ürün filmi Blender’da hazırlandı.',
+  summary: {
+    en: 'A full-stack app for Turkish households: decide what to cook, plan the day against nutrition targets and share one shopping list across devices. Live, built with a co-developer, with nutrition logic traced back to textbooks.',
+    tr: 'Türk haneleri için full-stack bir uygulama: ne pişireceğine karar ver, günü beslenme hedeflerine göre planla, tek bir alışveriş listesini cihazlar arasında paylaş. Yayında; bir ortak geliştiriciyle yapıldı ve beslenme mantığı ders kitaplarına dayanıyor.',
   },
-  landscape: { video: '/media/hero-16x9.mp4', poster: '/media/hero' },
-  portrait: { video: '/media/hero-9x16.mp4', poster: '/media/hero-mobile' },
+  shots: [
+    {
+      base: '/media/grocery-case/list',
+      alt: {
+        en: 'Grocery shopping list on a phone: items filed under fruit and vegetables, dairy, eggs and poultry.',
+        tr: 'Telefonda Grocery alışveriş listesi: ürünler meyve ve sebze, süt ürünleri, yumurta ve kanatlı reyonlarına ayrılmış.',
+      },
+    },
+    {
+      base: '/media/grocery-case/plan',
+      alt: {
+        en: 'Grocery meal plan for Friday 23 October: daily totals for calories, protein, carbs, fat and fibre above the first meal.',
+        tr: '23 Ekim Cuma için Grocery yemek planı: ilk öğünün üstünde kalori, protein, karbonhidrat, yağ ve lif günlük toplamları.',
+      },
+    },
+    {
+      base: '/media/grocery-case/suggestions',
+      alt: {
+        en: 'Grocery evening suggestions: minced beef with rice, 763 kcal and 29 g protein, with buttons to add it to the list or the plan.',
+        tr: 'Grocery akşam önerileri: dana kıyma ve pirinç, 763 kcal ve 29 g protein; listeye ya da plana ekleme düğmeleriyle.',
+      },
+    },
+  ],
 };

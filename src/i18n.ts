@@ -1,3 +1,4 @@
+import { pagePath } from './pages';
 import type { Locale, Status } from './types';
 
 const en = {
@@ -43,10 +44,16 @@ const en = {
   'media.play': 'Play preview',
   'media.pause': 'Pause preview',
   'media.watch': 'Watch video',
-  'hero.watch': 'Watch the film',
-  'hero.pause': 'Pause the film',
-  'hero.play': 'Play the film',
-  'hero.toProject': 'See the project',
+  'hero.label': 'Featured project',
+  'link.app': 'Live app',
+  'link.case': 'Read the case study',
+  'link.signIn': 'Google sign-in required',
+  'case.skip': 'Skip to the case study',
+  'case.back': 'Portfolio',
+  'case.toc': 'On this page',
+  'case.code': 'View source code',
+  'case.app': 'Open live app',
+  'case.noVideo': 'Your browser cannot play this video.',
   'lightbox.close': 'Close video',
   'footer.note': '© 2026 Ege Özel. Built with React, TypeScript and Vite.',
 } as const;
@@ -96,10 +103,16 @@ const tr: Record<UiKey, string> = {
   'media.play': 'Önizlemeyi oynat',
   'media.pause': 'Önizlemeyi durdur',
   'media.watch': 'Videoyu izle',
-  'hero.watch': 'Filmi izle',
-  'hero.pause': 'Filmi duraklat',
-  'hero.play': 'Filmi oynat',
-  'hero.toProject': 'Projeye git',
+  'hero.label': 'Öne çıkan proje',
+  'link.app': 'Canlı uygulama',
+  'link.case': 'Vaka çalışmasını oku',
+  'link.signIn': 'Google ile giriş gerekir',
+  'case.skip': 'Vaka çalışmasına geç',
+  'case.back': 'Portfolyo',
+  'case.toc': 'Bu sayfada',
+  'case.code': 'Kaynak kodunu incele',
+  'case.app': 'Canlı uygulamayı aç',
+  'case.noVideo': 'Tarayıcınız bu videoyu oynatamıyor.',
   'lightbox.close': 'Videoyu kapat',
   'footer.note': '© 2026 Ege Özel. React, TypeScript ve Vite ile geliştirildi.',
 };
@@ -124,7 +137,7 @@ export function createT(locale: Locale): Translate {
   return (key) => dict[key];
 }
 
-/** Path of the prerendered page for a locale. */
+/** Path of the prerendered portfolio page for a locale. */
 export function localePath(locale: Locale): string {
-  return locale === 'en' ? '/' : '/tr/';
+  return pagePath('home', locale);
 }

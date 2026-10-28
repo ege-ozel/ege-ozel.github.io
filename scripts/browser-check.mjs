@@ -74,15 +74,14 @@ for (const [locale, path] of Object.entries(pages)) {
     if ((await page.textContent('h1'))?.trim() !== 'Ege Özel') fail(where, 'h1 is not "Ege Özel"');
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     if (overflow > 0) fail(where, `horizontal overflow ${overflow}px`);
-    const poster = await page.evaluate(() => {
-      const img = document.querySelector('.hero__poster');
-      return img instanceof HTMLImageElement && img.complete && img.naturalWidth > 0;
-    });
-    if (!poster) fail(where, 'hero poster did not load');
+    const screens = await page.evaluate(() =>
+      [...document.querySelectorAll('.hero .shot')].filter((img) => img.complete && img.naturalWidth > 0).length,
+    );
+    if (screens !== 3) fail(where, `${screens} of 3 hero screens loaded`);
     const cvBottom = await page.evaluate(() => document.querySelector('.quick .btn--primary').getBoundingClientRect().bottom);
     if (cvBottom > viewport.height) fail(where, `CV button below the fold (${Math.round(cvBottom)}px)`);
     const smallTargets = await page.evaluate(() =>
-      [...document.querySelectorAll('a.btn, .lang a, .notes summary, .watch:not([hidden]), .hero__toggle:not([hidden])')]
+      [...document.querySelectorAll('a.btn, .lang a, .notes summary, .watch:not([hidden])')]
         .filter((el) => el.getBoundingClientRect().height < 40)
         .map((el) => el.textContent.trim()),
     );
@@ -118,10 +117,13 @@ for (const [locale, path] of Object.entries(pages)) {
   );
   if (js > 320_000) fail(where, `${js} bytes of JS loaded`);
   if (await cardClipRequests(page)) fail(where, 'a card clip was requested before any interaction');
-  await page.waitForTimeout(1500);
-  if (!(await page.evaluate(() => !document.querySelector('.hero__video').paused))) fail(where, 'hero film is not playing');
+  // The featured hero links the case study in the page language.
+  const caseHref = await page.locator('.hero .btn--primary').getAttribute('href');
+  if (caseHref !== '/projects/grocery/') fail(where, `hero case-study link is ${caseHref}`);
 
-  const watch = page.locator('.watch--hero');
+  // The Grocery card's clip opens in the lightbox; Escape closes it and focus returns.
+  const watch = page.locator('.card .watch').first();
+  await watch.scrollIntoViewIfNeeded();
   await watch.focus();
   await watch.press('Enter');
   await page.waitForTimeout(500);
@@ -129,46 +131,9 @@ for (const [locale, path] of Object.entries(pages)) {
   await page.keyboard.press('Escape');
   await page.waitForTimeout(300);
   if (await page.evaluate(() => document.querySelector('dialog.lightbox').open)) fail(where, 'Escape did not close the lightbox');
-  if (!(await page.evaluate(() => document.activeElement?.classList.contains('watch--hero')))) {
-    fail(where, 'focus did not return to the hero watch button');
+  if (!(await page.evaluate(() => document.activeElement?.classList.contains('watch')))) {
+    fail(where, 'focus did not return to the watch button');
   }
-
-  // Normal speed: the film advances with the clock and does not stall.
-  const heroTime = () => page.evaluate(() => document.querySelector('.hero__video').currentTime);
-  const paused = () => page.evaluate(() => document.querySelector('.hero__video').paused);
-  const t0 = await heroTime();
-  await page.waitForTimeout(3000);
-  const advanced = (await heroTime()) - t0;
-  if (advanced < 2.5 || advanced > 3.5) fail(where, `hero advanced ${advanced.toFixed(2)} s in 3 s`);
-
-  // While the lightbox shows the film, the background copy waits.
-  await watch.click();
-  await page.waitForTimeout(400);
-  if (!(await paused())) fail(where, 'hero keeps playing behind the lightbox');
-  await page.keyboard.press('Escape');
-  await page.waitForTimeout(600);
-  if (await paused()) fail(where, 'hero did not resume after the lightbox closed');
-
-  // Pause and resume from the keyboard (WCAG 2.2.2).
-  const toggle = page.locator('.hero__toggle');
-  if (!(await toggle.isVisible())) fail(where, 'hero pause button missing');
-  await toggle.focus();
-  await page.keyboard.press('Enter');
-  await page.waitForTimeout(300);
-  if (!(await paused())) fail(where, 'pause button did not pause the hero');
-  if ((await toggle.getAttribute('aria-pressed')) !== 'false') fail(where, 'pause button aria-pressed not false when paused');
-  await page.keyboard.press('Space');
-  await page.waitForTimeout(500);
-  if (await paused()) fail(where, 'play button did not resume the hero');
-
-  // Turning on reduced motion while the page is open stops the film and hides the toggle.
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.waitForTimeout(500);
-  if (!(await paused())) fail(where, 'hero keeps playing after reduced motion was turned on');
-  if (await toggle.isVisible()) fail(where, 'pause button still shown under reduced motion');
-  await page.emulateMedia({ reducedMotion: 'no-preference' });
-  await page.waitForTimeout(800);
-  if (await paused()) fail(where, 'hero did not restart after reduced motion was turned off');
 
   const card = page.locator('.card').first();
   await card.scrollIntoViewIfNeeded();
@@ -212,28 +177,11 @@ for (const [locale, path] of Object.entries(pages)) {
   const { context, page } = await open('/', viewports.phone, { javaScriptEnabled: false });
   const ok = await page.evaluate(
     () =>
-      document.querySelectorAll('.card').length === 5 &&
+      document.querySelectorAll('.card').length === 6 &&
       document.querySelector('h1')?.textContent === 'Ege Özel' &&
       [...document.querySelectorAll('.watch')].every((b) => b.hidden),
   );
   if (!ok) fail('en no-JS', 'content missing or a watch button visible without JavaScript');
-  await context.close();
-}
-
-// Phone rotation: the hero swaps between the 9:16 and 16:9 films and keeps playing
-{
-  const where = 'en phone rotation';
-  const { context, page } = await open('/', viewports.phone, { hasTouch: true, isMobile: true });
-  await page.waitForTimeout(1200);
-  const film = () => page.evaluate(() => document.querySelector('.hero__video').getAttribute('src'));
-  if (!(await film())?.includes('9x16')) fail(where, `portrait loads ${await film()}`);
-  await page.setViewportSize({ width: 812, height: 375 });
-  await page.waitForTimeout(1200);
-  if (!(await film())?.includes('16x9')) fail(where, `landscape still shows ${await film()}`);
-  if (await page.evaluate(() => document.querySelector('.hero__video').paused)) fail(where, 'film stopped after rotating');
-  await page.setViewportSize(viewports.phone);
-  await page.waitForTimeout(800);
-  if (!(await film())?.includes('9x16')) fail(where, `back to portrait shows ${await film()}`);
   await context.close();
 }
 
@@ -242,8 +190,7 @@ for (const [locale, path] of Object.entries(pages)) {
   const where = 'en reduced motion';
   const { context, page } = await open('/', viewports.desktop, { reducedMotion: 'reduce' });
   await page.waitForTimeout(1200);
-  if (await page.evaluate(() => !document.querySelector('.hero__video').paused)) fail(where, 'hero film autoplays');
-  if (await page.locator('.hero__toggle').isVisible()) fail(where, 'pause button shown without motion');
+  if (await page.evaluate(() => [...document.querySelectorAll('video')].some((v) => !v.paused))) fail(where, 'a video autoplays');
   const card = page.locator('.card').first();
   await card.scrollIntoViewIfNeeded();
   await card.hover();
@@ -255,6 +202,85 @@ for (const [locale, path] of Object.entries(pages)) {
     () => [...document.querySelectorAll('.enter, .card')].filter((el) => getComputedStyle(el).animationName !== 'none').length,
   );
   if (animated) fail(where, `${animated} elements still animate`);
+  await context.close();
+}
+
+// Grocery case study: static page, both languages, every width
+const casePages = { en: '/projects/grocery/', tr: '/tr/projects/grocery/' };
+for (const [locale, path] of Object.entries(casePages)) {
+  for (const [name, viewport] of Object.entries(viewports)) {
+    const where = `case ${locale} ${name}`;
+    const { context, page, errors } = await open(path, viewport);
+    if ((await page.getAttribute('html', 'lang')) !== locale) fail(where, 'wrong html lang');
+    if ((await page.locator('h1').count()) !== 1) fail(where, 'not exactly one h1');
+    if (!(await page.textContent('h1'))?.startsWith('Grocery —')) fail(where, 'h1 is not the Grocery title');
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    if (overflow > 0) fail(where, `horizontal overflow ${overflow}px`);
+    const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    if (bg !== 'rgb(244, 240, 231)') fail(where, `page background is ${bg}`);
+    const js = await page.evaluate(() => performance.getEntriesByType('resource').filter((r) => r.name.endsWith('.js')).length);
+    if (js > 1) fail(where, `${js} script files loaded on a static page`);
+    const smallTargets = await page.evaluate(() =>
+      [...document.querySelectorAll('.cs a.btn, .cs .lang a, .cs-toc a, .cs-top__home, .cs-footer a')]
+        .filter((el) => el.getBoundingClientRect().height < 40)
+        .map((el) => el.textContent.trim()),
+    );
+    if (smallTargets.length) fail(where, `touch targets under 40px: ${smallTargets.join(', ')}`);
+    await page.screenshot({ path: join(shots, `case-${locale}-${name}-fold.png`) });
+    // Scroll through so the lazy screens load, then check every one did.
+    await page.evaluate(async () => {
+      for (let y = 0; y < document.body.scrollHeight; y += 500) {
+        window.scrollTo(0, y);
+        await new Promise((r) => setTimeout(r, 60));
+      }
+    });
+    await page.waitForTimeout(600);
+    const broken = await page.evaluate(() =>
+      [...document.querySelectorAll('img')].filter((img) => !(img.complete && img.naturalWidth > 0)).map((img) => img.alt),
+    );
+    if (broken.length) fail(where, `images not loaded: ${broken.join(' | ')}`);
+    if (await page.evaluate(() => performance.getEntriesByType('resource').some((r) => r.name.endsWith('.mp4')))) {
+      fail(where, 'the recording loaded before play');
+    }
+    await page.screenshot({ path: join(shots, `case-${locale}-${name}.png`), fullPage: true });
+    if (errors.length) fail(where, `console errors: ${errors.join(' | ')}`);
+    await context.close();
+  }
+}
+
+// Case study on desktop: skip link, table of contents, recording, language and back links
+{
+  const where = 'case en desktop';
+  const { context, page, errors } = await open('/projects/grocery/', viewports.desktop);
+  await page.keyboard.press('Tab');
+  if ((await page.evaluate(() => document.activeElement?.className)) !== 'skip') fail(where, 'first Tab is not the skip link');
+  await page.keyboard.press('Enter');
+  if ((await page.evaluate(() => document.activeElement?.id)) !== 'case') fail(where, 'skip link does not focus #case');
+  await page.click('.cs-toc a[href="#nutrition"]');
+  await page.waitForTimeout(300);
+  const top = await page.evaluate(() => document.getElementById('nutrition').getBoundingClientRect().top);
+  if (Math.abs(top) > 40) fail(where, `table of contents left #nutrition at ${Math.round(top)}px`);
+  const video = page.locator('.cs-video video');
+  await video.scrollIntoViewIfNeeded();
+  await video.evaluate((el) => el.play());
+  await page.waitForTimeout(1500);
+  if ((await video.evaluate((el) => el.currentTime)) < 0.5) fail(where, 'the recording does not play');
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.click('.cs-top .lang a[hreflang="tr"]');
+  await page.waitForLoadState('networkidle');
+  if (new URL(page.url()).pathname !== '/tr/projects/grocery/') fail(where, `language link went to ${page.url()}`);
+  await page.click('.cs-top__home');
+  await page.waitForLoadState('networkidle');
+  if (new URL(page.url()).pathname !== '/tr/') fail(where, `back link went to ${page.url()}`);
+  if (errors.length) fail(where, `console errors: ${errors.join(' | ')}`);
+  await context.close();
+}
+
+// Case study without JavaScript is the same page
+{
+  const { context, page } = await open('/projects/grocery/', viewports.phone, { javaScriptEnabled: false });
+  const sections = await page.locator('.cs-section').count();
+  if (sections !== 9) fail('case no-JS', `${sections} sections instead of 9`);
   await context.close();
 }
 

@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import * as groceryCase from '../src/data/groceryCase';
 import { hero } from '../src/data/hero';
 import { degrees, jobs, profile } from '../src/data/profile';
 import { featuredProjects, moreProjects, projects, shippedCount } from '../src/data/projects';
@@ -29,18 +30,18 @@ describe('project data', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('features five projects in the agreed order', () => {
-    expect(featuredProjects.map((p) => p.id)).toEqual(['trackmesh', 'grocery', 'metronome', 'desktuk', 'interval-timer']);
+  it('features Grocery first, then the session manager and the timer, with TrackMesh after them', () => {
+    expect(featuredProjects.map((p) => p.id)).toEqual(['grocery', 'wsm', 'interval-timer', 'trackmesh', 'metronome', 'desktuk']);
   });
 
   it('lists the smaller projects in the agreed order and drops World of Cards', () => {
-    expect(moreProjects.map((p) => p.id)).toEqual(['pdf-reader', 'wsm', 'woodcraft', 'voice-type', 'mert-ozkan', 'trackmesh-film']);
+    expect(moreProjects.map((p) => p.id)).toEqual(['pdf-reader', 'woodcraft', 'voice-type', 'mert-ozkan', 'trackmesh-film']);
     expect(projects.some((p) => p.id === 'world-of-cards')).toBe(false);
   });
 
   it('fills every English and Turkish string', () => {
-    const all = texts({ profile, jobs, degrees, projects, hero });
-    expect(all.length).toBeGreaterThan(60);
+    const all = texts({ profile, jobs, degrees, projects, hero, groceryCase });
+    expect(all.length).toBeGreaterThan(150);
     for (const [path, text] of all) {
       expect(String(text.en).trim(), `${path}.en`).not.toBe('');
       expect(String(text.tr).trim(), `${path}.tr`).not.toBe('');
@@ -89,10 +90,40 @@ describe('project data', () => {
 });
 
 describe('hero and profile data', () => {
-  it('has the hero films and posters', () => {
-    for (const file of [hero.landscape.video, hero.portrait.video]) expect(existsSync(join('public', file)), file).toBe(true);
-    expect(existsSync(join('public', `${hero.landscape.poster}-1600.avif`))).toBe(true);
-    expect(existsSync(join('public', `${hero.portrait.poster}-800.avif`))).toBe(true);
+  it('leads with Grocery and three real screens that exist', () => {
+    expect(hero.projectId).toBe('grocery');
+    expect(hero.shots).toHaveLength(3);
+    for (const shot of hero.shots) {
+      for (const ext of ['avif', 'webp']) expect(existsSync(join('public', `${shot.base}-390.${ext}`)), shot.base).toBe(true);
+    }
+  });
+
+  it('links Grocery to its case study, the live app and the public repository', () => {
+    const grocery = projects.find((p) => p.id === 'grocery');
+    expect(grocery?.caseStudy).toBe('grocery');
+    expect(grocery?.links).toEqual([
+      { kind: 'app', href: 'https://grocery-five-ecru.vercel.app' },
+      { kind: 'code', href: 'https://github.com/ozan-ozel/grocery' },
+    ]);
+    expect(grocery?.myPart.en).toContain('Ozan Özel');
+    expect(grocery?.myPart.tr).toContain('Ozan Özel');
+  });
+
+  it('has every case-study screen and the recording', () => {
+    const shots = [groceryCase.intro.shot, ...groceryCase.walkthrough.steps.flatMap((step) => step.shots)];
+    for (const shot of shots) {
+      for (const ext of ['avif', 'webp']) expect(existsSync(join('public', `${shot.base}-390.${ext}`)), shot.base).toBe(true);
+    }
+    expect(existsSync(join('public', groceryCase.walkthrough.video.src))).toBe(true);
+    expect(existsSync(join('public', groceryCase.walkthrough.video.poster))).toBe(true);
+  });
+
+  it('counts all 112 decisions from the register', () => {
+    expect(groceryCase.decisionStatus.reduce((sum, s) => sum + s.count, 0)).toBe(112);
+  });
+
+  it('has the link previews', () => {
+    for (const file of ['og.png', 'og-grocery.png']) expect(existsSync(join('public', file)), file).toBe(true);
   });
 
   it('has three stats, the last one counting shipped projects', () => {

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createT, dictionaries, isLocale, localePath } from '../src/i18n';
+import { pagePath } from '../src/pages';
 
 describe('i18n', () => {
   it('has the same keys in English and Turkish', () => {
@@ -28,5 +29,7 @@ describe('i18n', () => {
   it('maps locales to page paths', () => {
     expect(localePath('en')).toBe('/');
     expect(localePath('tr')).toBe('/tr/');
+    expect(pagePath('grocery', 'en')).toBe('/projects/grocery/');
+    expect(pagePath('grocery', 'tr')).toBe('/tr/projects/grocery/');
   });
 });

@@ -3,6 +3,122 @@ import type { LinkKind, Project } from '../types';
 /** Featured projects render in this order; `placement: 'more'` goes to the compact list. */
 export const projects: Project[] = [
   {
+    id: 'grocery',
+    title: 'Grocery',
+    placement: 'featured',
+    device: 'mobile',
+    accent: '#9BCB6B',
+    status: 'live',
+    caseStudy: 'grocery',
+    summary: {
+      en: 'Helps Turkish households decide what to cook, plan meals against nutrition targets and share one shopping list across devices. Behind it: server-side Google sign-in, two authorization layers (function checks and Postgres row-level security), versioned sync and nutrition rules traced to a textbook-based decision register.',
+      tr: 'Türk hanelerinin ne pişireceğine karar vermesine, öğünleri beslenme hedeflerine göre planlamasına ve tek bir alışveriş listesini cihazlar arasında paylaşmasına yardım eder. Arkasında sunucu tarafında Google ile giriş, iki katmanlı yetkilendirme (fonksiyon kontrolleri ve Postgres satır düzeyi güvenliği), sürümlü eşitleme ve ders kitabı tabanlı bir karar kaydına bağlanan beslenme kuralları var.',
+    },
+    myPart: {
+      en: 'Co-developed with Ozan Özel, who started the project. My part: Google sign-in and sessions, the versioned sync layer, meal planning, the personal nutrition plan, most of the row-level security policies, account deletion, most of the interface and most of the nutrition curriculum. Built with Claude Code under written rules.',
+      tr: 'Projeyi başlatan Ozan Özel ile birlikte geliştirildi. Benim payım: Google ile giriş ve oturumlar, sürümlü eşitleme katmanı, yemek planlama, kişisel beslenme planı, satır düzeyi güvenlik politikalarının çoğu, hesap silme, arayüzün büyük bölümü ve beslenme müfredatının büyük kısmı. Yazılı kurallar altında Claude Code ile geliştirildi.',
+    },
+    notes: {
+      challenge: {
+        en: 'Turning nutrition science into everyday meal suggestions without overstating it, while keeping each household’s data visible only to its members.',
+        tr: 'Beslenme bilimini abartmadan gündelik öğün önerilerine dönüştürmek; her hanenin verisini yalnızca kendi üyelerine açık tutmak.',
+      },
+      approach: {
+        en: 'Every request is checked in the Vercel function and again by Postgres row-level security, because functions call the database with the caller’s own session. Each household list is one versioned document: a stale write gets HTTP 409 and the client adopts the server copy. Meal suggestions are a deterministic ranking against the macros left for the day, not a language model.',
+        tr: 'Her istek önce Vercel fonksiyonunda, sonra Postgres satır düzeyi güvenliğiyle tekrar denetlenir; çünkü fonksiyonlar veritabanına kullanıcının kendi oturumuyla bağlanır. Her hane listesi sürümlü tek bir belgedir: eski sürüme yapılan yazma HTTP 409 alır ve istemci sunucudaki kopyayı benimser. Öğün önerileri bir dil modeli değil; günün kalan makrolarına göre yapılan deterministik bir sıralamadır.',
+      },
+      status: {
+        en: 'Live, with small-scale use. Open work: making the macro ranges add up to the calorie target and separating planned meals from eaten ones.',
+        tr: 'Yayında, küçük ölçekte kullanılıyor. Açık işler: makro aralıklarının kalori hedefiyle tutarlı olması ve planlanan öğünlerle yenenlerin ayrılması.',
+      },
+    },
+    tags: ['Preact', 'TypeScript', 'Tailwind CSS', 'Supabase', 'PostgreSQL', 'Vercel Functions'],
+    video: '/media/grocery.mp4',
+    poster: {
+      base: '/media/grocery',
+      alt: {
+        en: 'Grocery meal plan on a phone: daily macro rings for calories, protein, carbs, fat and fibre above the day’s meals.',
+        tr: 'Telefonda Grocery yemek planı: günün öğünlerinin üstünde kalori, protein, karbonhidrat, yağ ve lif için günlük makro halkaları.',
+      },
+    },
+    links: [
+      { kind: 'app', href: 'https://grocery-five-ecru.vercel.app' },
+      { kind: 'code', href: 'https://github.com/ozan-ozel/grocery' },
+    ],
+  },
+  {
+    id: 'wsm',
+    title: 'Workspace Agent Session Manager',
+    placement: 'featured',
+    device: 'desktop',
+    accent: '#A992FF',
+    status: 'live',
+    summary: {
+      en: 'A VS Code extension that lists Claude Code and Codex sessions for every folder of a workspace, with context and usage limits in the status bar.',
+      tr: 'Claude Code ve Codex oturumlarını çalışma alanındaki her klasör için listeleyen, bağlam ve kullanım sınırlarını durum çubuğunda gösteren VS Code eklentisi.',
+    },
+    myPart: {
+      en: 'Solo project, published on the VS Code Marketplace.',
+      tr: 'Tek kişilik proje; VS Code Marketplace’te yayında.',
+    },
+    tags: ['TypeScript', 'VS Code Extension API', 'Node.js'],
+    video: '/media/wsm.mp4',
+    poster: {
+      base: '/media/wsm',
+      alt: {
+        en: 'VS Code side bar with the extension’s usage bars for Claude and Codex and its sessions grouped by repo.',
+        tr: 'Eklentinin Claude ve Codex kullanım çubuklarını ve depoya göre gruplanmış oturumlarını gösteren VS Code kenar çubuğu.',
+      },
+    },
+    links: [
+      {
+        kind: 'marketplace',
+        href: 'https://marketplace.visualstudio.com/items?itemName=egeozel.workspace-agent-session-manager',
+      },
+      { kind: 'code', href: 'https://github.com/ege-ozel/workspace-agent-session-manager' },
+    ],
+  },
+  {
+    id: 'interval-timer',
+    title: 'Interval Timer',
+    placement: 'featured',
+    device: 'desktop',
+    accent: '#F08A5D',
+    status: 'live',
+    summary: {
+      en: 'A work/break timer for Windows and the web, with presets, an always-on-top mini window and alarms from local files, YouTube or Spotify.',
+      tr: 'Hazır ayarlar, her zaman üstte duran mini pencere ve yerel dosya, YouTube ya da Spotify alarmlarıyla Windows ve web için çalışma/mola zamanlayıcısı.',
+    },
+    myPart: {
+      en: 'Solo project: timer logic, alarm sources, the Electron app, the PWA and the release pipeline.',
+      tr: 'Tek kişilik proje: zamanlayıcı mantığı, alarm kaynakları, Electron uygulaması, PWA ve sürüm hattı.',
+    },
+    notes: {
+      challenge: {
+        en: 'Three very different alarm sources have to behave the same way: pause, resume and a duration cap.',
+        tr: 'Birbirinden çok farklı üç alarm kaynağı aynı şekilde davranmalı: duraklatma, devam etme ve süre sınırı.',
+      },
+      approach: {
+        en: 'One shared core runs as an Electron desktop app and as an installable PWA. Alarms play a local file, a YouTube video or a Spotify track and fall back to the local sound when a source fails. The mini window stays above fullscreen apps, and the timer keeps ticking from the tray with background throttling disabled and a power-save blocker.',
+        tr: 'Ortak bir çekirdek hem Electron masaüstü uygulaması hem de kurulabilir PWA olarak çalışır. Alarmlar yerel dosya, YouTube videosu ya da Spotify parçası çalar; bir kaynak başarısız olursa yerel sese döner. Mini pencere tam ekran uygulamaların üstünde kalır; arka plan kısıtlaması kapatılıp güç tasarrufu engellenerek zamanlayıcı sistem tepsisinden çalışmaya devam eder.',
+      },
+    },
+    tags: ['JavaScript', 'Electron', 'PWA', 'YouTube IFrame API', 'Spotify Web API'],
+    video: '/media/interval-timer.mp4',
+    poster: {
+      base: '/media/interval-timer',
+      alt: {
+        en: 'Interval Timer web app running: 00:16 left in the work phase of loop 1, with Start, Pause, Continue and Reset.',
+        tr: 'Çalışan Interval Timer web uygulaması: 1. turun çalışma aşamasında 00:16 kaldı; Start, Pause, Continue ve Reset düğmeleri.',
+      },
+    },
+    links: [
+      { kind: 'site', href: 'https://ege-ozel.github.io/interval-timer/' },
+      { kind: 'release', href: 'https://github.com/ege-ozel/interval-timer/releases/latest' },
+      { kind: 'code', href: 'https://github.com/ege-ozel/interval-timer' },
+    ],
+  },
+  {
     id: 'trackmesh',
     title: 'TrackMesh',
     placement: 'featured',
@@ -44,42 +160,6 @@ export const projects: Project[] = [
       { kind: 'release', href: 'https://github.com/ege-ozel/trackmesh/releases/latest' },
       { kind: 'code', href: 'https://github.com/ege-ozel/trackmesh' },
     ],
-  },
-  {
-    id: 'grocery',
-    title: 'Grocery',
-    placement: 'featured',
-    device: 'mobile',
-    accent: '#9BCB6B',
-    status: 'live',
-    summary: {
-      en: 'A shopping list and meal-planning app for households, synced across devices, with nutrition guidance.',
-      tr: 'Haneler için cihazlar arasında eşitlenen alışveriş listesi ve yemek planlama uygulaması; beslenme rehberliğiyle.',
-    },
-    myPart: {
-      en: 'Built with Ozan Özel. My part: the meal-planning and nutrition features, per-user data access behind Supabase row-level security, the account deletion flow and most of the interface.',
-      tr: 'Ozan Özel ile birlikte geliştirildi. Benim payım: yemek planlama ve besin özellikleri, Supabase satır düzeyi güvenliğiyle kullanıcıya özel veri erişimi, hesap silme akışı ve arayüzün büyük bölümü.',
-    },
-    notes: {
-      challenge: {
-        en: 'Keeping one household’s lists in sync across devices and members, with clear ownership.',
-        tr: 'Bir hanenin listelerini cihazlar ve üyeler arasında, sahipliği net tutarak eşitlemek.',
-      },
-      approach: {
-        en: 'Preact with shadcn/ui running through preact/compat, Supabase for data and auth, one Vercel function per API route. Google sign-in, sessions, account deletion, household sharing by email and owner/member permissions.',
-        tr: 'shadcn/ui’ın preact/compat üzerinden çalıştığı Preact, veri ve kimlik doğrulama için Supabase, her API rotası için bir Vercel fonksiyonu. Google ile giriş, oturumlar, hesap silme, e-postayla hane paylaşımı ve sahip/üye yetkileri.',
-      },
-    },
-    tags: ['Preact', 'TypeScript', 'Tailwind CSS', 'Supabase', 'PostgreSQL', 'Vercel Functions'],
-    video: '/media/grocery.mp4',
-    poster: {
-      base: '/media/grocery',
-      alt: {
-        en: 'Grocery meal plan on a phone: daily macro rings for calories, protein, carbs, fat and fibre above the day’s meals.',
-        tr: 'Telefonda Grocery yemek planı: günün öğünlerinin üstünde kalori, protein, karbonhidrat, yağ ve lif için günlük makro halkaları.',
-      },
-    },
-    links: [{ kind: 'demo', href: 'https://grocery-five-ecru.vercel.app' }],
   },
   {
     id: 'metronome',
@@ -165,46 +245,6 @@ export const projects: Project[] = [
     links: [{ kind: 'code', href: 'https://github.com/ege-ozel/desktuk' }],
   },
   {
-    id: 'interval-timer',
-    title: 'Interval Timer',
-    placement: 'featured',
-    device: 'desktop',
-    accent: '#F08A5D',
-    status: 'live',
-    summary: {
-      en: 'A work/break timer for Windows and the web, with presets, an always-on-top mini window and alarms from local files, YouTube or Spotify.',
-      tr: 'Hazır ayarlar, her zaman üstte duran mini pencere ve yerel dosya, YouTube ya da Spotify alarmlarıyla Windows ve web için çalışma/mola zamanlayıcısı.',
-    },
-    myPart: {
-      en: 'Solo project: timer logic, alarm sources, the Electron app, the PWA and the release pipeline.',
-      tr: 'Tek kişilik proje: zamanlayıcı mantığı, alarm kaynakları, Electron uygulaması, PWA ve sürüm hattı.',
-    },
-    notes: {
-      challenge: {
-        en: 'Three very different alarm sources have to behave the same way: pause, resume and a duration cap.',
-        tr: 'Birbirinden çok farklı üç alarm kaynağı aynı şekilde davranmalı: duraklatma, devam etme ve süre sınırı.',
-      },
-      approach: {
-        en: 'One shared core runs as an Electron desktop app and as an installable PWA. Alarms play a local file, a YouTube video or a Spotify track and fall back to the local sound when a source fails. The mini window stays above fullscreen apps, and the timer keeps ticking from the tray with background throttling disabled and a power-save blocker.',
-        tr: 'Ortak bir çekirdek hem Electron masaüstü uygulaması hem de kurulabilir PWA olarak çalışır. Alarmlar yerel dosya, YouTube videosu ya da Spotify parçası çalar; bir kaynak başarısız olursa yerel sese döner. Mini pencere tam ekran uygulamaların üstünde kalır; arka plan kısıtlaması kapatılıp güç tasarrufu engellenerek zamanlayıcı sistem tepsisinden çalışmaya devam eder.',
-      },
-    },
-    tags: ['JavaScript', 'Electron', 'PWA', 'YouTube IFrame API', 'Spotify Web API'],
-    video: '/media/interval-timer.mp4',
-    poster: {
-      base: '/media/interval-timer',
-      alt: {
-        en: 'Interval Timer web app running: 00:16 left in the work phase of loop 1, with Start, Pause, Continue and Reset.',
-        tr: 'Çalışan Interval Timer web uygulaması: 1. turun çalışma aşamasında 00:16 kaldı; Start, Pause, Continue ve Reset düğmeleri.',
-      },
-    },
-    links: [
-      { kind: 'site', href: 'https://ege-ozel.github.io/interval-timer/' },
-      { kind: 'release', href: 'https://github.com/ege-ozel/interval-timer/releases/latest' },
-      { kind: 'code', href: 'https://github.com/ege-ozel/interval-timer' },
-    ],
-  },
-  {
     id: 'pdf-reader',
     title: 'PDF Reader',
     placement: 'more',
@@ -219,38 +259,6 @@ export const projects: Project[] = [
     tags: ['Tauri 2', 'JavaScript', 'PDF.js', 'Rust', 'Vitest'],
     poster: null,
     links: [{ kind: 'code', href: 'https://github.com/ege-ozel/pdf-reader' }],
-  },
-  {
-    id: 'wsm',
-    title: 'Workspace Agent Session Manager',
-    placement: 'more',
-    device: 'desktop',
-    accent: '#A992FF',
-    status: 'live',
-    summary: {
-      en: 'A VS Code extension that lists Claude Code and Codex sessions for every folder of a workspace, with context and usage limits in the status bar.',
-      tr: 'Claude Code ve Codex oturumlarını çalışma alanındaki her klasör için listeleyen, bağlam ve kullanım sınırlarını durum çubuğunda gösteren VS Code eklentisi.',
-    },
-    myPart: {
-      en: 'Solo project, published on the VS Code Marketplace.',
-      tr: 'Tek kişilik proje; VS Code Marketplace’te yayında.',
-    },
-    tags: ['TypeScript', 'VS Code Extension API', 'Node.js'],
-    video: '/media/wsm.mp4',
-    poster: {
-      base: '/media/wsm',
-      alt: {
-        en: 'VS Code side bar with the extension’s usage bars for Claude and Codex and its sessions grouped by repo.',
-        tr: 'Eklentinin Claude ve Codex kullanım çubuklarını ve depoya göre gruplanmış oturumlarını gösteren VS Code kenar çubuğu.',
-      },
-    },
-    links: [
-      {
-        kind: 'marketplace',
-        href: 'https://marketplace.visualstudio.com/items?itemName=egeozel.workspace-agent-session-manager',
-      },
-      { kind: 'code', href: 'https://github.com/ege-ozel/workspace-agent-session-manager' },
-    ],
   },
   {
     id: 'woodcraft',
@@ -338,7 +346,7 @@ export const featuredProjects = projects.filter((p) => p.placement === 'featured
 export const moreProjects = projects.filter((p) => p.placement === 'more');
 
 /** Links that let a visitor open or install the project, not only read its code. */
-const SHIPPED: readonly LinkKind[] = ['demo', 'site', 'release', 'marketplace'];
+const SHIPPED: readonly LinkKind[] = ['demo', 'app', 'site', 'release', 'marketplace'];
 
 /** How many projects a visitor can open or download right now. */
 export const shippedCount = projects.filter((p) => p.links.some((l) => SHIPPED.includes(l.kind))).length;

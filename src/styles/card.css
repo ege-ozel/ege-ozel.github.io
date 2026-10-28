@@ -359,3 +359,9 @@
     transform: none;
   }
 }
+
+.card__note {
+  margin-top: var(--s-2);
+  color: var(--text-2);
+  font-size: var(--fs-tag);
+}

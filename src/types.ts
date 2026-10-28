@@ -1,3 +1,5 @@
+import type { PageId } from './pages';
+
 export type Locale = 'en' | 'tr';
 export const locales: readonly Locale[] = ['en', 'tr'];
 
@@ -6,7 +8,7 @@ export type Text = Record<Locale, string>;
 
 export type Status = 'live' | 'preview' | 'prototype' | 'inDevelopment';
 export type Device = 'desktop' | 'mobile';
-export type LinkKind = 'demo' | 'code' | 'marketplace' | 'release' | 'site';
+export type LinkKind = 'demo' | 'app' | 'code' | 'marketplace' | 'release' | 'site';
 
 export interface ProjectLink {
   kind: LinkKind;
@@ -34,6 +36,8 @@ export interface Project {
   /** Silent preview clip, MP4. */
   video?: string;
   links: ProjectLink[];
+  /** The project's own case-study page, if it has one. */
+  caseStudy?: Exclude<PageId, 'home'>;
 }
 
 /** A figure in the header, such as "2 years". */
@@ -42,14 +46,19 @@ export interface Stat {
   label: Text;
 }
 
-/** The film under the header: a 16:9 cut for wide screens and a 9:16 cut for tall ones. */
-export interface HeroMedia {
+/** A real app screen: files live at `${base}-390.{avif,webp}` (see scripts/case-media.mjs). */
+export interface Shot {
+  base: string;
+  alt: Text;
+}
+
+/** The featured project under the header: a short pitch next to real screens. */
+export interface Hero {
   projectId: string;
+  kicker: Text;
   title: Text;
-  caption: Text;
-  /** `poster` is a base path; files follow scripts/media-sizes.mjs (.wide / .tall). */
-  landscape: { video: string; poster: string };
-  portrait: { video: string; poster: string };
+  summary: Text;
+  shots: Shot[];
 }
 
 export interface Job {
