@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { type PreviewMode, previewGroup, previewMode } from '../preview';
+import { Icon } from './Icon';
 
 interface Props {
   src: string;
@@ -104,6 +105,26 @@ export function PreviewVideo({ src, labels }: Props) {
     return () => observer.disconnect();
   }, [mode, start, stop]);
 
+  // While the clip plays, the frame is marked and a thin bar in the project colour tracks the clip,
+  // so it is clear something is playing. The bar is updated per frame on the compositor (transform).
+  useEffect(() => {
+    const video = ref.current;
+    if (!playing || !video) return;
+    const frame = video.closest('.media__frame');
+    const bar = frame?.querySelector<HTMLElement>('.media__progress-fill');
+    frame?.setAttribute('data-playing', '');
+    let id = 0;
+    const tick = () => {
+      if (bar && video.duration) bar.style.transform = `scaleX(${video.currentTime / video.duration})`;
+      id = requestAnimationFrame(tick);
+    };
+    tick();
+    return () => {
+      cancelAnimationFrame(id);
+      frame?.removeAttribute('data-playing');
+    };
+  }, [playing]);
+
   return (
     <>
       <video
@@ -126,9 +147,7 @@ export function PreviewVideo({ src, labels }: Props) {
           aria-label={playing ? labels.pause : labels.play}
           onClick={playing ? stop : start}
         >
-          <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-            {playing ? <path d="M3 2h4v12H3zM9 2h4v12H9z" /> : <path d="M4 2l10 6-10 6z" />}
-          </svg>
+          <Icon name={playing ? 'pause' : 'play'} />
         </button>
       )}
     </>

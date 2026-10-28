@@ -11,8 +11,8 @@ export const projects: Project[] = [
     status: 'live',
     caseStudy: 'grocery',
     summary: {
-      en: 'Helps Turkish households decide what to cook, plan meals against nutrition targets and share one shopping list across devices. Behind it: server-side Google sign-in, two authorization layers (function checks and Postgres row-level security), versioned sync and nutrition rules traced to a textbook-based decision register.',
-      tr: 'Türk hanelerinin ne pişireceğine karar vermesine, öğünleri beslenme hedeflerine göre planlamasına ve tek bir alışveriş listesini cihazlar arasında paylaşmasına yardım eder. Arkasında sunucu tarafında Google ile giriş, iki katmanlı yetkilendirme (fonksiyon kontrolleri ve Postgres satır düzeyi güvenliği), sürümlü eşitleme ve ders kitabı tabanlı bir karar kaydına bağlanan beslenme kuralları var.',
+      en: 'Helps Turkish households decide what to cook, plan meals around nutrition goals and keep one shared shopping list in sync. Behind it: server-side Google sign-in, two authorization layers (function checks and Postgres row-level security), versioned sync and nutrition rules traced to a textbook-based decision register.',
+      tr: 'Türk hanelerinin ne pişireceğine karar vermesine, öğünleri beslenme hedeflerine göre planlamasına ve ortak alışveriş listesini her cihazda güncel tutmasına yardım eder. Arkasında sunucu tarafında Google ile giriş, iki katmanlı yetkilendirme (fonksiyon kontrolleri ve Postgres satır düzeyi güvenliği), sürümlü eşitleme ve ders kitabı tabanlı bir karar kaydına bağlanan beslenme kuralları var.',
     },
     myPart: {
       en: 'Co-developed with Ozan Özel, who started the project. My part: Google sign-in and sessions, the versioned sync layer, meal planning, the personal nutrition plan, most of the row-level security policies, account deletion, most of the interface and most of the nutrition curriculum. Built with Claude Code under written rules.',

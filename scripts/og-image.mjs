@@ -2,7 +2,7 @@
 // Writes the 1200×630 link previews for LinkedIn and other sites, both built from real Grocery
 // screens (public/media/grocery-case/*-390.webp):
 //   public/og.png         the portfolio: name and role on the dark site background
-//   public/og-grocery.png the Grocery case study: title on warm paper
+//   public/og-grocery.png the Grocery case study: title on the same dark background
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
@@ -69,15 +69,14 @@ await render({
 
 await render({
   file: 'public/og-grocery.png',
-  background: '#f4f0e7',
-  frame: '#17232c',
-  text: `<g ${font} fill="#20332e">
-    <text x="64" y="150" font-size="20" fill="#b64a40" letter-spacing="2">CASE STUDY · FULL-STACK PRODUCT</text>
+  background: '#0d0f12',
+  frame: '#2a2f38',
+  text: `<g ${font} fill="#f2f2f5">
     <text x="64" y="240" font-size="68" font-weight="700" letter-spacing="-2">Grocery</text>
     <text x="64" y="300" font-size="32" font-weight="500">From meal planning</text>
     <text x="64" y="342" font-size="32" font-weight="500">to shared shopping</text>
-    <text x="64" y="410" font-size="21" fill="#4a5a54">Preact · Vercel Functions · Supabase RLS</text>
-    <text x="64" y="440" font-size="21" fill="#4a5a54">Nutrition rules traced to textbooks</text>
-    <text x="64" y="560" font-size="21" fill="#4a5a54">ege-ozel.github.io/projects/grocery</text>
+    <text x="64" y="410" font-size="21" fill="#9a9eaa">Preact · Vercel Functions · Supabase RLS</text>
+    <text x="64" y="440" font-size="21" fill="#9a9eaa">Nutrition rules traced to textbooks</text>
+    <text x="64" y="560" font-size="21" fill="#9a9eaa">ege-ozel.github.io/projects/grocery</text>
   </g>`,
 });

@@ -4,7 +4,7 @@ import { createT } from '../i18n';
 import { pagePath } from '../pages';
 import type { Locale } from '../types';
 import { ExternalLink } from './ExternalLink';
-import { Shot } from './Shot';
+import { HeroScreens } from './HeroScreens';
 
 /** The first project a visitor sees: Grocery's pitch, its links and three real screens. */
 export function FeaturedHero({ locale }: { locale: Locale }) {
@@ -17,7 +17,6 @@ export function FeaturedHero({ locale }: { locale: Locale }) {
   return (
     <section className="hero" aria-labelledby="hero-title">
       <div className="hero__text">
-        <p className="hero__kicker">{hero.kicker[locale]}</p>
         <h2 id="hero-title" className="hero__title">
           {hero.title[locale]}
         </h2>
@@ -49,14 +48,7 @@ export function FeaturedHero({ locale }: { locale: Locale }) {
           </p>
         )}
       </div>
-      <div className="hero__screens">
-        {hero.shots.map((shot, i) => (
-          <div key={shot.base} className={`phone phone--${i}`}>
-            {/* The middle screen sits in front, so it is the one image fetched with high priority. */}
-            <Shot shot={shot} locale={locale} eager priority={i === 1} />
-          </div>
-        ))}
-      </div>
+      <HeroScreens shots={hero.shots} locale={locale} />
     </section>
   );
 }

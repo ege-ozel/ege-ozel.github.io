@@ -12,6 +12,15 @@
   --accent: #69d8cc;
   --accent-hover: #8be6dc;
   --on-accent: #0d0f12;
+  --bezel: #2a2f38;
+  --band: #121419;
+  /* Decision register: teal for what is live, greys for what waits */
+  --bar-shipped: #69d8cc;
+  --bar-provisional: #4aa89e;
+  --bar-partial: #357d76;
+  --bar-covered: #2c5a56;
+  --bar-deferred: #8a8f9a;
+  --bar-blocked: #4b515c;
 
   /* Shape */
   --r-sm: 12px;
@@ -29,29 +38,101 @@
   --s-8: 72px;
   --s-9: 112px;
 
-  /* Type */
+  /* Type
+     Seven sizes, one per role. `npm run check` fails when a page renders a font size,
+     weight or family that is not defined here, so add a role here first.
+
+     Role      Size           Line height     Tracking       Weight     Used by
+     display   --fs-display   --lh-display    --tr-display   bold       each page's h1: the name, "Grocery"
+     title     --fs-title     --lh-title      --tr-title     bold       home: featured project name
+     section   --fs-section   --lh-heading    --tr-heading   bold       section headings on both pages
+     lead      --fs-lead      snug / lead     --tr-heading*  regular    tagline, case lead, card titles*, stat values*, email*
+     subhead   --fs-subhead   snug / body     -              semibold   role line, companies, sub headings
+     body      --fs-body      --lh-body       -              regular    running text
+     small     --fs-small     body / lead     -              medium     buttons, meta, tags, captions, notes; never running text
+     (* set in semibold or bold with heading tracking when the text is a name, not a sentence)
+
+     No eyebrow labels, no uppercase tracked labels, no index numbers; monospace only for code. */
   --font: 'Geist Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
-  --fs-name: clamp(2.5rem, 1.9rem + 1.6vw, 3.25rem);
-  --fs-lead: 1.125rem;
-  --fs-h2: 1.5rem;
-  --fs-h3: 1.375rem;
+
+  --fs-display: clamp(2.75rem, 1.6rem + 3.8vw, 5rem);
+  --fs-title: clamp(2rem, 1.4rem + 2vw, 3rem);
+  --fs-section: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+  --fs-lead: clamp(1.1875rem, 1rem + 0.8vw, 1.5rem);
+  --fs-subhead: 1.125rem;
   --fs-body: 1rem;
   --fs-small: 0.875rem;
-  --fs-tag: 0.8125rem;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 650;
+
+  --lh-display: 1.04;
+  --lh-title: 1.15;
+  --lh-heading: 1.2;
+  --lh-snug: 1.35;
+  --lh-lead: 1.45;
+  --lh-body: 1.6;
+
+  --tr-display: -0.035em;
+  --tr-title: -0.025em;
+  --tr-heading: -0.02em;
+
+  /* Reading width: about 70 characters of Geist at any size (1ch is a wide "0", so ch overshoots). */
+  --measure: 31em;
 
   /* Motion: three durations, one curve */
   --t-fast: 220ms;
   --t-base: 320ms;
   --t-slow: 550ms;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --lift: -4px;
-  --zoom: 1.02;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --lift: 0px;
-    --zoom: 1;
+/* Light theme: the system setting, unless the visitor picked dark; or picked light. Contrast on
+   --bg: text 17:1, text-2 6.6:1, accent 5.1:1, white on accent 5.5:1. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) {
+    color-scheme: light;
+    --bg: #f6f7f9;
+    --surface: #ffffff;
+    --surface-2: #eef0f3;
+    --text: #121418;
+    --text-2: #545a65;
+    --line: rgb(18 20 24 / 0.12);
+    --line-strong: rgb(18 20 24 / 0.24);
+    --accent: #0d7a70;
+    --accent-hover: #0a6159;
+    --on-accent: #ffffff;
+    --band: #ffffff;
+      --bar-shipped: #0d7a70;
+    --bar-provisional: #2f9c90;
+    --bar-partial: #6cc0b6;
+    --bar-covered: #b3ddd8;
+    --bar-deferred: #8a909b;
+    --bar-blocked: #c9cdd4;
   }
 }
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-2: #eef0f3;
+  --text: #121418;
+  --text-2: #545a65;
+  --line: rgb(18 20 24 / 0.12);
+  --line-strong: rgb(18 20 24 / 0.24);
+  --accent: #0d7a70;
+  --accent-hover: #0a6159;
+  --on-accent: #ffffff;
+  --band: #ffffff;
+  --bar-shipped: #0d7a70;
+  --bar-provisional: #2f9c90;
+  --bar-partial: #6cc0b6;
+  --bar-covered: #b3ddd8;
+  --bar-deferred: #8a909b;
+  --bar-blocked: #c9cdd4;
+}
+

@@ -17,14 +17,12 @@ const escapeAttr = (value) =>
 
 const locales = ['en', 'tr'];
 const prefix = (locale) => (locale === 'en' ? '' : `/${locale}`);
-/** Keep in step with src/pages.ts. The case study is a light page; the portfolio stays dark. */
+/** Keep in step with src/pages.ts. Both pages share the theme set in index.html. */
 const pages = {
-  home: { path: (l) => `${prefix(l)}/`, og: '/og.png', scheme: 'dark', theme: '#0D0F12', type: 'website' },
+  home: { path: (l) => `${prefix(l)}/`, og: '/og.png', type: 'website' },
   grocery: {
     path: (l) => `${prefix(l)}/projects/grocery/`,
     og: '/og-grocery.png',
-    scheme: 'light',
-    theme: '#F4F0E7',
     type: 'article',
   },
 };
@@ -65,8 +63,6 @@ for (const [pageId, page] of Object.entries(pages)) {
 
     let out = template;
     out = replaceOnce(out, '<html lang="en">', `<html lang="${locale}" data-page="${pageId}">`);
-    out = replaceOnce(out, '<meta name="color-scheme" content="dark" />', `<meta name="color-scheme" content="${page.scheme}" />`);
-    out = replaceOnce(out, '<meta name="theme-color" content="#0D0F12" />', `<meta name="theme-color" content="${page.theme}" />`);
     out = replaceOnce(out, /<title>[^<]*<\/title>/, `<title>${escapeAttr(title)}</title>`);
     out = replaceOnce(
       out,

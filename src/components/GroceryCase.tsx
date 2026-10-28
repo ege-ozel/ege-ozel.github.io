@@ -18,7 +18,9 @@ import { createT } from '../i18n';
 import { pagePath } from '../pages';
 import { locales, type Locale } from '../types';
 import { ExternalLink } from './ExternalLink';
+import { Icon } from './Icon';
 import { Shot } from './Shot';
+import { ThemeSwitch } from './ThemeSwitch';
 
 const TOTAL = decisionStatus.reduce((sum, s) => sum + s.count, 0);
 
@@ -27,7 +29,7 @@ function Heading({ id, locale }: { id: string; locale: Locale }) {
   if (!section) throw new Error(`Unknown case-study section ${id}`);
   return (
     <h2 id={`${id}-title`} className="cs-h2">
-      <span className="cs-h2__num">{section.number}</span> {section.title[locale]}
+      {section.title[locale]}
     </h2>
   );
 }
@@ -45,32 +47,36 @@ export function GroceryCase({ locale }: { locale: Locale }) {
       </a>
       <header className="cs-top">
         <a className="cs-top__home" href={pagePath('home', locale)}>
-          <span aria-hidden="true">←</span> {profile.name} · {t('case.back')}
+          <Icon name="arrowLeft" />
+          <span className="cs-top__name">{profile.name} · </span>
+          {t('case.back')}
         </a>
-        <nav className="lang" aria-label={t('lang.label')}>
-          {locales.map((code) => (
-            <a
-              key={code}
-              href={pagePath('grocery', code)}
-              hrefLang={code}
-              lang={code}
-              aria-current={code === locale ? 'page' : undefined}
-            >
-              {code.toUpperCase()}
-            </a>
-          ))}
-        </nav>
+        <div className="prefs">
+          <ThemeSwitch locale={locale} />
+          <nav className="lang switch" aria-label={t('lang.label')}>
+            <span className="switch__pill" aria-hidden="true" />
+            {locales.map((code) => (
+              <a
+                key={code}
+                href={pagePath('grocery', code)}
+                hrefLang={code}
+                lang={code}
+                aria-current={code === locale ? 'page' : undefined}
+              >
+                {code.toUpperCase()}
+              </a>
+            ))}
+          </nav>
+        </div>
       </header>
 
       <main id="case" className="cs-main" tabIndex={-1}>
         <section className="cs-hero" aria-labelledby="case-title">
           <div className="cs-hero__text">
-            <p className="cs-kicker">{L(intro.kicker)}</p>
             <h1 id="case-title" className="cs-h1">
               {L(intro.title)}
             </h1>
             <p className="cs-lead">{L(intro.lead)}</p>
-            <p className="cs-body">{L(intro.body)}</p>
             <ul className="actions cs-actions">
               <li>
                 <ExternalLink className="btn btn--primary" href={links.code} hint={newTab}>
@@ -105,9 +111,7 @@ export function GroceryCase({ locale }: { locale: Locale }) {
           <ol>
             {sections.map((s) => (
               <li key={s.id}>
-                <a href={`#${s.id}`}>
-                  <span className="cs-mono">{s.number}</span> {L(s.title)}
-                </a>
+                <a href={`#${s.id}`}>{L(s.title)}</a>
               </li>
             ))}
           </ol>
@@ -153,31 +157,33 @@ export function GroceryCase({ locale }: { locale: Locale }) {
               </div>
             </article>
           ))}
-          <ul className="cs-cards">
-            {walkthrough.more.map((item) => (
-              <li key={item.title.en}>
-                <h3 className="cs-h3">{L(item.title)}</h3>
-                <p>{L(item.body)}</p>
-              </li>
-            ))}
-          </ul>
-          <figure className="cs-video">
-            <video
-              controls
-              playsInline
-              preload="none"
-              width={390}
-              height={844}
-              poster={walkthrough.video.poster}
-              aria-label={L(walkthrough.video.title)}
-            >
-              <source src={walkthrough.video.src} type="video/mp4" />
-              {t('case.noVideo')}
-            </video>
-            <figcaption>
-              <strong>{L(walkthrough.video.title)}.</strong> {L(walkthrough.video.caption)}
-            </figcaption>
-          </figure>
+          <div className="cs-more">
+            <ul className="cs-cards cs-cards--stack">
+              {walkthrough.more.map((item) => (
+                <li key={item.title.en}>
+                  <h3 className="cs-h3">{L(item.title)}</h3>
+                  <p>{L(item.body)}</p>
+                </li>
+              ))}
+            </ul>
+            <figure className="cs-video">
+              <video
+                controls
+                playsInline
+                preload="none"
+                width={390}
+                height={844}
+                poster={walkthrough.video.poster}
+                aria-label={L(walkthrough.video.title)}
+              >
+                <source src={walkthrough.video.src} type="video/mp4" />
+                {t('case.noVideo')}
+              </video>
+              <figcaption>
+                <strong>{L(walkthrough.video.title)}.</strong> {L(walkthrough.video.caption)}
+              </figcaption>
+            </figure>
+          </div>
         </section>
 
         <section id="architecture" className="cs-section cs-dark" aria-labelledby="architecture-title" tabIndex={-1}>
@@ -194,7 +200,7 @@ export function GroceryCase({ locale }: { locale: Locale }) {
               </li>
               <li className="cs-node">
                 <strong>{L(architecture.diagram.functions)}</strong>
-                <span className="cs-mono">{L(architecture.diagram.functionsDetail)}</span>
+                <code>{L(architecture.diagram.functionsDetail)}</code>
                 <span className="cs-node__side">↔ {L(architecture.diagram.google)}</span>
               </li>
               <li className="cs-edge" aria-hidden="true">
@@ -230,22 +236,20 @@ export function GroceryCase({ locale }: { locale: Locale }) {
             {decisionStatus.map((s) => (
               <li key={s.id}>
                 <span className={`cs-swatch cs-bar__seg--${s.id}`} aria-hidden="true" />
-                <span className="cs-mono">{s.count}</span> {L(s.label)}
+                <span className="cs-num">{s.count}</span> {L(s.label)}
               </li>
             ))}
             <li className="cs-legend__total">
-              <span className="cs-mono">{TOTAL}</span> DEC
+              <span className="cs-num">{TOTAL}</span> DEC
             </li>
           </ul>
           <p className="cs-small">{L(nutrition.statusNote)}</p>
 
           <h3 className="cs-h3">{L(nutrition.chainTitle)}</h3>
           <ol className="cs-chain">
-            {nutrition.chain.map((step, i) => (
+            {nutrition.chain.map((step) => (
               <li key={step.title.en}>
-                <span className="cs-chain__label cs-mono">
-                  {String(i + 1).padStart(2, '0')} · {L(step.title)}
-                </span>
+                <span className="cs-chain__label">{L(step.title)}</span>
                 <p>{L(step.body)}</p>
               </li>
             ))}
@@ -294,7 +298,7 @@ export function GroceryCase({ locale }: { locale: Locale }) {
           </dl>
         </section>
 
-        <section id="status" className="cs-section" aria-labelledby="status-title" tabIndex={-1}>
+        <section id="status" className="cs-section cs-section--split" aria-labelledby="status-title" tabIndex={-1}>
           <Heading id="status" locale={locale} />
           <p className="cs-prose">{L(status.body)}</p>
           <ul className="cs-list">
@@ -304,7 +308,7 @@ export function GroceryCase({ locale }: { locale: Locale }) {
           </ul>
         </section>
 
-        <section id="credits" className="cs-section" aria-labelledby="credits-title" tabIndex={-1}>
+        <section id="credits" className="cs-section cs-section--split" aria-labelledby="credits-title" tabIndex={-1}>
           <Heading id="credits" locale={locale} />
           <div className="cs-prose">
             {credits.body.map((p) => (
@@ -343,7 +347,7 @@ export function GroceryCase({ locale }: { locale: Locale }) {
 
       <footer className="cs-footer">
         <a href={pagePath('home', locale)}>
-          <span aria-hidden="true">←</span> {t('case.back')}
+          <Icon name="arrowLeft" /> {t('case.back')}
         </a>
         <span>{t('footer.note')}</span>
       </footer>

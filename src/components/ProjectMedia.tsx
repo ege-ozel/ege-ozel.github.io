@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { createT } from '../i18n';
 import { useLightbox } from '../lightbox';
 import type { Device, Locale, Poster as PosterData, Project } from '../types';
+import { Icon } from './Icon';
 import { PreviewVideo } from './PreviewVideo';
 
 const POSTER = {
@@ -49,6 +50,7 @@ export function ProjectMedia({ project, locale, eager }: Props) {
   useEffect(() => setReady(true), []);
   const demo = project.links.find((link) => link.kind === 'demo');
   const video = project.poster ? project.video : undefined;
+  const preview = video && <PreviewVideo src={video} labels={{ play: t('media.play'), pause: t('media.pause') }} />;
   return (
     <div className={`media media--${project.device}`}>
       <div className="media__frame">
@@ -59,11 +61,26 @@ export function ProjectMedia({ project, locale, eager }: Props) {
         )}
         <div className="media__screen">
           {project.poster ? (
-            <Poster poster={project.poster} device={project.device} alt={project.poster.alt[locale]} eager={eager} />
+            project.device === 'mobile' ? (
+              // Poster and clip share one phone frame, so the clip lands exactly on the poster.
+              <div className="media__phone">
+                <Poster poster={project.poster} device="mobile" alt={project.poster.alt[locale]} eager={eager} />
+                {preview}
+              </div>
+            ) : (
+              <>
+                <Poster poster={project.poster} device="desktop" alt={project.poster.alt[locale]} eager={eager} />
+                {preview}
+              </>
+            )
           ) : (
             <p className="media__empty">{t('media.empty')}</p>
           )}
-          {video && <PreviewVideo src={video} labels={{ play: t('media.play'), pause: t('media.pause') }} />}
+          {video && (
+            <span className="media__progress" aria-hidden="true">
+              <span className="media__progress-fill" />
+            </span>
+          )}
           {video && (
             <button
               type="button"
@@ -71,9 +88,7 @@ export function ProjectMedia({ project, locale, eager }: Props) {
               hidden={!ready}
               onClick={() => openLightbox({ src: video, title: project.title })}
             >
-              <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-                <path d="M4 2l10 6-10 6z" />
-              </svg>
+              <Icon name="play" />
               {t('media.watch')}
               <span className="sr-only">: {project.title}</span>
             </button>

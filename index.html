@@ -3,8 +3,179 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#0D0F12" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#0D0F12" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#F6F7F9" media="(prefers-color-scheme: light)" />
+    <script>
+      // Theme and language, shared by every page (the case study is static and loads no other
+      // script). Theme: the visitor's saved choice ("dark" or "light"), otherwise the system
+      // setting, applied before the first paint so the page never flashes the wrong theme.
+      (function () {
+        var root = document.documentElement;
+        var colors = { dark: '#0D0F12', light: '#F6F7F9' };
+        var fadeTimer = 0;
+        function still() {
+          return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        }
+        function saved() {
+          try {
+            return localStorage.getItem('theme');
+          } catch (e) {
+            return null;
+          }
+        }
+        function apply(choice) {
+          var fixed = choice === 'dark' || choice === 'light';
+          if (fixed) root.setAttribute('data-theme', choice);
+          else root.removeAttribute('data-theme');
+          var metas = document.querySelectorAll('meta[name="theme-color"]');
+          for (var i = 0; i < metas.length; i++) {
+            var m = metas[i];
+            m.content = fixed ? colors[choice] : m.media.indexOf('dark') > -1 ? colors.dark : colors.light;
+          }
+          var buttons = document.querySelectorAll('[data-theme-choice]');
+          for (var j = 0; j < buttons.length; j++) {
+            var b = buttons[j];
+            b.setAttribute('aria-pressed', String(b.getAttribute('data-theme-choice') === (fixed ? choice : 'system')));
+          }
+        }
+        apply(saved());
+        document.addEventListener('DOMContentLoaded', function () {
+          apply(saved());
+        });
+
+        // Runs a change inside a view transition marked by a class on <html> (base.css styles each
+        // kind), or straight away where the browser has none or the visitor asked for less motion.
+        function transition(kind, change, onReady) {
+          if (!document.startViewTransition || still()) {
+            change();
+            return;
+          }
+          root.classList.add(kind);
+          var t = document.startViewTransition(change);
+          if (onReady) t.ready.then(onReady, function () {});
+          t.finished.finally(function () {
+            root.classList.remove(kind);
+          });
+        }
+
+        // Theme: the new theme opens as a circle from the pressed button, over the old one, so
+        // nothing passes through a half-way grey; the pill slides to its new place meanwhile.
+        function setTheme(choice, button) {
+          try {
+            if (choice === 'system') localStorage.removeItem('theme');
+            else localStorage.setItem('theme', choice);
+          } catch (e) {}
+          if (!document.startViewTransition && !still()) {
+            root.classList.add('theme-fade');
+            window.clearTimeout(fadeTimer);
+            fadeTimer = window.setTimeout(function () {
+              root.classList.remove('theme-fade');
+            }, 400);
+          }
+          var box = button.getBoundingClientRect();
+          var x = box.left + box.width / 2;
+          var y = box.top + box.height / 2;
+          var r = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+          transition(
+            'vt-theme',
+            function () {
+              apply(choice);
+            },
+            function () {
+              root.animate(
+                { clipPath: ['circle(0px at ' + x + 'px ' + y + 'px)', 'circle(' + r + 'px at ' + x + 'px ' + y + 'px)'] },
+                { duration: 650, easing: 'cubic-bezier(0.7, 0, 0.3, 1)', pseudoElement: '::view-transition-new(root)' },
+              );
+            },
+          );
+        }
+
+        // Language: the other page is fetched (already on hover) and swapped in place, so the page
+        // neither reloads nor jumps to the top. The portfolio re-renders through React
+        // (window.__renderLocale); the static case study takes the other page's markup.
+        var pages = {};
+        function langOf(url) {
+          return /^\/tr(\/|$)/.test(new URL(url, location.href).pathname) ? 'tr' : 'en';
+        }
+        function load(url) {
+          if (!pages[url]) {
+            pages[url] = fetch(url)
+              .then(function (res) {
+                if (!res.ok) throw new Error(String(res.status));
+                return res.text();
+              })
+              .then(function (text) {
+                return new DOMParser().parseFromString(text, 'text/html');
+              });
+            pages[url].catch(function () {
+              delete pages[url];
+            });
+          }
+          return pages[url];
+        }
+        var HEAD =
+          'title, meta[name="description"], link[rel="canonical"], link[rel="alternate"], meta[property^="og:"], meta[name^="twitter:"]';
+        function swap(doc, url) {
+          var old = document.head.querySelectorAll(HEAD);
+          for (var i = 0; i < old.length; i++) old[i].remove();
+          var next = doc.head.querySelectorAll(HEAD);
+          for (var j = 0; j < next.length; j++) document.head.appendChild(document.importNode(next[j], true));
+          var lang = langOf(url || location.href);
+          var focused = document.activeElement && document.activeElement.closest('.lang');
+          root.lang = lang;
+          if (window.__renderLocale) window.__renderLocale(lang);
+          else document.getElementById('root').innerHTML = doc.getElementById('root').innerHTML;
+          apply(saved());
+          if (url) history.pushState(null, '', url);
+          // The static page's links are new elements: keep keyboard focus on the switch.
+          if (focused && !window.__renderLocale) {
+            var link = document.querySelector('.lang a[hreflang="' + lang + '"]');
+            if (link) link.focus({ preventScroll: true });
+          }
+        }
+        function go(url, push) {
+          load(url).then(
+            function (doc) {
+              var next = doc.getElementById('root');
+              // The portfolio only needs the other page's head; the static page needs its markup
+              // too. The dev server answers every path with an empty shell: load the page then.
+              if (!window.__renderLocale && (!next || !next.firstElementChild)) return location.assign(url);
+              transition('vt-lang', function () {
+                swap(doc, push ? url : null);
+              });
+            },
+            function () {
+              location.assign(url);
+            },
+          );
+        }
+        function langLink(event) {
+          return event.target.closest ? event.target.closest('.lang a[hreflang]') : null;
+        }
+        function warm(event) {
+          var link = langLink(event);
+          if (link && !link.hasAttribute('aria-current')) load(link.href);
+        }
+        document.addEventListener('pointerover', warm);
+        document.addEventListener('focusin', warm);
+        // Back and forward between languages swap again; other history steps (the case study's
+        // section links) stay with the browser.
+        window.addEventListener('popstate', function () {
+          if (langOf(location.href) !== root.lang) go(location.href, false);
+        });
+
+        document.addEventListener('click', function (event) {
+          var button = event.target.closest ? event.target.closest('[data-theme-choice]') : null;
+          if (button) return setTheme(button.getAttribute('data-theme-choice'), button);
+          var link = langLink(event);
+          if (!link || event.defaultPrevented || event.button !== 0) return;
+          if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+          event.preventDefault();
+          if (!link.hasAttribute('aria-current')) go(link.href, true);
+        });
+      })();
+    </script>
     <title>Ege Özel, Frontend Developer</title>
     <meta name="description" content="Frontend developer in Ankara building React and TypeScript interfaces." />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

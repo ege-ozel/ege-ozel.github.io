@@ -9,79 +9,25 @@
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   background: var(--surface);
-  transition:
-    transform var(--t-base) var(--ease),
-    border-color var(--t-fast) var(--ease);
+  transition: border-color var(--t-fast) var(--ease);
 }
 
-/* The shadow fades on a pseudo-element; animating box-shadow repaints every frame. */
-.card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: 0 28px 56px -28px rgb(0 0 0 / 0.7);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--t-base) var(--ease);
-}
-
+/* Keyboard focus marks the card without moving it: a card that jumps on every Tab is hard to follow. */
 .card:focus-within {
-  transform: translateY(var(--lift));
   border-color: var(--line-strong);
 }
 
-.card:focus-within::after {
-  opacity: 1;
-}
-
-@media (hover: hover) {
+/* Hover is quiet, because it happens often: nothing moves or grows. The border firms up and the
+   preview plays. */
+@media (hover: hover) and (pointer: fine) {
   .card:hover {
-    transform: translateY(var(--lift));
     border-color: var(--line-strong);
   }
-
-  .card:hover::after {
-    opacity: 1;
-  }
-
-  .card:hover .media__screen img {
-    transform: scale(var(--zoom));
-    will-change: transform;
-  }
-
-  .card:hover .media::before,
-  .card:hover .media__frame::after {
-    opacity: 1;
-  }
 }
 
-.card:focus-within .media::before,
-.card:focus-within .media__frame::after {
-  opacity: 1;
-}
-
-/* Media: one frame, poster, optional video. On hover a soft glow in the project color
-   fades in behind it and a thin colored edge fades in on it (opacity only, no layers). */
+/* Media: one frame, poster, optional video. */
 .media {
   position: relative;
-  isolation: isolate;
-}
-
-.media::before {
-  content: '';
-  position: absolute;
-  inset: -10% -4% -4%;
-  z-index: -1;
-  background: radial-gradient(
-    60% 70% at 50% 45%,
-    color-mix(in srgb, var(--accent-project) 38%, transparent),
-    transparent 72%
-  );
-  filter: blur(28px);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--t-slow) var(--ease);
 }
 
 .media__frame {
@@ -92,18 +38,6 @@
   background: var(--surface-2);
 }
 
-.media__frame::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  border: 1px solid color-mix(in srgb, var(--accent-project) 70%, transparent);
-  border-radius: inherit;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--t-base) var(--ease);
-}
-
 .media__bar {
   display: flex;
   align-items: center;
@@ -111,7 +45,7 @@
   padding: 0 var(--s-3);
   border-bottom: 1px solid var(--line);
   color: var(--text-2);
-  font-size: 0.75rem;
+  font-size: var(--fs-small);
 }
 
 .media__bar span {
@@ -130,27 +64,42 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform var(--t-slow) var(--ease);
 }
 
 .media--mobile .media__screen {
   display: grid;
   place-items: center;
+  grid-template-rows: minmax(0, 1fr);
 }
 
-.media--mobile picture {
+/* The phone: the bezel is the padding on a dark box, and the screen inside has its own, smaller
+   radius. A border with overflow clipping leaves a light fringe on the inner curve. Poster and clip
+   sit in the same grid cell, so the clip covers the poster exactly. */
+.media__phone {
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
   height: 88%;
+  min-height: 0;
   aspect-ratio: 9 / 19.5;
-  overflow: hidden;
-  border: 6px solid #050608;
+  padding: 6px;
   border-radius: 24px;
+  background: #050608;
+}
+
+.media__phone > picture,
+.media__phone > .media__video {
+  grid-area: 1 / 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 18px;
 }
 
 .media--mobile .media__screen img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform var(--t-slow) var(--ease);
 }
 
 .media__empty {
@@ -173,10 +122,45 @@
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  transition: opacity var(--t-fast) var(--ease);
+  transition: opacity var(--t-base) var(--ease);
+}
+
+.media__phone > .media__video {
+  position: static;
 }
 
 .media__video.is-playing {
+  opacity: 1;
+}
+
+/* Playing: a bar at the top of the screen, under the address bar on desktop cards, tracks the
+   clip. Its faint track shows the whole length from the start, and it sits inset with round ends,
+   so it reads as a progress bar and not as the frame's edge. */
+.media__progress {
+  position: absolute;
+  top: var(--s-2);
+  right: var(--s-3);
+  left: var(--s-3);
+  z-index: 1;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgb(128 132 140 / 0.4);
+  opacity: 0;
+  transition: opacity var(--t-base) var(--ease);
+  pointer-events: none;
+}
+
+.media__progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--accent-project) 80%, var(--text));
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.media__frame[data-playing] .media__progress {
   opacity: 1;
 }
 
@@ -189,17 +173,11 @@
   width: 44px;
   height: 44px;
   padding: 0;
-  border: 1px solid var(--line-strong);
+  border: 1px solid rgb(242 242 245 / 0.2);
   border-radius: 50%;
   background: rgb(13 15 18 / 0.85);
-  color: var(--text);
+  color: #f2f2f5;
   cursor: pointer;
-}
-
-.preview-toggle svg {
-  width: 16px;
-  height: 16px;
-  fill: currentColor;
 }
 
 /* Body */
@@ -216,10 +194,10 @@
 }
 
 .card__title {
-  font-size: var(--fs-h3);
-  font-weight: 600;
-  line-height: 1.25;
-  letter-spacing: -0.02em;
+  font-size: var(--fs-lead);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tr-heading);
 }
 
 .status {
@@ -227,8 +205,8 @@
   align-items: center;
   gap: 6px;
   color: var(--text-2);
-  font-size: var(--fs-tag);
-  font-weight: 500;
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
 }
 
 .status::before {
@@ -244,7 +222,7 @@
 }
 
 .card__summary {
-  max-width: 62ch;
+  max-width: var(--measure);
   margin-top: var(--s-2);
   color: var(--text-2);
 }
@@ -260,19 +238,19 @@
   padding: 2px 10px;
   border-radius: var(--r-sm);
   background: var(--surface-2);
-  font-size: var(--fs-tag);
+  font-size: var(--fs-small);
 }
 
 .card__part {
-  max-width: 66ch;
+  max-width: var(--measure);
   margin-top: var(--s-4);
   color: var(--text-2);
-  font-size: var(--fs-small);
+  font-size: var(--fs-body);
 }
 
 .card__label {
   color: var(--text);
-  font-weight: 500;
+  font-weight: var(--fw-medium);
 }
 
 .card .links {
@@ -290,7 +268,7 @@
   gap: var(--s-2);
   min-height: 44px;
   font-size: var(--fs-small);
-  font-weight: 500;
+  font-weight: var(--fw-medium);
   list-style: none;
   cursor: pointer;
 }
@@ -321,11 +299,11 @@
 
 .notes dt {
   font-size: var(--fs-small);
-  font-weight: 500;
+  font-weight: var(--fw-medium);
 }
 
 .notes dd {
-  max-width: 66ch;
+  max-width: var(--measure);
   margin-top: 2px;
   color: var(--text-2);
   font-size: var(--fs-small);
@@ -336,32 +314,16 @@
   aspect-ratio: 16 / 5;
 }
 
-/* Phone cards: the clip plays inside the same phone frame as the poster. */
-.media--mobile .media__video {
-  inset: 6% auto auto 50%;
-  width: auto;
-  height: 88%;
-  aspect-ratio: 9 / 19.5;
-  transform: translateX(-50%);
-  border: 6px solid #050608;
-  border-radius: 24px;
-}
-
 /* Narrow screens: move the phone to the right so the watch button on the left doesn't cover it. */
 @media (max-width: 640px) {
   .media--mobile .media__screen {
     justify-items: end;
     padding-right: 10%;
   }
-
-  .media--mobile .media__video {
-    inset: 6% 10% auto auto;
-    transform: none;
-  }
 }
 
 .card__note {
   margin-top: var(--s-2);
   color: var(--text-2);
-  font-size: var(--fs-tag);
+  font-size: var(--fs-small);
 }

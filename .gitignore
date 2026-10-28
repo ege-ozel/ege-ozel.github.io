@@ -4,3 +4,11 @@ dist-ssr/
 tmp/
 .vercel
 .env*
+
+# Agent skills (installed locally, not part of the site)
+.claude/**
+.agents/**
+skills-lock.json
+
+# Taste skill inspector output
+.taste-skill/

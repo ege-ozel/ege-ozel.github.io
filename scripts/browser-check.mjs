@@ -2,7 +2,7 @@
 // Serves dist/ locally and checks the built pages in Chrome through Playwright.
 // PLAYWRIGHT_MODULE: path to a playwright package (default: "playwright").
 // CHROME_PATH: Chrome executable (default: the installed Google Chrome on Windows).
-import { createReadStream, existsSync, statSync } from 'node:fs';
+import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
@@ -49,7 +49,8 @@ const failures = [];
 const fail = (where, message) => failures.push(`${where}: ${message}`);
 
 async function open(path, viewport, options = {}) {
-  const context = await browser.newContext({ viewport, ...options });
+  // The site follows the system theme; the main checks run dark, the theme block below runs light.
+  const context = await browser.newContext({ viewport, colorScheme: 'dark', ...options });
   const page = await context.newPage();
   const errors = [];
   page.on('console', (msg) => msg.type() === 'error' && errors.push(msg.text()));
@@ -57,6 +58,83 @@ async function open(path, viewport, options = {}) {
   await page.goto(base + path, { waitUntil: 'networkidle' });
   await page.evaluate(() => document.fonts.ready);
   return { context, page, errors };
+}
+
+// Typography: every rendered size, weight and family comes from a token in tokens.css,
+// prose stays readable, and no text spills out of its box.
+const tokenNames = (prefix) => [...readFileSync(join(root, 'src/styles/tokens.css'), 'utf8').matchAll(new RegExp(`(--${prefix}-[\\w-]+):`, 'g'))].map((m) => m[1]);
+const typeTokens = { sizes: [...new Set(tokenNames('fs'))], weights: [...new Set(tokenNames('fw'))] };
+// Selectors allowed outside the type tokens (none today).
+const typeExceptions = [];
+// Notes and captions may stay at the small size; every other running paragraph is 16px or more.
+const noteRoles = ['.cs-note', '.cs-small'];
+
+async function checkType(page, where) {
+  const issues = await page.evaluate(
+    ({ sizes, weights, exceptions, notes }) => {
+      const out = [];
+      const probe = document.createElement('span');
+      probe.style.cssText = 'position:absolute;visibility:hidden;display:inline-block;';
+      document.body.append(probe);
+      const resolve = (prop, name) => {
+        probe.style[prop] = `var(${name})`;
+        return getComputedStyle(probe)[prop];
+      };
+      const allowedSizes = sizes.map((n) => parseFloat(resolve('fontSize', n)));
+      const allowedWeights = weights.map((n) => resolve('fontWeight', n));
+      const families = ['--font', '--mono'].map((n) => resolve('fontFamily', n));
+      const label = (el) => `${el.tagName.toLowerCase()}${el.className ? '.' + String(el.className).trim().split(/\s+/).join('.') : ''} "${el.textContent.trim().slice(0, 30)}"`;
+
+      const textEls = [...document.body.querySelectorAll('*')].filter(
+        (el) =>
+          !el.closest('svg, script, style, noscript, [hidden], [aria-hidden="true"]') &&
+          !exceptions.some((s) => el.matches(s)) &&
+          !el.closest('.sr-only') &&
+          el.checkVisibility({ visibilityProperty: true }) &&
+          [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()),
+      );
+      for (const el of textEls) {
+        const cs = getComputedStyle(el);
+        const size = parseFloat(cs.fontSize);
+        if (!allowedSizes.some((s) => Math.abs(s - size) < 0.5)) out.push(`size ${size}px is not a token: ${label(el)}`);
+        if (!allowedWeights.includes(cs.fontWeight)) out.push(`weight ${cs.fontWeight} is not a token: ${label(el)}`);
+        if (!families.includes(cs.fontFamily)) out.push(`font family outside the tokens: ${label(el)}`);
+        const tracking = parseFloat(cs.letterSpacing) / size;
+        if (tracking < -0.0405) out.push(`tracking ${tracking.toFixed(3)}em is tighter than -0.04em: ${label(el)}`);
+        const block = !cs.display.startsWith('inline') && cs.display !== 'contents';
+        const onlyText = [...el.children].every((c) => getComputedStyle(c).display.startsWith('inline'));
+        if (block && onlyText && cs.textOverflow !== 'ellipsis' && el.scrollWidth > el.clientWidth + 1) {
+          out.push(`text overflows its box by ${el.scrollWidth - el.clientWidth}px: ${label(el)}`);
+        }
+      }
+
+      // Prose: running paragraphs of two or more lines
+      for (const p of document.querySelectorAll('p')) {
+        if (!p.checkVisibility() || p.textContent.trim().length < 120) continue;
+        const cs = getComputedStyle(p);
+        const lines = p.getBoundingClientRect().height / parseFloat(cs.lineHeight);
+        if (lines < 2) continue;
+        // Characters on a full line: the box width over the average width of this paragraph's own characters.
+        const text = p.textContent.trim();
+        probe.style.font = cs.font;
+        probe.style.letterSpacing = cs.letterSpacing;
+        probe.style.whiteSpace = 'nowrap';
+        probe.textContent = text;
+        const measure = Math.round(p.clientWidth / (probe.getBoundingClientRect().width / text.length));
+        probe.textContent = '';
+        if (measure > 75) out.push(`about ${measure} characters per line, over 75: ${label(p)}`);
+        if (parseFloat(cs.fontSize) < 15.5 && !notes.some((s) => p.matches(s))) out.push(`running text at ${cs.fontSize}: ${label(p)}`);
+      }
+      for (const h of document.querySelectorAll('h1, h2, h3')) {
+        const wrap = getComputedStyle(h).textWrapStyle ?? getComputedStyle(h).textWrap;
+        if (h.checkVisibility() && !String(wrap).includes('balance')) out.push(`heading without text-wrap: balance: ${label(h)}`);
+      }
+      probe.remove();
+      return [...new Set(out)];
+    },
+    { ...typeTokens, exceptions: typeExceptions, notes: noteRoles },
+  );
+  for (const issue of issues) fail(where, `type: ${issue}`);
 }
 
 const viewports = { phone: { width: 375, height: 812 }, tablet: { width: 768, height: 1024 }, desktop: { width: 1440, height: 900 } };
@@ -86,6 +164,7 @@ for (const [locale, path] of Object.entries(pages)) {
         .map((el) => el.textContent.trim()),
     );
     if (smallTargets.length) fail(where, `touch targets under 40px: ${smallTargets.join(', ')}`);
+    await checkType(page, where);
     await page.screenshot({ path: join(shots, `${locale}-${name}-fold.png`) });
     const hidden = [];
     for (const card of await page.locator('.card').all()) {
@@ -140,7 +219,7 @@ for (const [locale, path] of Object.entries(pages)) {
   await card.hover();
   await page.waitForTimeout(700);
   const lift = await card.evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m42);
-  if (Math.round(lift) !== -4) fail(where, `hover lift ${lift}, expected -4`);
+  if (Math.round(lift) !== 0) fail(where, `card moves on hover (${lift}px); hover should only firm the border and play the clip`);
   if (!(await card.evaluate((el) => !el.querySelector('.media__video')?.paused))) fail(where, 'hover did not start the card clip');
 
   await page.locator('.notes summary').first().click();
@@ -148,7 +227,8 @@ for (const [locale, path] of Object.entries(pages)) {
 
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.click('.lang a[hreflang="tr"]');
-  await page.waitForLoadState('networkidle');
+  // The switch swaps the language in place (no page load): wait for the new language.
+  await page.waitForFunction(() => document.documentElement.lang === 'tr', null, { timeout: 5000 }).catch(() => {});
   if (new URL(page.url()).pathname !== '/tr/') fail(where, `language link went to ${page.url()}`);
   if ((await page.getAttribute('html', 'lang')) !== 'tr') fail(where, 'Turkish page lang is not tr');
   if (errors.length) fail(where, `console errors: ${errors.join(' | ')}`);
@@ -213,11 +293,18 @@ for (const [locale, path] of Object.entries(casePages)) {
     const { context, page, errors } = await open(path, viewport);
     if ((await page.getAttribute('html', 'lang')) !== locale) fail(where, 'wrong html lang');
     if ((await page.locator('h1').count()) !== 1) fail(where, 'not exactly one h1');
-    if (!(await page.textContent('h1'))?.startsWith('Grocery —')) fail(where, 'h1 is not the Grocery title');
+    if ((await page.textContent('h1'))?.trim() !== 'Grocery') fail(where, 'h1 is not the Grocery title');
+    const headlineLines = await page.evaluate(() =>
+      [...document.querySelectorAll('h1, h2')].map((h) => ({
+        text: h.textContent.trim(),
+        lines: Math.round(h.getBoundingClientRect().height / parseFloat(getComputedStyle(h).lineHeight)),
+      })),
+    );
+    for (const h of headlineLines) if (h.lines > 2) fail(where, `"${h.text}" wraps to ${h.lines} lines`);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     if (overflow > 0) fail(where, `horizontal overflow ${overflow}px`);
     const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-    if (bg !== 'rgb(244, 240, 231)') fail(where, `page background is ${bg}`);
+    if (bg !== 'rgb(13, 15, 18)') fail(where, `page background is ${bg}`);
     const js = await page.evaluate(() => performance.getEntriesByType('resource').filter((r) => r.name.endsWith('.js')).length);
     if (js > 1) fail(where, `${js} script files loaded on a static page`);
     const smallTargets = await page.evaluate(() =>
@@ -226,6 +313,7 @@ for (const [locale, path] of Object.entries(casePages)) {
         .map((el) => el.textContent.trim()),
     );
     if (smallTargets.length) fail(where, `touch targets under 40px: ${smallTargets.join(', ')}`);
+    await checkType(page, where);
     await page.screenshot({ path: join(shots, `case-${locale}-${name}-fold.png`) });
     // Scroll through so the lazy screens load, then check every one did.
     await page.evaluate(async () => {
@@ -267,7 +355,8 @@ for (const [locale, path] of Object.entries(casePages)) {
   if ((await video.evaluate((el) => el.currentTime)) < 0.5) fail(where, 'the recording does not play');
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.click('.cs-top .lang a[hreflang="tr"]');
-  await page.waitForLoadState('networkidle');
+  // The switch swaps the language in place (no page load): wait for the new language.
+  await page.waitForFunction(() => document.documentElement.lang === 'tr', null, { timeout: 5000 }).catch(() => {});
   if (new URL(page.url()).pathname !== '/tr/projects/grocery/') fail(where, `language link went to ${page.url()}`);
   await page.click('.cs-top__home');
   await page.waitForLoadState('networkidle');
@@ -282,6 +371,29 @@ for (const [locale, path] of Object.entries(casePages)) {
   const sections = await page.locator('.cs-section').count();
   if (sections !== 9) fail('case no-JS', `${sections} sections instead of 9`);
   await context.close();
+}
+
+// Theme: the system setting by default, a saved choice overrides it, both pages share it
+for (const [where, path] of [['theme home', '/'], ['theme case', '/projects/grocery/']]) {
+  for (const [name, viewport] of [['phone', viewports.phone], ['desktop', viewports.desktop]]) {
+    const at = `${where} ${name}`;
+    const { context, page, errors } = await open(path, viewport, { colorScheme: 'light' });
+    const bg = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    const pressed = () => page.evaluate(() => document.querySelector('[data-theme-choice][aria-pressed="true"]')?.dataset.themeChoice);
+    if ((await bg()) !== 'rgb(246, 247, 249)') fail(at, `light system theme shows ${await bg()}`);
+    if ((await pressed()) !== 'system') fail(at, `switch shows ${await pressed()} instead of system`);
+    await page.screenshot({ path: join(shots, `light-${where.split(' ')[1]}-${name}-fold.png`) });
+    await page.click('[data-theme-choice="dark"]');
+    await page.waitForTimeout(400);
+    if ((await bg()) !== 'rgb(13, 15, 18)') fail(at, `dark choice shows ${await bg()}`);
+    await page.reload({ waitUntil: 'networkidle' });
+    if ((await bg()) !== 'rgb(13, 15, 18)' || (await pressed()) !== 'dark') fail(at, 'the dark choice is not kept after a reload');
+    await page.click('[data-theme-choice="system"]');
+    await page.waitForTimeout(400);
+    if ((await bg()) !== 'rgb(246, 247, 249)') fail(at, 'system choice does not return to light');
+    if (errors.length) fail(at, `console errors: ${errors.join(' | ')}`);
+    await context.close();
+  }
 }
 
 await browser.close();

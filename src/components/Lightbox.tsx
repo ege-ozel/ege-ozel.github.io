@@ -1,8 +1,11 @@
 import { useEffect, useRef } from 'react';
+import { Icon } from './Icon';
 
 export interface LightboxItem {
   src: string;
   title: string;
+  /** A still picture instead of a video; the alt text describes it. */
+  image?: { alt: string; width: number; height: number };
 }
 
 interface Props {
@@ -12,7 +15,7 @@ interface Props {
 }
 
 /**
- * A native modal dialog with one video. The browser traps focus and closes it on Escape;
+ * A native modal dialog with one video or one picture. The browser traps focus and closes it on Escape;
  * a click on the backdrop or the close button closes it too.
  */
 export function Lightbox({ item, onClose, labels }: Props) {
@@ -29,7 +32,7 @@ export function Lightbox({ item, onClose, labels }: Props) {
   return (
     <dialog
       ref={dialog}
-      className="lightbox"
+      className={item?.image ? 'lightbox lightbox--image' : 'lightbox'}
       aria-label={item?.title}
       onClose={() => {
         video.current?.pause();
@@ -42,11 +45,20 @@ export function Lightbox({ item, onClose, labels }: Props) {
       {item && (
         <div className="lightbox__body">
           <button type="button" className="lightbox__close" aria-label={labels.close} onClick={() => dialog.current?.close()}>
-            <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-              <path d="M3 3l10 10M13 3L3 13" />
-            </svg>
+            <Icon name="close" />
           </button>
-          <video ref={video} key={item.src} src={item.src} controls autoPlay muted playsInline className="lightbox__video" />
+          {item.image ? (
+            <img
+              key={item.src}
+              src={item.src}
+              alt={item.image.alt}
+              width={item.image.width}
+              height={item.image.height}
+              className="lightbox__image"
+            />
+          ) : (
+            <video ref={video} key={item.src} src={item.src} controls autoPlay muted playsInline className="lightbox__video" />
+          )}
           <p className="lightbox__title">{item.title}</p>
         </div>
       )}

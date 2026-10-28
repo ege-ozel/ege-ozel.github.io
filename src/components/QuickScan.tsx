@@ -1,18 +1,37 @@
 import { profile } from '../data/profile';
 import { createT, localePath } from '../i18n';
 import { locales, type Locale } from '../types';
+import { CopyEmail } from './CopyEmail';
+import { useLightbox } from '../lightbox';
 import { ExternalLink } from './ExternalLink';
+import { ThemeSwitch } from './ThemeSwitch';
 
 /** The first screen: everything a recruiter checks, before any project. */
 export function QuickScan({ locale }: { locale: Locale }) {
   const t = createT(locale);
   const newTab = ` (${t('link.newTab')})`;
+  const openLightbox = useLightbox();
 
   return (
     <header className="quick">
       <div className="quick__id">
         {profile.portrait ? (
-          <img className="portrait" src={profile.portrait} alt="" width={64} height={64} />
+          // Without script the link still opens the whole photo; with it, the photo opens in the lightbox.
+          <a
+            className="portrait-link"
+            href={profile.photo.src}
+            aria-label={t('profile.photo')}
+            onClick={(event) => {
+              event.preventDefault();
+              openLightbox({
+                src: profile.photo.src,
+                title: profile.name,
+                image: { alt: t('profile.photoAlt'), width: profile.photo.width, height: profile.photo.height },
+              });
+            }}
+          >
+            <img className="portrait" src={profile.portrait} alt="" width={88} height={88} />
+          </a>
         ) : (
           <div className="portrait portrait--empty" aria-hidden="true">
             {profile.initials}
@@ -22,19 +41,23 @@ export function QuickScan({ locale }: { locale: Locale }) {
           <h1 className="quick__name">{profile.name}</h1>
           <p className="quick__role">{t('profile.role')}</p>
         </div>
-        <nav className="lang" aria-label={t('lang.label')}>
-          {locales.map((code) => (
-            <a
-              key={code}
-              href={localePath(code)}
-              hrefLang={code}
-              lang={code}
-              aria-current={code === locale ? 'page' : undefined}
-            >
-              {code.toUpperCase()}
-            </a>
-          ))}
-        </nav>
+        <div className="prefs">
+          <ThemeSwitch locale={locale} />
+          <nav className="lang switch" aria-label={t('lang.label')}>
+            <span className="switch__pill" aria-hidden="true" />
+            {locales.map((code) => (
+              <a
+                key={code}
+                href={localePath(code)}
+                hrefLang={code}
+                lang={code}
+                aria-current={code === locale ? 'page' : undefined}
+              >
+                {code.toUpperCase()}
+              </a>
+            ))}
+          </nav>
+        </div>
       </div>
 
       <div className="quick__meta">
@@ -50,14 +73,18 @@ export function QuickScan({ locale }: { locale: Locale }) {
       <p className="quick__tagline">{profile.tagline[locale]}</p>
       <ul className="actions">
         <li>
-          <a className="btn btn--primary" href={profile.publicCv[locale]} type="application/pdf">
+          <a
+            className="btn btn--primary"
+            href={profile.publicCv[locale]}
+            type="application/pdf"
+            download={`Ege-Ozel-CV-${locale.toUpperCase()}.pdf`}
+          >
             {t('link.cv')}
+            <span className="btn__meta">PDF</span>
           </a>
         </li>
         <li>
-          <a className="btn" href={`mailto:${profile.email}`}>
-            {t('link.email')}
-          </a>
+          <CopyEmail email={profile.email} label={t('link.copyEmail')} copied={t('link.copied')} />
         </li>
         <li>
           <ExternalLink className="btn" href={profile.linkedin} hint={newTab}>

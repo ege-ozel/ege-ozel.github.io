@@ -28,16 +28,16 @@ export function App({ locale }: { locale: Locale }) {
               ))}
             </div>
           </Section>
-          <Section id="more" title={t('more.title')}>
+          <Section id="more" split title={t('more.title')}>
             <MoreWork locale={locale} />
           </Section>
-          <Section id="experience" title={t('experience.title')}>
+          <Section id="experience" split title={t('experience.title')}>
             <ExperienceList locale={locale} />
           </Section>
-          <Section id="education" title={t('education.title')}>
+          <Section id="education" split title={t('education.title')}>
             <EducationList locale={locale} />
           </Section>
-          <Section id="contact" title={t('contact.title')}>
+          <Section id="contact" split title={t('contact.title')}>
             <Contact locale={locale} />
           </Section>
           <footer className="footer">{t('footer.note')}</footer>

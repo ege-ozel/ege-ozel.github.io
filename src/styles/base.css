@@ -15,7 +15,7 @@ body {
   color: var(--text);
   font-family: var(--font);
   font-size: var(--fs-body);
-  line-height: 1.6;
+  line-height: var(--lh-body);
   /* clip, not hidden: hidden would break position: sticky on the profile */
   overflow-x: clip;
   -webkit-font-smoothing: antialiased;
@@ -28,6 +28,21 @@ p,
 dl,
 dd {
   margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+strong,
+b {
+  font-weight: var(--fw-bold);
 }
 
 ul,
@@ -66,6 +81,32 @@ a:hover {
   outline: none;
 }
 
+/* Icons (Icon.tsx): one 16px grid and one 1.5px round stroke everywhere. Play and pause are
+   solid; a thin stroke of the same colour rounds their corners. */
+.icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon--solid {
+  fill: currentColor;
+  stroke-width: 1;
+}
+
+/* The same set for pseudo-elements, drawn as a mask over the text colour. Arrow glyphs (↗ → ↓)
+   are not in Geist and fell back to a system font. */
+:root {
+  --icon-out: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 11 11 5M6 5h5v5'/%3E%3C/svg%3E");
+  --icon-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 3v10M3.5 8.5 8 13l4.5-4.5'/%3E%3C/svg%3E");
+  --icon-right: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 8h10M8.5 3.5 13 8l-4.5 4.5'/%3E%3C/svg%3E");
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -87,7 +128,7 @@ a:hover {
   border-radius: var(--r-sm);
   background: var(--accent);
   color: var(--on-accent);
-  font-weight: 500;
+  font-weight: var(--fw-medium);
   text-decoration: none;
   translate: 0 -200%;
 }
@@ -107,13 +148,22 @@ a:hover {
   background: var(--surface);
   color: var(--text);
   font-size: var(--fs-small);
-  font-weight: 500;
+  font-weight: var(--fw-medium);
   text-decoration: none;
   white-space: nowrap;
   transition:
     border-color var(--t-fast) var(--ease),
     background-color var(--t-fast) var(--ease),
-    color var(--t-fast) var(--ease);
+    color var(--t-fast) var(--ease),
+    transform 160ms var(--ease);
+}
+
+/* Press feedback: the button answers the moment it is pressed. */
+@media (prefers-reduced-motion: no-preference) {
+  .btn:active,
+  .watch:active {
+    transform: scale(0.97);
+  }
 }
 
 .btn:hover {
@@ -130,6 +180,85 @@ a:hover {
 .btn--primary:hover {
   background: var(--accent-hover);
   color: var(--on-accent);
+}
+
+/* Say what a button does before it is pressed: a file format, or an arrow when it leaves the site. */
+.btn {
+  gap: var(--s-2);
+}
+
+.btn__meta {
+  opacity: 0.7;
+}
+
+.btn[target='_blank']::after {
+  content: '';
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  mask: var(--icon-out) center / contain no-repeat;
+  opacity: 0.7;
+}
+
+/* Page changes and the theme and language switches use view transitions (the head script in
+   index.html starts them and marks <html> with the kind). */
+@media (prefers-reduced-motion: no-preference) {
+  /* Moving between pages of the site cross-fades instead of flashing white. */
+  @view-transition {
+    navigation: auto;
+  }
+
+  ::view-transition-group(*) {
+    animation-duration: 260ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Language: the background stays, so the old words stay put and the new ones fade in over
+     them, while the pill slides from one label to the other. A plain cross-fade would dim both
+     at once half-way and read as a flicker. */
+  :root.vt-lang::view-transition-old(root) {
+    animation: none;
+  }
+
+  :root.vt-lang::view-transition-new(root) {
+    animation: vt-fade-in 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    mix-blend-mode: normal;
+  }
+
+  @keyframes vt-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* Theme: no cross-fade, which would pass through a muddy half-way grey. The new theme stays
+     whole and opens as a circle from the pressed button (the script animates its clip). */
+  :root.vt-theme::view-transition-old(root),
+  :root.vt-theme::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+
+  /* The pill moves with the transition, so its own CSS slide waits. */
+  .vt-lang .switch__pill,
+  .vt-theme .switch__pill {
+    transition: none;
+  }
+
+  /* Theme change without view transitions: colours ease over instead of snapping. The head
+     script adds the class for one transition's length; the pill keeps its slide. */
+  .theme-fade,
+  .theme-fade *,
+  .theme-fade *::before,
+  .theme-fade *::after {
+    transition:
+      background-color 320ms ease,
+      border-color 320ms ease,
+      color 320ms ease,
+      fill 320ms ease,
+      stroke 320ms ease,
+      translate 220ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+  }
 }
 
 .btn--small {

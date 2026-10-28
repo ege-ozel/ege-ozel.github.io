@@ -19,8 +19,10 @@ const stats: Stat[] = [
 export const profile = {
   name: 'Ege Özel',
   initials: 'EÖ',
-  /** Path under public/ once a portrait exists; null shows the initials. */
-  portrait: null as string | null,
+  /** Path under public/; null shows the initials. */
+  portrait: '/portrait.webp' as string | null,
+  /** The whole photo the portrait is cut from, opened from the portrait. */
+  photo: { src: '/portrait-full.webp', width: 977, height: 1600 },
   openToWork: true,
   tagline: {
     en: 'React and TypeScript developer who ships complete products.',

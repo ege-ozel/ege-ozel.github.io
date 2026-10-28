@@ -55,7 +55,6 @@ export interface Shot {
 /** The featured project under the header: a short pitch next to real screens. */
 export interface Hero {
   projectId: string;
-  kicker: Text;
   title: Text;
   summary: Text;
   shots: Shot[];

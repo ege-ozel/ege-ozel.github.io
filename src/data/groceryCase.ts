@@ -11,7 +11,6 @@ import type { Shot, Text } from '../types';
 
 export interface CaseSection {
   id: string;
-  number: string;
   title: Text;
 }
 
@@ -30,15 +29,15 @@ interface Point {
 const shot = (name: string, alt: Text, caption: Text) => ({ base: `/media/grocery-case/${name}`, alt, caption });
 
 export const sections: CaseSection[] = [
-  { id: 'problem', number: '01', title: { en: 'The problem', tr: 'Sorun' } },
-  { id: 'walkthrough', number: '02', title: { en: 'Product walkthrough', tr: 'Ürün turu' } },
-  { id: 'architecture', number: '03', title: { en: 'Architecture', tr: 'Mimari' } },
-  { id: 'nutrition', number: '04', title: { en: 'Nutrition traceability', tr: 'Beslenmede izlenebilirlik' } },
-  { id: 'ai', number: '05', title: { en: 'AI-assisted development', tr: 'Yapay zekâ destekli geliştirme' } },
-  { id: 'tradeoffs', number: '06', title: { en: 'Trade-offs', tr: 'Bilinçli ödünler' } },
-  { id: 'status', number: '07', title: { en: 'Status and next steps', tr: 'Durum ve sıradaki adımlar' } },
-  { id: 'credits', number: '08', title: { en: 'Who built what', tr: 'Kim neyi yaptı' } },
-  { id: 'contact', number: '09', title: { en: 'Work with me', tr: 'Birlikte çalışalım' } },
+  { id: 'problem', title: { en: 'The problem', tr: 'Sorun' } },
+  { id: 'walkthrough', title: { en: 'Product walkthrough', tr: 'Ürün turu' } },
+  { id: 'architecture', title: { en: 'Architecture', tr: 'Mimari' } },
+  { id: 'nutrition', title: { en: 'Nutrition traceability', tr: 'Beslenmede izlenebilirlik' } },
+  { id: 'ai', title: { en: 'AI-assisted development', tr: 'Yapay zekâ destekli geliştirme' } },
+  { id: 'tradeoffs', title: { en: 'Trade-offs', tr: 'Bilinçli ödünler' } },
+  { id: 'status', title: { en: 'Status and next steps', tr: 'Durum ve sıradaki adımlar' } },
+  { id: 'credits', title: { en: 'Who built what', tr: 'Kim neyi yaptı' } },
+  { id: 'contact', title: { en: 'Work with me', tr: 'Birlikte çalışalım' } },
 ];
 
 export const meta = {
@@ -47,24 +46,16 @@ export const meta = {
     tr: 'Grocery — Yemek planından ortak alışverişe · Ege Özel',
   },
   description: {
-    en: 'Case study: a live full-stack app that helps Turkish households decide what to cook, plan meals against nutrition targets and share a shopping list. Preact, Vercel Functions, Supabase with row-level security.',
-    tr: 'Vaka çalışması: Türk hanelerinin ne pişireceğine karar vermesine, öğünleri beslenme hedeflerine göre planlamasına ve alışveriş listesini paylaşmasına yardım eden, yayındaki full-stack uygulama. Preact, Vercel Functions, satır düzeyi güvenlikli Supabase.',
+    en: 'Case study: a live full-stack app that helps Turkish households decide what to cook, plan meals around nutrition goals and keep one shared shopping list in sync. Preact, Vercel Functions, Supabase with row-level security.',
+    tr: 'Vaka çalışması: Türk hanelerinin ne pişireceğine karar vermesine, öğünleri beslenme hedeflerine göre planlamasına ve ortak alışveriş listesini her cihazda güncel tutmasına yardım eden, yayındaki full-stack uygulama. Preact, Vercel Functions, satır düzeyi güvenlikli Supabase.',
   },
 };
 
 export const intro = {
-  kicker: { en: 'Case study · Full-stack product', tr: 'Vaka çalışması · Full-stack ürün' },
-  title: {
-    en: 'Grocery — From Meal Planning to Shared Shopping',
-    tr: 'Grocery — Yemek planından ortak alışverişe',
-  },
+  title: { en: 'Grocery', tr: 'Grocery' },
   lead: {
-    en: 'A full-stack application connecting everyday food decisions, nutrition planning and household shopping.',
-    tr: 'Gündelik yemek kararlarını, beslenme planlamasını ve hane alışverişini birbirine bağlayan full-stack bir uygulama.',
-  },
-  body: {
-    en: 'Grocery helps Turkish households decide what to cook, plan the day’s meals against nutrition targets and share one shopping list across devices. It is live, used on a small scale, and built by two developers.',
-    tr: 'Grocery, Türk hanelerinin ne pişireceğine karar vermesine, günün öğünlerini beslenme hedeflerine göre planlamasına ve tek bir alışveriş listesini cihazlar arasında paylaşmasına yardım eder. Yayında, küçük ölçekte kullanılıyor ve iki geliştirici tarafından yapıldı.',
+    en: 'A full-stack app helping Turkish households decide what to cook, plan meals around nutrition goals and keep one shared shopping list in sync.',
+    tr: 'Türk hanelerinin ne pişireceğine karar vermesine, öğünleri beslenme hedeflerine göre planlamasına ve ortak alışveriş listesini her cihazda güncel tutmasına yardım eden full-stack bir uygulama.',
   },
   facts: [
     { label: { en: 'Role', tr: 'Rol' }, value: { en: 'Co-developer: product and full stack', tr: 'Ortak geliştirici: ürün ve full-stack' } },

@@ -4,28 +4,41 @@
 
 .section__title {
   margin-bottom: var(--s-5);
-  font-size: var(--fs-h2);
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-size: var(--fs-section);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tr-heading);
+}
+
+/* Lower sections: the heading holds the left column, the content the rest, so no half of the page sits empty. */
+@media (min-width: 960px) {
+  .section--split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
+    column-gap: var(--s-7);
+    align-items: start;
+  }
+
+  .section--split .section__title {
+    position: sticky;
+    top: var(--s-5);
+    margin-bottom: 0;
+  }
 }
 
 /* More work */
-.more__item {
-  padding: var(--s-5) 0;
-  border-top: 1px solid var(--line);
-}
-
-.more__item:last-child {
-  border-bottom: 1px solid var(--line);
+.more {
+  display: grid;
+  gap: var(--s-6);
 }
 
 .more__title {
-  font-size: 1.125rem;
-  font-weight: 600;
+  font-size: var(--fs-subhead);
+  font-weight: var(--fw-semibold);
 }
 
 .more__summary {
-  max-width: 62ch;
+  max-width: var(--measure);
   margin-top: var(--s-1);
   color: var(--text-2);
 }
@@ -33,7 +46,7 @@
 .more__tags {
   margin-top: var(--s-2);
   color: var(--text-2);
-  font-size: var(--fs-tag);
+  font-size: var(--fs-small);
 }
 
 .more__item .links {
@@ -47,8 +60,8 @@
 }
 
 .job__company {
-  font-size: 1.125rem;
-  font-weight: 600;
+  font-size: var(--fs-subhead);
+  font-weight: var(--fw-semibold);
 }
 
 .job__meta {
@@ -65,7 +78,7 @@
 
 .job__bullets li {
   position: relative;
-  max-width: 66ch;
+  max-width: var(--measure);
   padding-left: var(--s-4);
 }
 
@@ -92,7 +105,7 @@
 }
 
 .degree__title {
-  font-weight: 500;
+  font-weight: var(--fw-medium);
 }
 
 .degree__meta {
@@ -108,9 +121,9 @@
 .contact__email {
   display: inline-block;
   margin-top: var(--s-3);
-  font-size: clamp(1.25rem, 1rem + 1.2vw, 1.75rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-size: var(--fs-lead);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tr-heading);
   overflow-wrap: anywhere;
 }
 
@@ -121,7 +134,6 @@
 .footer {
   margin-top: var(--s-8);
   padding-top: var(--s-5);
-  border-top: 1px solid var(--line);
   color: var(--text-2);
   font-size: var(--fs-small);
 }

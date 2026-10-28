@@ -13,11 +13,28 @@
 }
 
 .portrait {
-  width: 64px;
-  height: 64px;
-  border: 1px solid var(--line-strong);
+  width: 88px;
+  height: 88px;
   border-radius: var(--r-lg);
   object-fit: cover;
+}
+
+/* The portrait opens the whole photo. A zoom-in cursor says so; the frame firms on hover. */
+.portrait-link {
+  display: block;
+  border-radius: var(--r-lg);
+  cursor: zoom-in;
+}
+
+.portrait-link .portrait {
+  display: block;
+  outline: 1px solid var(--line);
+  outline-offset: -1px;
+  transition: outline-color var(--t-fast) var(--ease);
+}
+
+.portrait-link:hover .portrait {
+  outline-color: var(--line-strong);
 }
 
 .portrait--empty {
@@ -25,9 +42,9 @@
   place-items: center;
   background: var(--surface);
   color: var(--text-2);
-  font-size: 1.125rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-size: var(--fs-subhead);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tr-heading);
 }
 
 .quick__heading {
@@ -35,16 +52,16 @@
 }
 
 .quick__name {
-  font-size: var(--fs-name);
-  font-weight: 650;
-  line-height: 1.02;
-  letter-spacing: -0.04em;
+  font-size: var(--fs-display);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
 }
 
 .quick__role {
   margin-top: var(--s-1);
-  font-size: var(--fs-lead);
-  font-weight: 500;
+  font-size: var(--fs-subhead);
+  font-weight: var(--fw-medium);
 }
 
 .quick__meta {
@@ -60,12 +77,8 @@
   display: inline-flex;
   align-items: center;
   gap: var(--s-2);
-  padding: 4px 12px;
-  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
   color: var(--text);
-  font-weight: 500;
+  font-weight: var(--fw-medium);
 }
 
 .dot {
@@ -77,83 +90,156 @@
 
 .quick__tagline {
   max-width: 34ch;
-  font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
-  line-height: 1.35;
+  font-size: var(--fs-lead);
+  line-height: var(--lh-snug);
   text-wrap: balance;
 }
 
 .quick__intro {
-  max-width: 62ch;
+  max-width: var(--measure);
   color: var(--text-2);
 }
 
+/* Figures and technologies sit unboxed: the name and the tagline lead, these support. */
 .stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--s-3);
+  gap: var(--s-3) var(--s-5);
+  margin-top: var(--s-2);
 }
 
 .stat {
   display: grid;
+  align-content: start;
   gap: var(--s-1);
-  padding: var(--s-4);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--surface);
 }
 
 .stat__value {
-  font-size: 1.5rem;
-  font-weight: 650;
-  letter-spacing: -0.02em;
+  font-size: var(--fs-lead);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--tr-heading);
   font-variant-numeric: tabular-nums;
 }
 
 .stat__label {
   color: var(--text-2);
   font-size: var(--fs-small);
-  line-height: 1.35;
+  line-height: var(--lh-snug);
 }
 
 .strengths {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-}
-
-.strength {
-  padding: 3px 10px;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--r-sm);
-  font-size: var(--fs-tag);
-  font-weight: 500;
-}
-
-.strength--secondary {
-  border-color: var(--line);
-  color: var(--text-2);
-}
-
-.lang {
-  display: flex;
-  gap: var(--s-1);
+  gap: var(--s-1) var(--s-4);
   font-size: var(--fs-small);
 }
 
-.lang a {
+.strength {
+  font-weight: var(--fw-medium);
+}
+
+.strength--secondary {
+  color: var(--text-2);
+  font-weight: var(--fw-regular);
+}
+
+/* Theme and language switches, side by side. One filled pill marks the current choice and slides
+   to the next one: within the page for the theme, across the page change for the language (the
+   pill and the labels carry view-transition names, so the browser moves them between documents). */
+.prefs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--s-2);
+}
+
+.switch {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--r-md);
+  background: var(--surface);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+}
+
+.switch a,
+.switch button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
+  width: 44px;
+  height: 40px;
+  padding: 0;
+  border: 0;
   border-radius: var(--r-sm);
+  background: transparent;
   color: var(--text-2);
+  font: inherit;
   text-decoration: none;
+  cursor: pointer;
+  transition: color var(--t-fast) var(--ease);
 }
 
-.lang a[aria-current='page'] {
-  background: var(--surface);
+.switch button {
+  width: 40px;
+}
+
+.switch a:hover,
+.switch button:hover {
   color: var(--text);
+}
+
+.switch__pill {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  z-index: -1;
+  width: 44px;
+  height: 40px;
+  border-radius: var(--r-sm);
+  background: var(--text);
+  transition: translate var(--t-fast) var(--ease);
+}
+
+/* Theme: the head script sets data-theme on <html> before the first paint, so the pill starts in
+   place instead of sliding in on load. No attribute means "system". */
+.switch--theme .switch__pill {
+  width: 40px;
+}
+
+:root[data-theme='dark'] .switch--theme .switch__pill {
+  translate: 42px 0;
+}
+
+:root[data-theme='light'] .switch--theme .switch__pill {
+  translate: 84px 0;
+}
+
+:root:not([data-theme]) [data-theme-choice='system'],
+:root[data-theme='dark'] [data-theme-choice='dark'],
+:root[data-theme='light'] [data-theme-choice='light'],
+.switch a[aria-current='page'],
+.switch a[aria-current='page']:hover {
+  color: var(--bg);
+}
+
+.lang:has(a[hreflang='tr'][aria-current='page']) .switch__pill {
+  translate: 46px 0;
+}
+
+.lang .switch__pill {
+  view-transition-name: lang-pill;
+}
+
+.lang a[hreflang='en'] {
+  view-transition-name: lang-en;
+}
+
+.lang a[hreflang='tr'] {
+  view-transition-name: lang-tr;
 }
 
 @media (max-width: 599px) {
@@ -165,23 +251,19 @@
     grid-template-columns: auto 1fr;
   }
 
-  .quick__id .lang {
+  .quick__id .prefs {
     grid-column: 1 / -1;
     grid-row: 1;
     justify-self: end;
   }
 
   .portrait {
-    width: 52px;
-    height: 52px;
-  }
-
-  .quick__name {
-    font-size: 2rem;
+    width: 60px;
+    height: 60px;
   }
 
   .quick__role {
-    font-size: 1rem;
+    font-size: var(--fs-body);
   }
 
   .stats {
@@ -191,6 +273,5 @@
   .stat {
     grid-template-columns: 5.5rem 1fr;
     align-items: baseline;
-    padding: var(--s-3) var(--s-4);
   }
 }

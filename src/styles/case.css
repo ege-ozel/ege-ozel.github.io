@@ -1,25 +1,8 @@
 /*
- * Grocery case study (/projects/grocery/). A light, editorial page: warm paper, pine ink,
- * a sparing label red, sage details and dark slate for the technical sections.
- * Contrast (WCAG): ink on paper 11.7, ink-2 on paper 6.4, red on paper 4.6, paper on slate 14.1,
- * sage on slate 8.9. Red is only used for labels and the primary button.
+ * Grocery case study (/projects/grocery/). It uses the portfolio's dark theme and tokens; Grocery's
+ * own colours appear only in its screens. Surfaces are told apart by tone and space, not by lines
+ * or outlines; monospace is only for real code names.
  */
-html[data-page='grocery'] {
-  color-scheme: light;
-  --bg: #f4f0e7;
-  --surface: #fbf8f2;
-  --surface-2: #ede7da;
-  --text: #20332e;
-  --text-2: #4a5a54;
-  --line: rgb(32 51 46 / 0.12);
-  --line-strong: rgb(32 51 46 / 0.3);
-  --accent: #b64a40;
-  --accent-hover: #9c3e35;
-  --on-accent: #fbf8f2;
-  --sage: #b8c5ba;
-  --slate: #17232c;
-}
-
 .cs {
   max-width: 1100px;
   margin: 0 auto;
@@ -32,8 +15,7 @@ html[data-page='grocery'] {
   }
 }
 
-.cs-mono {
-  font-family: var(--mono);
+.cs-num {
   font-variant-numeric: tabular-nums;
 }
 
@@ -44,7 +26,6 @@ html[data-page='grocery'] {
   align-items: center;
   gap: var(--s-3);
   padding: var(--s-3) 0;
-  border-bottom: 1px solid var(--line);
 }
 
 .cs-top__home {
@@ -53,7 +34,7 @@ html[data-page='grocery'] {
   gap: var(--s-2);
   min-height: 44px;
   font-size: var(--fs-small);
-  font-weight: 500;
+  font-weight: var(--fw-medium);
   text-decoration: none;
 }
 
@@ -81,35 +62,23 @@ html[data-page='grocery'] {
   gap: var(--s-4);
 }
 
-.cs-kicker {
-  color: var(--accent);
-  font-family: var(--mono);
-  font-size: var(--fs-tag);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 .cs-h1 {
-  font-size: clamp(2rem, 1.35rem + 2.6vw, 3.25rem);
-  font-weight: 650;
-  line-height: 1.08;
-  letter-spacing: -0.03em;
+  font-size: var(--fs-display);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
   text-wrap: balance;
 }
 
 .cs-lead {
   max-width: 46ch;
-  font-size: clamp(1.125rem, 1rem + 0.5vw, 1.3rem);
-  line-height: 1.45;
+  font-size: var(--fs-lead);
+  line-height: var(--lh-lead);
 }
 
-.cs-body,
 .cs-note {
-  max-width: 62ch;
+  max-width: var(--measure);
   color: var(--text-2);
-}
-
-.cs-note {
   font-size: var(--fs-small);
 }
 
@@ -132,23 +101,18 @@ html[data-page='grocery'] {
 .cs-facts {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--s-3) var(--s-5);
-  margin-top: var(--s-2);
-  padding-top: var(--s-4);
-  border-top: 1px solid var(--line);
+  gap: var(--s-4) var(--s-5);
+  margin-top: var(--s-3);
 }
 
 .cs-facts dt {
   color: var(--text-2);
-  font-family: var(--mono);
-  font-size: var(--fs-tag);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-size: var(--fs-small);
 }
 
 .cs-facts dd {
   font-size: var(--fs-small);
-  font-weight: 500;
+  font-weight: var(--fw-medium);
 }
 
 .cs-hero__shot {
@@ -160,14 +124,15 @@ html[data-page='grocery'] {
 .cs figcaption {
   margin-top: var(--s-2);
   color: var(--text-2);
-  font-size: var(--fs-tag);
-  line-height: 1.45;
+  font-size: var(--fs-small);
+  line-height: var(--lh-lead);
 }
 
 /* Table of contents */
 .cs-toc {
-  padding: var(--s-4) 0;
-  border-block: 1px solid var(--line);
+  padding: var(--s-3) var(--s-5);
+  border-radius: var(--r-lg);
+  background: var(--surface-2);
 }
 
 .cs-toc ol {
@@ -190,10 +155,6 @@ html[data-page='grocery'] {
   color: var(--text);
 }
 
-.cs-toc .cs-mono {
-  color: var(--accent);
-}
-
 /* Sections */
 .cs-section {
   display: grid;
@@ -206,62 +167,34 @@ html[data-page='grocery'] {
   outline: none;
 }
 
-.cs-section + .cs-section:not(.cs-dark) {
-  border-top: 1px solid var(--line);
-}
-
-.cs-dark + .cs-section {
-  border-top: 0;
-}
-
 .cs-h2 {
-  display: flex;
-  align-items: baseline;
-  gap: var(--s-3);
-  font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
-  font-weight: 650;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-}
-
-.cs-h2__num {
-  color: var(--accent);
-  font-family: var(--mono);
-  font-size: 0.6em;
-  font-weight: 500;
+  font-size: var(--fs-section);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tr-heading);
 }
 
 .cs-h3 {
-  font-size: 1.0625rem;
-  font-weight: 600;
-  line-height: 1.35;
+  font-size: var(--fs-subhead);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-snug);
 }
 
 .cs-prose {
   display: grid;
   gap: var(--s-4);
-  max-width: 68ch;
+  max-width: var(--measure);
 }
 
 .cs-small {
-  max-width: 68ch;
+  max-width: var(--measure);
   color: var(--text-2);
   font-size: var(--fs-small);
 }
 
-/* Full-bleed slate for the technical sections, without changing the layout box. */
+/* A full-bleed band one step below the page for the technical sections, without changing the layout box. */
 .cs-dark {
-  --text: #f4f0e7;
-  --text-2: var(--sage);
-  --line: rgb(184 197 186 / 0.2);
-  --line-strong: rgb(184 197 186 / 0.4);
-  --accent: #d98a80;
-  color: var(--text);
-  border-image: conic-gradient(var(--slate) 0 0) fill 0 // 0 100vw;
-}
-
-.cs-dark :focus-visible {
-  outline-color: #d98a80;
+  border-image: conic-gradient(var(--band) 0 0) fill 0 // 0 100vw;
 }
 
 /* Problem */
@@ -277,30 +210,25 @@ html[data-page='grocery'] {
   padding: var(--s-4);
   border-radius: var(--r-md);
   background: var(--surface);
-  border: 1px solid var(--line);
 }
 
 .cs-jobs strong {
   color: var(--accent);
-  font-family: var(--mono);
-  font-size: var(--fs-tag);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-size: var(--fs-small);
+  font-weight: var(--fw-semibold);
 }
 
 .cs-jobs span {
-  font-size: 1.0625rem;
-  font-weight: 500;
-  line-height: 1.4;
+  font-size: var(--fs-subhead);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-snug);
 }
 
 /* Walkthrough */
 .cs-step {
   display: grid;
   gap: var(--s-5);
-  padding-top: var(--s-5);
-  border-top: 1px solid var(--line);
+  padding-top: var(--s-6);
 }
 
 @media (min-width: 900px) {
@@ -308,12 +236,26 @@ html[data-page='grocery'] {
     grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.4fr);
     align-items: start;
   }
+
+  /* A step with one screen: the text takes the width, the screen closes the row on the right. */
+  .cs-step:has(.cs-shots > :only-child) {
+    grid-template-columns: minmax(0, 1fr) 200px;
+    column-gap: var(--s-7);
+  }
+
+  .cs-step:has(.cs-shots > :only-child) .cs-step__text {
+    max-width: var(--measure);
+  }
+
+  .cs-step:has(.cs-shots > :only-child) .cs-shots {
+    grid-template-columns: 1fr;
+  }
 }
 
 .cs-step__text {
   display: grid;
   gap: var(--s-2);
-  max-width: 52ch;
+  max-width: var(--measure);
 }
 
 .cs-step__text p {
@@ -330,10 +272,6 @@ html[data-page='grocery'] {
   margin: 0;
 }
 
-.cs .phone {
-  border-color: var(--slate);
-}
-
 .cs-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -344,13 +282,32 @@ html[data-page='grocery'] {
   display: grid;
   align-content: start;
   gap: var(--s-2);
-  padding-top: var(--s-3);
-  border-top: 2px solid var(--line-strong);
 }
 
 .cs-cards p {
   color: var(--text-2);
-  font-size: var(--fs-small);
+  font-size: var(--fs-body);
+}
+
+/* The other features beside the recording, so neither leaves half the width empty. */
+.cs-more {
+  display: grid;
+  gap: var(--s-6);
+  padding-top: var(--s-6);
+}
+
+@media (min-width: 760px) {
+  .cs-more {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    column-gap: var(--s-7);
+    align-items: start;
+  }
+}
+
+.cs-cards--stack {
+  grid-template-columns: 1fr;
+  gap: var(--s-5);
+  max-width: var(--measure);
 }
 
 .cs-video {
@@ -363,13 +320,13 @@ html[data-page='grocery'] {
 .cs-video video {
   width: min(100%, 300px);
   height: auto;
-  border: 5px solid var(--slate);
+  border: 5px solid var(--bezel);
   border-radius: 22px;
   background: var(--surface-2);
 }
 
 .cs-video figcaption {
-  max-width: 52ch;
+  max-width: var(--measure);
 }
 
 /* Architecture flow */
@@ -394,17 +351,22 @@ html[data-page='grocery'] {
   align-content: start;
   gap: var(--s-1);
   padding: var(--s-4);
-  border: 1px solid var(--line-strong);
   border-radius: var(--r-md);
+  background: var(--surface);
 }
 
 .cs-node strong {
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
 }
 
-.cs-node span {
+.cs-node span,
+.cs-node code {
   color: var(--text-2);
   font-size: var(--fs-small);
+}
+
+.cs-node code {
+  font-family: var(--mono);
 }
 
 .cs-node__side {
@@ -416,15 +378,16 @@ html[data-page='grocery'] {
   place-items: center;
   padding: var(--s-1) var(--s-2);
   color: var(--text-2);
-  font-family: var(--mono);
-  font-size: var(--fs-tag);
+  font-size: var(--fs-small);
   text-align: center;
 }
 
 .cs-edge::before {
-  content: '↓';
-  color: var(--accent);
-  font-size: 1.1rem;
+  content: '';
+  width: 20px;
+  height: 20px;
+  background: var(--accent);
+  mask: var(--icon-down) center / contain no-repeat;
 }
 
 @media (min-width: 860px) {
@@ -433,7 +396,7 @@ html[data-page='grocery'] {
   }
 
   .cs-edge::before {
-    content: '→';
+    mask-image: var(--icon-right);
   }
 }
 
@@ -447,22 +410,22 @@ html[data-page='grocery'] {
 }
 
 .cs-bar__seg--shipped {
-  background: #20332e;
+  background: var(--bar-shipped);
 }
 .cs-bar__seg--provisional {
-  background: #4e7a66;
+  background: var(--bar-provisional);
 }
 .cs-bar__seg--partial {
-  background: #7fa08c;
+  background: var(--bar-partial);
 }
 .cs-bar__seg--covered {
-  background: #b8c5ba;
+  background: var(--bar-covered);
 }
 .cs-bar__seg--deferred {
-  background: #d9cdb5;
+  background: var(--bar-deferred);
 }
 .cs-bar__seg--blocked {
-  background: #b64a40;
+  background: var(--bar-blocked);
 }
 
 .cs-legend {
@@ -506,28 +469,25 @@ html[data-page='grocery'] {
   padding: var(--s-4);
   border-radius: var(--r-md);
   background: var(--surface);
-  border: 1px solid var(--line);
 }
 
 .cs-chain__label {
   color: var(--accent);
-  font-size: var(--fs-tag);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-size: var(--fs-small);
+  font-weight: var(--fw-semibold);
 }
 
 .cs-chain p {
-  font-size: var(--fs-small);
+  font-size: var(--fs-body);
 }
 
 .cs-limits {
   display: grid;
   gap: var(--s-2);
-  max-width: 72ch;
+  max-width: var(--measure);
   padding: var(--s-4) var(--s-5);
-  border-left: 3px solid var(--accent);
-  border-radius: 0 var(--r-md) var(--r-md) 0;
-  background: var(--surface);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
 }
 
 .cs-limits ul,
@@ -544,7 +504,7 @@ html[data-page='grocery'] {
 }
 
 .cs-list {
-  max-width: 68ch;
+  max-width: var(--measure);
 }
 
 /* AI workflow */
@@ -556,10 +516,9 @@ html[data-page='grocery'] {
 
 .cs-pills li {
   padding: var(--s-1) var(--s-3);
-  border: 1px solid var(--line-strong);
   border-radius: 999px;
-  font-family: var(--mono);
-  font-size: var(--fs-tag);
+  background: var(--surface);
+  font-size: var(--fs-small);
 }
 
 /* Trade-offs */
@@ -571,13 +530,12 @@ html[data-page='grocery'] {
 
 .cs-tradeoffs div {
   display: grid;
+  align-content: start;
   gap: var(--s-1);
-  padding-top: var(--s-3);
-  border-top: 1px solid var(--line-strong);
 }
 
 .cs-tradeoffs dt {
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
 }
 
 .cs-tradeoffs dd {
@@ -590,8 +548,7 @@ html[data-page='grocery'] {
   padding-inline: var(--s-5);
   margin-bottom: var(--s-6);
   border-radius: var(--r-lg);
-  background: var(--surface);
-  border: 1px solid var(--line);
+  background: var(--surface-2);
 }
 
 .cs-contact .btn {
@@ -604,7 +561,6 @@ html[data-page='grocery'] {
   justify-content: space-between;
   gap: var(--s-3);
   padding: var(--s-5) 0 var(--s-7);
-  border-top: 1px solid var(--line);
   color: var(--text-2);
   font-size: var(--fs-small);
 }
@@ -614,4 +570,28 @@ html[data-page='grocery'] {
   align-items: center;
   gap: var(--s-2);
   min-height: 44px;
+}
+
+/* Prose-only sections: the heading holds the left column, the text the right. */
+@media (min-width: 960px) {
+  .cs-section--split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    column-gap: var(--s-7);
+    align-items: start;
+  }
+
+  .cs-section--split > .cs-h2 {
+    grid-row: 1 / span 4;
+  }
+
+  .cs-section--split > :not(.cs-h2) {
+    grid-column: 2;
+  }
+}
+
+/* On narrow phones the back link drops the name so the theme and language switches fit beside it. */
+@media (max-width: 479px) {
+  .cs-top__name {
+    display: none;
+  }
 }

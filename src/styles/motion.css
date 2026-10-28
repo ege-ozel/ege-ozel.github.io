@@ -1,6 +1,5 @@
 /*
- * Entrances animate `translate`, hover animates `transform`: separate properties,
- * so a finished entrance never fights the hover lift.
+ * Entrances animate `translate`; hover moves nothing (see card.css).
  * The name, tagline and first poster never animate; they are LCP candidates.
  */
 @media (prefers-reduced-motion: no-preference) {

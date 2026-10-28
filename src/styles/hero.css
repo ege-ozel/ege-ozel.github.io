@@ -1,17 +1,13 @@
-/* Featured project (Grocery) on a warm-paper panel, then the shared watch buttons and lightbox. */
+/* Featured project (Grocery) on a portfolio surface, then the shared watch buttons and lightbox.
+   Grocery's own colours stay inside its screens. */
 .hero {
-  --paper: #f4f0e7;
-  --ink: #20332e;
-  --ink-2: #4a5a54;
-  --label-red: #b64a40;
   display: grid;
   gap: var(--s-6);
   align-items: center;
   margin-bottom: var(--s-8);
   padding: var(--s-6) var(--s-5);
   border-radius: var(--r-lg);
-  background: var(--paper);
-  color: var(--ink);
+  background: var(--surface);
   overflow: hidden;
 }
 
@@ -27,105 +23,155 @@
   gap: var(--s-3);
 }
 
-.hero__kicker {
-  color: var(--label-red);
-  font-family: var(--mono);
-  font-size: var(--fs-tag);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 .hero__title {
-  font-size: clamp(1.625rem, 1.2rem + 1.4vw, 2.25rem);
-  font-weight: 650;
-  line-height: 1.15;
-  letter-spacing: -0.025em;
+  font-size: var(--fs-title);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-title);
+  letter-spacing: var(--tr-title);
   text-wrap: balance;
 }
 
 .hero__summary {
-  max-width: 54ch;
-  color: var(--ink-2);
+  max-width: var(--measure);
+  color: var(--text-2);
 }
 
 .hero__actions {
   margin-top: var(--s-2);
 }
 
-.hero .btn {
-  border-color: rgb(32 51 46 / 0.35);
-  background: transparent;
-  color: var(--ink);
-}
-
-.hero .btn:hover {
-  border-color: var(--ink);
-  color: var(--ink);
-}
-
-.hero .btn--primary {
-  border-color: var(--ink);
-  background: var(--ink);
-  color: var(--paper);
-}
-
-.hero .btn--primary:hover {
-  background: #2d4740;
-  color: var(--paper);
-}
-
-.hero :focus-visible {
-  outline-color: var(--label-red);
-}
-
 .hero__note {
-  color: var(--ink-2);
+  color: var(--text-2);
   font-size: var(--fs-small);
 }
 
-/* Three real screens, the middle one in front. */
+/* Three real screens on a turning ring (HeroScreens.tsx). Each screen's place is one angle, --a:
+   0deg is the front, 120deg and -120deg the sides, 180deg straight behind. Sideways it moves
+   with the sine and backwards with the cosine, so a turn carries every screen along the same
+   circle; the browser's 3D sorting keeps the nearest in front. The script moves --a every
+   frame; registered and not inherited, it restyles only the screen it is set on. */
+@property --a {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
 .hero__screens {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: grid;
+  justify-items: center;
+  gap: var(--s-4);
 }
 
-.hero__screens .phone {
-  width: 34%;
-  max-width: 200px;
+.ring {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  perspective: 1100px;
+  transform-style: preserve-3d;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-.hero__screens .phone--0,
-.hero__screens .phone--2 {
-  translate: 0 6%;
-  opacity: 0.92;
-}
-
-.hero__screens .phone--0 {
-  margin-right: -7%;
-}
-
-.hero__screens .phone--1 {
-  position: relative;
-  z-index: 1;
+.ring__item {
+  grid-area: 1 / 1;
   width: 42%;
   max-width: 240px;
+  transform: translateX(calc(sin(var(--a)) * 105%)) translateZ(calc((cos(var(--a)) - 1) * 160px))
+    rotateY(calc(sin(var(--a)) * -28deg));
+  cursor: pointer;
 }
 
-.hero__screens .phone--2 {
-  margin-left: -7%;
+.ring__item.is-front,
+.ring.is-dragging .ring__item {
+  cursor: grab;
 }
 
-/* A phone frame for the 390×844 screens, shared with the case study. */
+.ring.is-dragging .ring__item {
+  cursor: grabbing;
+}
+
+.ring__item img {
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+/* Back and forward, with the dots for where the ring is between them. */
+.ring__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.ring__arrow {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+  transition:
+    border-color var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease),
+    transform 160ms var(--ease);
+}
+
+.ring__arrow:hover {
+  border-color: var(--text-2);
+  color: var(--text);
+}
+
+/* Where the ring is: one dot per screen, the front one filled. */
+.ring__dots {
+  display: flex;
+  gap: 8px;
+  padding: 0 var(--s-2);
+}
+
+.ring__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--line-strong);
+  transition:
+    background-color var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease);
+}
+
+.ring__dot.is-front {
+  background: var(--text);
+  transform: scale(1.34);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ring__arrow:active {
+    transform: scale(0.94);
+  }
+}
+
+/* A phone frame for the 390×844 screens, shared with the case study. The bezel is padding on a
+   dark box and the screen has its own radius: a border with overflow clipping leaves a light
+   fringe along the inner curve. */
 .phone {
-  overflow: hidden;
-  border: 5px solid #20332e;
+  padding: 5px;
   border-radius: 22px;
-  background: #fafafa;
+  background: var(--bezel);
   box-shadow: 0 18px 40px -18px rgb(23 35 44 / 0.55);
 }
 
+.phone picture {
+  display: block;
+  overflow: hidden;
+  border-radius: 17px;
+  background: #fafafa;
+}
+
 .phone img {
+  display: block;
   width: 100%;
   height: auto;
 }
@@ -140,28 +186,33 @@
   gap: var(--s-2);
   min-height: 44px;
   padding: 0 var(--s-4);
-  border: 1px solid var(--line-strong);
+  border: 1px solid rgb(242 242 245 / 0.2);
   border-radius: 999px;
   background: rgb(13 15 18 / 0.85);
-  color: var(--text);
+  transition:
+    border-color var(--t-fast) var(--ease),
+    background-color var(--t-fast) var(--ease),
+    transform 160ms var(--ease);
+  color: #f2f2f5;
   font: inherit;
   font-size: var(--fs-small);
-  font-weight: 500;
+  font-weight: var(--fw-medium);
   cursor: pointer;
 }
 
+/* Hover lifts the pill a step out of the picture instead of ringing it in the accent. */
 .watch:hover {
-  border-color: var(--accent);
+  border-color: rgb(242 242 245 / 0.4);
+  background: rgb(30 33 40 / 0.92);
 }
 
 .watch[hidden] {
   display: none;
 }
 
-.watch svg {
+.watch .icon {
   width: 12px;
   height: 12px;
-  fill: currentColor;
 }
 
 .lightbox {
@@ -179,6 +230,51 @@
   background: rgb(5 6 8 / 0.82);
 }
 
+/*
+ * The lightbox fades in from 96% and closes faster than it opens. It stays centred: a modal
+ * belongs to the screen, not to its trigger. Reduced motion keeps the fade and drops the scale.
+ */
+.lightbox,
+.lightbox::backdrop {
+  transition:
+    opacity 200ms var(--ease),
+    overlay 200ms allow-discrete,
+    display 200ms allow-discrete;
+}
+
+.lightbox:not([open]),
+.lightbox:not([open])::backdrop {
+  opacity: 0;
+  transition-duration: 140ms;
+}
+
+@starting-style {
+  .lightbox[open],
+  .lightbox[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lightbox {
+    transition:
+      opacity 200ms var(--ease),
+      scale 200ms var(--ease),
+      overlay 200ms allow-discrete,
+      display 200ms allow-discrete;
+  }
+
+  .lightbox:not([open]) {
+    scale: 0.96;
+  }
+
+  @starting-style {
+    .lightbox[open] {
+      scale: 0.96;
+    }
+  }
+}
+
 .lightbox__body {
   position: relative;
   display: grid;
@@ -190,6 +286,19 @@
   max-height: calc(92svh - 56px);
   background: #000;
   object-fit: contain;
+}
+
+/* A photo: the dialog takes the picture's width instead of the video's. */
+.lightbox--image {
+  width: fit-content;
+}
+
+.lightbox__image {
+  display: block;
+  width: auto;
+  max-width: 96vw;
+  height: auto;
+  max-height: calc(92svh - 56px);
 }
 
 .lightbox__title {
@@ -207,19 +316,11 @@
   place-items: center;
   width: 44px;
   height: 44px;
-  border: 1px solid var(--line-strong);
+  border: 1px solid rgb(242 242 245 / 0.2);
   border-radius: 50%;
   background: rgb(13 15 18 / 0.85);
-  color: var(--text);
+  color: #f2f2f5;
   cursor: pointer;
-}
-
-.lightbox__close svg {
-  width: 14px;
-  height: 14px;
-  stroke: currentColor;
-  stroke-width: 2;
-  fill: none;
 }
 
 .status--preview::before {

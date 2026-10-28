@@ -61,7 +61,8 @@ describe('prerendered page', () => {
   });
 
   it('prerenders the three Grocery screens first and eagerly, one with high priority, and every card poster lazily', () => {
-    const images = [...en.html.matchAll(/<img\b[^>]*>/g)].map((m) => m[0]);
+    // The portrait is a small header image; the rest are screens and posters.
+    const images = [...en.html.matchAll(/<img\b[^>]*>/g)].map((m) => m[0]).filter((img) => !img.includes('portrait'));
     expect(images.length).toBe(3 + featuredProjects.filter((p) => p.poster).length);
     for (const img of images.slice(0, 3)) {
       expect(img).toContain('/media/grocery-case/');
@@ -73,7 +74,7 @@ describe('prerendered page', () => {
 
   it('opens with Grocery and links its case study in the page language', () => {
     expect(en.html.indexOf('id="hero-title"')).toBeLessThan(en.html.indexOf('<section id="work"'));
-    expect(en.html).toContain('Grocery — From Meal Planning to Shared Shopping');
+    expect(en.html).toMatch(/id="hero-title"[^>]*>Grocery<\/h2>/);
     expect(en.html).toContain('href="/projects/grocery/"');
     expect(tr.html).toContain('href="/tr/projects/grocery/"');
     expect(en.html).not.toContain('TrackMesh: DAW projects');

@@ -3,14 +3,10 @@ import type { Hero } from '../types';
 /** Grocery leads the portfolio: a short pitch next to three real screens (sample household data). */
 export const hero: Hero = {
   projectId: 'grocery',
-  kicker: { en: 'Featured case study', tr: 'Öne çıkan vaka çalışması' },
-  title: {
-    en: 'Grocery — From Meal Planning to Shared Shopping',
-    tr: 'Grocery — Yemek planından ortak alışverişe',
-  },
+  title: { en: 'Grocery', tr: 'Grocery' },
   summary: {
-    en: 'A full-stack app for Turkish households: decide what to cook, plan the day against nutrition targets and share one shopping list across devices. Live, built with a co-developer, with nutrition logic traced back to textbooks.',
-    tr: 'Türk haneleri için full-stack bir uygulama: ne pişireceğine karar ver, günü beslenme hedeflerine göre planla, tek bir alışveriş listesini cihazlar arasında paylaş. Yayında; bir ortak geliştiriciyle yapıldı ve beslenme mantığı ders kitaplarına dayanıyor.',
+    en: 'A full-stack app for Turkish households: decide what to cook, plan meals around nutrition goals and keep one shared shopping list in sync. Live, built with a co-developer, with nutrition logic traced back to textbooks.',
+    tr: 'Türk haneleri için full-stack bir uygulama: ne pişireceğine karar ver, öğünleri beslenme hedeflerine göre planla, ortak alışveriş listesini her cihazda güncel tut. Yayında; bir ortak geliştiriciyle yapıldı ve beslenme mantığı ders kitaplarına dayanıyor.',
   },
   shots: [
     {
