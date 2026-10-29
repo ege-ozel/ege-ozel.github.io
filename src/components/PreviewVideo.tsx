@@ -45,6 +45,14 @@ export function PreviewVideo({ src, labels }: Props) {
   const ref = useRef<HTMLVideoElement>(null);
   const mode = usePreviewMode();
   const [playing, setPlaying] = useState(false);
+  // Paused by a click on the clip: the frame stays on screen until the pointer leaves the card or
+  // the clip leaves the screen, and nothing restarts it meanwhile.
+  const [held, setHeld] = useState(false);
+  const heldRef = useRef(false);
+  const hold = useCallback((value: boolean) => {
+    heldRef.current = value;
+    setHeld(value);
+  }, []);
 
   const start = useCallback(() => {
     const video = ref.current;
@@ -68,10 +76,11 @@ export function PreviewVideo({ src, labels }: Props) {
     let timer = 0;
     const enter = () => {
       window.clearTimeout(timer);
-      timer = window.setTimeout(start, 150);
+      if (!heldRef.current) timer = window.setTimeout(start, 150);
     };
     const leave = () => {
       window.clearTimeout(timer);
+      hold(false);
       stop();
     };
     const focusOut = (event: FocusEvent) => {
@@ -88,7 +97,31 @@ export function PreviewVideo({ src, labels }: Props) {
       card.removeEventListener('focusin', enter);
       card.removeEventListener('focusout', focusOut);
     };
-  }, [mode, start, stop]);
+  }, [mode, start, stop, hold]);
+
+  // A click (a tap on phones) on the clip pauses it on the current frame; another resumes. Buttons
+  // and links in the frame keep their own clicks.
+  useEffect(() => {
+    const video = ref.current;
+    const frame = video?.closest<HTMLElement>('.media__frame');
+    if (!video || !frame || mode === null || mode === 'button') return;
+    const click = (event: MouseEvent) => {
+      if ((event.target as Element).closest('button, a')) return;
+      if (!video.paused) {
+        hold(true);
+        stop();
+      } else {
+        hold(false);
+        start();
+      }
+    };
+    frame.addEventListener('click', click);
+    frame.setAttribute('data-toggle', '');
+    return () => {
+      frame.removeEventListener('click', click);
+      frame.removeAttribute('data-toggle');
+    };
+  }, [mode, start, stop, hold]);
 
   useEffect(() => {
     const video = ref.current;
@@ -96,40 +129,59 @@ export function PreviewVideo({ src, labels }: Props) {
     // In-view mode plays on entry; every mode stops a clip that leaves the screen.
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (mode === 'inView' && entry.intersectionRatio >= IN_VIEW_THRESHOLD) start();
-        else if (!entry.isIntersecting || mode === 'inView') stop();
+        if (!entry.isIntersecting) hold(false);
+        if (mode === 'inView' && entry.intersectionRatio >= IN_VIEW_THRESHOLD) {
+          if (!heldRef.current) start();
+        } else if (!entry.isIntersecting || mode === 'inView') stop();
       },
       { threshold: [0, IN_VIEW_THRESHOLD] },
     );
     observer.observe(video);
     return () => observer.disconnect();
-  }, [mode, start, stop]);
+  }, [mode, start, stop, hold]);
 
   // While the clip plays, the frame is marked and a thin bar in the project colour tracks the clip,
-  // so it is clear something is playing. The bar is updated per frame on the compositor (transform).
+  // so it is clear something is playing. The bar is one linear animation as long as the clip, run
+  // by the browser off the main thread, and set to the clip's time only when that changes on its
+  // own (start, pause, seek, loop), so no script runs per frame. Held on a frame, both stop there.
+  const shown = playing || held;
   useEffect(() => {
     const video = ref.current;
-    if (!playing || !video) return;
+    if (!shown || !video) return;
     const frame = video.closest('.media__frame');
     const bar = frame?.querySelector<HTMLElement>('.media__progress-fill');
     frame?.setAttribute('data-playing', '');
-    let id = 0;
-    const tick = () => {
-      if (bar && video.duration) bar.style.transform = `scaleX(${video.currentTime / video.duration})`;
-      id = requestAnimationFrame(tick);
+    if (!bar) return () => frame?.removeAttribute('data-playing');
+    const run = bar.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], {
+      duration: 1000,
+      iterations: Infinity,
+      easing: 'linear',
+    });
+    const sync = () => {
+      if (!video.duration) return run.pause();
+      const length = video.duration * 1000;
+      if (run.effect?.getTiming().duration !== length) run.effect?.updateTiming({ duration: length });
+      // timeupdate comes a few times a second: correct only a drift the eye could see.
+      const drift = Math.abs(((Number(run.currentTime) % length) - video.currentTime * 1000 + length) % length);
+      if (Math.min(drift, length - drift) > 80) run.currentTime = video.currentTime * 1000;
+      if (video.paused) run.pause();
+      else run.play();
     };
-    tick();
+    const events = ['playing', 'pause', 'seeked', 'loadedmetadata', 'timeupdate', 'ratechange'];
+    for (const name of events) video.addEventListener(name, sync);
+    sync();
     return () => {
-      cancelAnimationFrame(id);
+      for (const name of events) video.removeEventListener(name, sync);
+      run.cancel();
       frame?.removeAttribute('data-playing');
     };
-  }, [playing]);
+  }, [shown]);
 
   return (
     <>
       <video
         ref={ref}
-        className={playing ? 'media__video is-playing' : 'media__video'}
+        className={shown ? 'media__video is-playing' : 'media__video'}
         muted
         playsInline
         loop

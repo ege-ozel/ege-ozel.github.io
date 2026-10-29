@@ -116,23 +116,48 @@
         }
         var HEAD =
           'title, meta[name="description"], link[rel="canonical"], link[rel="alternate"], meta[property^="og:"], meta[name^="twitter:"]';
+        // The static page takes the other language by patching the page it has: only text and
+        // attributes that differ change, so pictures, the video and focus stay as they are and
+        // nothing reloads or flashes. Both languages render the same component, so the trees match;
+        // where they do not, that node is replaced.
+        function patch(a, b) {
+          if (a.nodeType !== b.nodeType || a.nodeName !== b.nodeName) {
+            a.parentNode.replaceChild(document.importNode(b, true), a);
+            return;
+          }
+          if (a.nodeType === 3 || a.nodeType === 8) {
+            if (a.data !== b.data) a.data = b.data;
+            return;
+          }
+          if (a.nodeType !== 1) return;
+          var i;
+          for (i = a.attributes.length - 1; i >= 0; i--) {
+            var name = a.attributes[i].name;
+            if (name !== 'open' && name !== 'style' && name !== 'data-idle' && !b.hasAttribute(name)) a.removeAttribute(name);
+          }
+          for (i = 0; i < b.attributes.length; i++) {
+            var attr = b.attributes[i];
+            if (a.getAttribute(attr.name) !== attr.value) a.setAttribute(attr.name, attr.value);
+          }
+          var mine = a.childNodes;
+          var theirs = b.childNodes;
+          for (i = 0; i < theirs.length; i++) {
+            if (i < mine.length) patch(mine[i], theirs[i]);
+            else a.appendChild(document.importNode(theirs[i], true));
+          }
+          while (mine.length > theirs.length) a.removeChild(a.lastChild);
+        }
         function swap(doc, url) {
           var old = document.head.querySelectorAll(HEAD);
           for (var i = 0; i < old.length; i++) old[i].remove();
           var next = doc.head.querySelectorAll(HEAD);
           for (var j = 0; j < next.length; j++) document.head.appendChild(document.importNode(next[j], true));
           var lang = langOf(url || location.href);
-          var focused = document.activeElement && document.activeElement.closest('.lang');
           root.lang = lang;
           if (window.__renderLocale) window.__renderLocale(lang);
-          else document.getElementById('root').innerHTML = doc.getElementById('root').innerHTML;
+          else patch(document.getElementById('root'), doc.getElementById('root'));
           apply(saved());
           if (url) history.pushState(null, '', url);
-          // The static page's links are new elements: keep keyboard focus on the switch.
-          if (focused && !window.__renderLocale) {
-            var link = document.querySelector('.lang a[hreflang="' + lang + '"]');
-            if (link) link.focus({ preventScroll: true });
-          }
         }
         function go(url, push) {
           load(url).then(
@@ -165,9 +190,223 @@
           if (langOf(location.href) !== root.lang) go(location.href, false);
         });
 
+        // Screen viewer (the case study's #viewer). The screen lifts out of its place on the page
+        // and grows to the full height of the window, and shrinks back on close: one transform
+        // on the picture, run by the browser off the main thread on a spring's curve, like the
+        // hero carousel. The arrows and arrow keys step through every screen on the page.
+        // A spring as a CSS linear() curve, sampled from the equation the carousel runs.
+        function spring(stiffness, damping, fallback) {
+          if (!window.CSS || !CSS.supports('animation-timing-function', 'linear(0, 1)')) return fallback;
+          var x = 0;
+          var v = 0;
+          var t = 0;
+          var points = ['0'];
+          while (t < 1.5 && (Math.abs(1 - x) > 0.001 || Math.abs(v) > 0.01)) {
+            for (var s = 0; s < 4; s++) {
+              v += (stiffness * (1 - x) - damping * v) / 240;
+              x += v / 240;
+              t += 1 / 240;
+            }
+            points.push(x.toFixed(4));
+          }
+          points.push('1');
+          return { duration: Math.round(t * 1000), easing: 'linear(' + points.join(', ') + ')' };
+        }
+        // Open: a 0.5s response with a damping ratio of 0.9, a hint of settle. Close: 0.4s,
+        // critically damped, so the screen lands in its place without overshooting it.
+        var GROW = spring(158, 22.6, { duration: 480, easing: 'cubic-bezier(0.32, 0.72, 0, 1)' });
+        var SHRINK = spring(247, 31.4, { duration: 360, easing: 'cubic-bezier(0.32, 0.72, 0, 1)' });
+        var EASE_OUT = 'cubic-bezier(0.23, 1, 0.32, 1)';
+        var at = 0;
+        var lifted = null;
+        var closing = false;
+        function zooms() {
+          return Array.prototype.slice.call(document.querySelectorAll('a.zoom'));
+        }
+        function viewer() {
+          return document.getElementById('viewer');
+        }
+        function picture(i) {
+          return zooms()[i].querySelector('picture');
+        }
+        function picOf(i) {
+          var list = zooms();
+          var thumb = list[i].querySelector('img');
+          return { src: thumb.currentSrc || list[i].href, alt: thumb.alt };
+        }
+        function image() {
+          var frame = viewer().querySelector('.viewer__frame');
+          var img = frame.querySelector('img');
+          if (!img) {
+            img = frame.appendChild(document.createElement('img'));
+            img.className = 'viewer__image';
+            img.width = 390;
+            img.height = 844;
+          }
+          return img;
+        }
+        function show(i) {
+          var n = zooms().length;
+          at = (i + n) % n;
+          var pic = picOf(at);
+          var img = image();
+          img.src = pic.src;
+          img.alt = pic.alt;
+          viewer().querySelector('.viewer__count').textContent = at + 1 + ' / ' + n;
+          return img;
+        }
+        // The transform that puts the picture, laid out at "to", over the box "from".
+        function over(from, to) {
+          var dx = from.left + from.width / 2 - (to.left + to.width / 2);
+          var dy = from.top + from.height / 2 - (to.top + to.height / 2);
+          return 'translate(' + dx + 'px, ' + dy + 'px) scale(' + from.width / to.width + ')';
+        }
+        // The screen on the page hides while its copy is out, so it is one screen that moves.
+        function lift(pic) {
+          if (lifted) lifted.style.visibility = '';
+          lifted = pic;
+          if (pic) pic.style.visibility = 'hidden';
+        }
+        function chrome(dialog, visible, duration) {
+          var from = visible ? 0 : 1;
+          var options = { duration: duration, easing: EASE_OUT, fill: 'both' };
+          var parts = dialog.querySelectorAll('.viewer__bar, .viewer__close');
+          for (var i = 0; i < parts.length; i++) parts[i].animate({ opacity: [from, 1 - from] }, options);
+          options.pseudoElement = '::backdrop';
+          dialog.animate({ opacity: [from, 1 - from] }, options);
+        }
+        function openShot(link) {
+          var dialog = viewer();
+          if (!dialog || !dialog.showModal || dialog.open) return false;
+          var img = show(zooms().indexOf(link));
+          var go = function () {
+            closing = false;
+            dialog.showModal();
+            if (still()) return chrome(dialog, true, 150);
+            var pic = picture(at);
+            var start = over(pic.getBoundingClientRect(), img.getBoundingClientRect());
+            // The copy first sits exactly over the screen for two frames, so the browser has drawn
+            // it before it moves; drawing it in the first frame of the move made that frame late.
+            img.style.transform = start;
+            lift(pic);
+            chrome(dialog, true, 260);
+            requestAnimationFrame(function () {
+              requestAnimationFrame(function () {
+                if (closing) return;
+                img.style.transform = '';
+                img.animate({ transform: [start, 'none'] }, GROW);
+              });
+            });
+          };
+          // Grow only once the big picture is decoded, so no frame of the move is empty.
+          if (img.decode) img.decode().then(go, go);
+          else go();
+          return true;
+        }
+        function closeShot() {
+          var dialog = viewer();
+          if (!dialog || !dialog.open || closing) return;
+          closing = true;
+          var img = image();
+          var pic = picture(at);
+          var done = function () {
+            img.style.transform = '';
+            dialog.close();
+            closing = false;
+            lift(null);
+            img.getAnimations().forEach(function (a) {
+              a.cancel();
+            });
+          };
+          // After stepping through, the screen to return to may be off the window.
+          var box = pic.getBoundingClientRect();
+          if (box.bottom < 0 || box.top > innerHeight) pic.scrollIntoView({ block: 'center' });
+          if (still()) {
+            chrome(dialog, false, 120);
+            setTimeout(done, 120);
+            return;
+          }
+          // Start from wherever the picture is now, so closing mid-opening turns smoothly back.
+          var now = getComputedStyle(img).transform;
+          img.getAnimations().forEach(function (a) {
+            a.cancel();
+          });
+          lift(pic);
+          var to = over(pic.getBoundingClientRect(), img.getBoundingClientRect());
+          var shrink = img.animate(
+            { transform: [now, to] },
+            { duration: SHRINK.duration, easing: SHRINK.easing, fill: 'forwards' },
+          );
+          chrome(dialog, false, 220);
+          shrink.finished.then(done, done);
+        }
+        // Next or previous: the new screen slides in a little from its side once it is decoded.
+        function step(by) {
+          if (closing) return;
+          var n = zooms().length;
+          var next = new Image();
+          next.src = picOf((at + by + n) % n).src;
+          var swap = function () {
+            var img = show(at + by);
+            if (!still())
+              img.animate(
+                { opacity: [0, 1], transform: ['translateX(' + by * 40 + 'px)', 'none'] },
+                { duration: 280, easing: EASE_OUT },
+              );
+          };
+          if (next.decode) next.decode().then(swap, swap);
+          else swap();
+        }
+        function viewerClick(event) {
+          var dialog = viewer();
+          if (!dialog || !dialog.open || !dialog.contains(event.target)) return false;
+          var control = event.target.closest('[data-viewer]');
+          var action = control ? control.getAttribute('data-viewer') : null;
+          if (action === 'prev') step(-1);
+          else if (action === 'next') step(1);
+          // The close button, or anywhere around the picture.
+          else if (action === 'close' || !event.target.closest('.viewer__image, .viewer__bar')) closeShot();
+          return true;
+        }
+        document.addEventListener('keydown', function (event) {
+          var dialog = viewer();
+          if (!dialog || !dialog.open) return;
+          if (event.key === 'ArrowLeft') step(-1);
+          else if (event.key === 'ArrowRight') step(1);
+        });
+        // Escape: shrink back instead of the dialog's own instant close.
+        document.addEventListener(
+          'cancel',
+          function (event) {
+            if (event.target !== viewer()) return;
+            event.preventDefault();
+            closeShot();
+          },
+          true,
+        );
+
+        // Endless motion (the case study's diagram wires) stops while it is off the screen, so it
+        // spends nothing there; base.css pauses anything inside [data-idle].
+        document.addEventListener('DOMContentLoaded', function () {
+          if (!window.IntersectionObserver) return;
+          var watch = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+              entry.target.toggleAttribute('data-idle', !entry.isIntersecting);
+            });
+          });
+          var loops = document.querySelectorAll('[data-loop]');
+          for (var i = 0; i < loops.length; i++) watch.observe(loops[i]);
+        });
+
         document.addEventListener('click', function (event) {
           var button = event.target.closest ? event.target.closest('[data-theme-choice]') : null;
           if (button) return setTheme(button.getAttribute('data-theme-choice'), button);
+          if (viewerClick(event)) return;
+          var zoom = event.target.closest ? event.target.closest('a.zoom') : null;
+          if (zoom && event.button === 0 && !(event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)) {
+            if (openShot(zoom)) event.preventDefault();
+            return;
+          }
           var link = langLink(event);
           if (!link || event.defaultPrevented || event.button !== 0) return;
           if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;

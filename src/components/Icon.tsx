@@ -7,6 +7,7 @@ const paths = {
   chevronLeft: <path d="M10 3.5 5.5 8l4.5 4.5" />,
   chevronRight: <path d="M6 3.5 10.5 8 6 12.5" />,
   arrowLeft: <path d="M13 8H3m4-4.5L2.5 8 7 12.5" />,
+  arrowsLeftRight: <path d="M2.5 8h11m-8-3-3 3 3 3m5-6 3 3-3 3" />,
   close: <path d="m4 4 8 8m0-8-8 8" />,
   // The triangle sits a little right of the middle, where it looks centred.
   play: <path d="M5 3.2v9.6a.6.6 0 0 0 .9.5l7.6-4.8a.6.6 0 0 0 0-1L5.9 2.7a.6.6 0 0 0-.9.5Z" />,

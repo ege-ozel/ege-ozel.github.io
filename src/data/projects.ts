@@ -28,8 +28,8 @@ export const projects: Project[] = [
         tr: 'Her istek önce Vercel fonksiyonunda, sonra Postgres satır düzeyi güvenliğiyle tekrar denetlenir; çünkü fonksiyonlar veritabanına kullanıcının kendi oturumuyla bağlanır. Her hane listesi sürümlü tek bir belgedir: eski sürüme yapılan yazma HTTP 409 alır ve istemci sunucudaki kopyayı benimser. Öğün önerileri bir dil modeli değil; günün kalan makrolarına göre yapılan deterministik bir sıralamadır.',
       },
       status: {
-        en: 'Live, with small-scale use. Open work: making the macro ranges add up to the calorie target and separating planned meals from eaten ones.',
-        tr: 'Yayında, küçük ölçekte kullanılıyor. Açık işler: makro aralıklarının kalori hedefiyle tutarlı olması ve planlanan öğünlerle yenenlerin ayrılması.',
+        en: 'Live, with small-scale use. Open work: separating planned meals from eaten ones and growing the food catalog.',
+        tr: 'Yayında, küçük ölçekte kullanılıyor. Açık işler: planlanan öğünlerle yenenlerin ayrılması ve besin kataloğunun büyütülmesi.',
       },
     },
     tags: ['Preact', 'TypeScript', 'Tailwind CSS', 'Supabase', 'PostgreSQL', 'Vercel Functions'],

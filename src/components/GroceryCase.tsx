@@ -13,6 +13,7 @@ import {
   tradeoffs,
   walkthrough,
 } from '../data/groceryCase';
+import type { ReactNode } from 'react';
 import { profile } from '../data/profile';
 import { createT } from '../i18n';
 import { pagePath } from '../pages';
@@ -100,9 +101,9 @@ export function GroceryCase({ locale }: { locale: Locale }) {
             </dl>
           </div>
           <figure className="cs-hero__shot">
-            <div className="phone">
+            <Zoom shot={intro.shot} label={t('case.enlarge')}>
               <Shot shot={intro.shot} locale={locale} eager priority />
-            </div>
+            </Zoom>
             <figcaption>{L(intro.shot.caption)}</figcaption>
           </figure>
         </section>
@@ -148,9 +149,9 @@ export function GroceryCase({ locale }: { locale: Locale }) {
               <div className="cs-shots">
                 {step.shots.map((s) => (
                   <figure key={s.base}>
-                    <div className="phone">
+                    <Zoom shot={s} label={t('case.enlarge')}>
                       <Shot shot={s} locale={locale} />
-                    </div>
+                    </Zoom>
                     <figcaption>{L(s.caption)}</figcaption>
                   </figure>
                 ))}
@@ -189,24 +190,36 @@ export function GroceryCase({ locale }: { locale: Locale }) {
         <section id="architecture" className="cs-section cs-dark" aria-labelledby="architecture-title" tabIndex={-1}>
           <Heading id="architecture" locale={locale} />
           <p className="cs-prose">{L(architecture.intro)}</p>
-          <figure className="cs-flow">
+          <figure className="cs-flow" data-loop="">
+            {/* Three stops and what travels between them; a light runs along each wire in turn,
+                the request's path. The two checks are labelled as such: the section's point. */}
             <ol aria-label={L(architecture.diagram.label)}>
               <li className="cs-node">
+                <span className="cs-node__role">{L(architecture.diagram.browserRole)}</span>
                 <strong>{L(architecture.diagram.browser)}</strong>
                 <span>{L(architecture.diagram.browserDetail)}</span>
               </li>
-              <li className="cs-edge" aria-hidden="true">
-                <span>{L(architecture.diagram.cookie)}</span>
-              </li>
+              <Wire label={L(architecture.diagram.cookie)} />
               <li className="cs-node">
+                <span className="cs-node__role cs-node__role--check">{L(architecture.diagram.functionsRole)}</span>
                 <strong>{L(architecture.diagram.functions)}</strong>
-                <code>{L(architecture.diagram.functionsDetail)}</code>
-                <span className="cs-node__side">↔ {L(architecture.diagram.google)}</span>
+                <span className="cs-node__code">
+                  {L(architecture.diagram.functionsDetail)
+                    .split(' · ')
+                    .map((name) => (
+                      <code key={name}>{name}</code>
+                    ))}
+                </span>
+                <span className="cs-node__side">
+                  <Icon name="arrowsLeftRight" />
+                  <span>
+                    {L(architecture.diagram.google)} <small>{L(architecture.diagram.googleNote)}</small>
+                  </span>
+                </span>
               </li>
-              <li className="cs-edge" aria-hidden="true">
-                <span>{L(architecture.diagram.session)}</span>
-              </li>
+              <Wire label={L(architecture.diagram.session)} />
               <li className="cs-node">
+                <span className="cs-node__role cs-node__role--check">{L(architecture.diagram.databaseRole)}</span>
                 <strong>{L(architecture.diagram.database)}</strong>
                 <span>{L(architecture.diagram.databaseDetail)}</span>
               </li>
@@ -351,6 +364,51 @@ export function GroceryCase({ locale }: { locale: Locale }) {
         </a>
         <span>{t('footer.note')}</span>
       </footer>
+
+      {/* Every screen on the page, full height. The head script in index.html opens it from a
+          screen and fills it; the picture is added only then. */}
+      <dialog id="viewer" className="viewer" aria-label={t('case.viewer')}>
+        <div className="viewer__frame" />
+        <div className="viewer__bar">
+          <button type="button" className="viewer__btn" data-viewer="prev" aria-label={t('hero.prev')}>
+            <Icon name="chevronLeft" />
+          </button>
+          <span className="viewer__count" aria-live="polite" />
+          <button type="button" className="viewer__btn" data-viewer="next" aria-label={t('hero.next')}>
+            <Icon name="chevronRight" />
+          </button>
+        </div>
+        <button type="button" className="viewer__btn viewer__close" data-viewer="close" aria-label={t('case.close')}>
+          <Icon name="close" />
+        </button>
+      </dialog>
     </div>
+  );
+}
+
+/** A connection in the architecture diagram: what it carries, a line with an arrowhead, and a light running along it. */
+function Wire({ label }: { label: string }) {
+  return (
+    <li className="cs-wire" aria-hidden="true">
+      <span className="cs-wire__label">{label}</span>
+      <span className="cs-wire__line">
+        <span className="cs-wire__track">
+          <span className="cs-wire__run" />
+        </span>
+      </span>
+    </li>
+  );
+}
+
+/**
+ * A phone screen that opens full height in the viewer. Without the head script it is a plain link
+ * to the picture.
+ */
+function Zoom({ shot, label, children }: { shot: { base: string }; label: string; children: ReactNode }) {
+  return (
+    <a className="phone zoom" href={`${shot.base}-390.webp`}>
+      {children}
+      <span className="sr-only"> ({label})</span>
+    </a>
   );
 }

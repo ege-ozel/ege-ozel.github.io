@@ -182,8 +182,21 @@ export function HeroScreens({ shots, locale }: { shots: ShotData[]; locale: Loca
     };
 
     // Scrolling the page turns the ring by one screen, from when its middle passes the middle of
-    // the window to when it has left at the top.
+    // the window to when it has left at the top. Far from the window it skips the work; the
+    // observer runs it once more on leaving, so the ring settles at the end of its turn.
+    let near = true;
+    const nearby = new IntersectionObserver(
+      ([entry]) => {
+        near = entry.isIntersecting;
+        update();
+      },
+      { rootMargin: '50% 0px' },
+    );
+    nearby.observe(el);
     const onScroll = () => {
+      if (near) update();
+    };
+    const update = () => {
       if (still.matches) {
         if (scroll) {
           scroll = 0;
@@ -208,8 +221,8 @@ export function HeroScreens({ shots, locale }: { shots: ShotData[]; locale: Loca
     el.addEventListener('pointercancel', up);
     el.addEventListener('wheel', wheel, { passive: false });
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    onScroll();
+    window.addEventListener('resize', update);
+    update();
     return () => {
       stop();
       window.clearTimeout(wheelTimer);
@@ -219,7 +232,8 @@ export function HeroScreens({ shots, locale }: { shots: ShotData[]; locale: Loca
       el.removeEventListener('pointercancel', up);
       el.removeEventListener('wheel', wheel);
       window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
+      window.removeEventListener('resize', update);
+      nearby.disconnect();
       api.current = null;
     };
   }, [n]);

@@ -164,6 +164,11 @@
   opacity: 1;
 }
 
+/* A click on the clip pauses or resumes it (PreviewVideo.tsx). */
+.media__frame[data-toggle] {
+  cursor: pointer;
+}
+
 .preview-toggle {
   position: absolute;
   right: var(--s-3);

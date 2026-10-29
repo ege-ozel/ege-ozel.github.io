@@ -330,18 +330,21 @@
 }
 
 /* Architecture flow */
+/* Architecture diagram: three stops in a row (a column on phones) joined by wires. Each wire says
+   what it carries, ends in an arrowhead, and a light runs along it: first into the functions,
+   then on to the database, the path of one request. */
 .cs-flow {
   margin: 0;
 }
 
 .cs-flow ol {
   display: grid;
-  gap: var(--s-2);
+  justify-items: stretch;
 }
 
 @media (min-width: 860px) {
   .cs-flow ol {
-    grid-template-columns: 1fr auto 1fr auto 1fr;
+    grid-template-columns: 1fr minmax(120px, 0.6fr) 1fr minmax(120px, 0.6fr) 1fr;
     align-items: stretch;
   }
 }
@@ -349,10 +352,21 @@
 .cs-node {
   display: grid;
   align-content: start;
-  gap: var(--s-1);
+  gap: var(--s-2);
   padding: var(--s-4);
+  border: 1px solid var(--line);
   border-radius: var(--r-md);
   background: var(--surface);
+  transition:
+    background-color var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cs-node:hover {
+    border-color: var(--line-strong);
+    background: var(--surface-2);
+  }
 }
 
 .cs-node strong {
@@ -365,39 +379,315 @@
   font-size: var(--fs-small);
 }
 
-.cs-node code {
+/* What the stop does in the story: holds no keys, or one of the two checks. */
+.cs-node .cs-node__role {
+  justify-self: start;
+  padding: 2px var(--s-2);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  line-height: 1.5;
+}
+
+.cs-node .cs-node__role--check {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  color: var(--accent);
+}
+
+.cs-node__code {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1);
+}
+
+.cs-node__code code {
+  padding: 2px var(--s-2);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
   font-family: var(--mono);
 }
 
-.cs-node__side {
-  margin-top: var(--s-1);
+.cs-node:hover .cs-node__code code {
+  background: var(--surface);
 }
 
-.cs-edge {
+/* Google sign-in hangs off the functions: dashed, because it is not on every request's path. */
+.cs-node .cs-node__side {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-top: var(--s-1);
+  padding: var(--s-2) var(--s-3);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-sm);
+}
+
+.cs-node__side .icon {
+  color: var(--accent);
+}
+
+/* The name, and under it when it is used. */
+.cs-node__side span {
   display: grid;
-  place-items: center;
-  padding: var(--s-1) var(--s-2);
+  color: var(--text);
+}
+
+.cs-node__side small {
+  color: var(--text-2);
+  font-size: inherit;
+}
+
+.cs-wire {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: 72px;
+  padding-left: var(--s-5);
+}
+
+.cs-wire__label {
+  grid-column: 2;
   color: var(--text-2);
   font-size: var(--fs-small);
-  text-align: center;
 }
 
-.cs-edge::before {
+/* The line: 2px drawn in the middle of a taller box, so the light has room; down on phones. */
+.cs-wire__line {
+  position: relative;
+  grid-row: 1;
+  grid-column: 1;
+  align-self: stretch;
+  width: 10px;
+  background: linear-gradient(var(--line-strong), var(--line-strong)) center / 2px 100% no-repeat;
+}
+
+.cs-wire__line::after {
   content: '';
-  width: 20px;
-  height: 20px;
-  background: var(--accent);
-  mask: var(--icon-down) center / contain no-repeat;
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  background: var(--text-2);
+  mask: var(--icon-head-down) center / contain no-repeat;
+  translate: -50% 0;
+}
+
+.cs-wire__track {
+  position: absolute;
+  inset: 0 0 6px;
+  overflow: hidden;
+}
+
+.cs-wire__run {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.cs-wire__run::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  height: 28px;
+  border-radius: 2px;
+  background: linear-gradient(transparent, var(--accent));
+  translate: -50% 0;
 }
 
 @media (min-width: 860px) {
-  .cs-edge {
-    max-width: 120px;
+  .cs-wire {
+    grid-template-columns: none;
+    grid-template-rows: 1fr auto 1fr;
+    justify-items: center;
+    gap: var(--s-2);
+    min-height: 0;
+    padding: 0 var(--s-2);
   }
 
-  .cs-edge::before {
-    mask-image: var(--icon-right);
+  .cs-wire__label {
+    grid-row: 1;
+    grid-column: 1;
+    align-self: end;
+    text-align: center;
   }
+
+  .cs-wire__line {
+    grid-row: 2;
+    align-self: auto;
+    justify-self: stretch;
+    width: auto;
+    height: 10px;
+    background-size: 100% 2px;
+  }
+
+  .cs-wire__line::after {
+    top: 50%;
+    right: -2px;
+    bottom: auto;
+    left: auto;
+    mask-image: var(--icon-head);
+    translate: 0 -50%;
+  }
+
+  .cs-wire__track {
+    inset: 0 6px 0 0;
+  }
+
+  .cs-wire__run::after {
+    top: 50%;
+    right: 0;
+    bottom: auto;
+    left: auto;
+    width: 32px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent));
+    translate: 0 -50%;
+  }
+}
+
+/* The light: transform and opacity only, so it runs on the compositor. Each lap is 2.4s and the
+   second wire starts half a lap later, so the light seems to pass through the functions. */
+@media (prefers-reduced-motion: no-preference) {
+  .cs-wire__run {
+    animation: cs-run-down 2.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+
+  .cs-wire ~ .cs-node ~ .cs-wire .cs-wire__run {
+    animation-delay: 1.2s;
+  }
+
+  @media (min-width: 860px) {
+    .cs-wire__run {
+      animation-name: cs-run-across;
+    }
+  }
+}
+
+@keyframes cs-run-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  15%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cs-run-across {
+  0% {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  15%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+}
+
+/* Screens open full height in the viewer (#viewer, run by the head script in index.html). */
+.zoom {
+  display: block;
+  cursor: zoom-in;
+}
+
+.viewer {
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #f2f2f5;
+}
+
+.viewer[open] {
+  display: grid;
+  place-items: center;
+}
+
+.viewer::backdrop {
+  background: rgb(8 9 11 / 0.94);
+}
+
+/* The page stays put behind the viewer; the gutter keeps the scrollbar's room, so nothing shifts. */
+html:has(.viewer[open]) {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+
+/* As tall as the window allows, leaving room for the bar; as wide on a narrow phone. */
+.viewer__image {
+  display: block;
+  width: auto;
+  height: min(calc(100dvh - 136px), calc((100vw - 32px) * 844 / 390));
+  border-radius: 28px;
+}
+
+.viewer__bar {
+  position: absolute;
+  bottom: var(--s-4);
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  translate: -50% 0;
+}
+
+.viewer__count {
+  min-width: 4ch;
+  font-size: var(--fs-small);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.viewer__btn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid rgb(242 242 245 / 0.2);
+  border-radius: 50%;
+  background: rgb(30 33 40 / 0.9);
+  color: inherit;
+  cursor: pointer;
+  transition:
+    border-color var(--t-fast) var(--ease),
+    transform 160ms var(--ease);
+}
+
+.viewer__btn:hover {
+  border-color: rgb(242 242 245 / 0.45);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .viewer__btn:active {
+    transform: scale(0.94);
+  }
+}
+
+.viewer__close {
+  position: absolute;
+  top: var(--s-3);
+  right: var(--s-3);
 }
 
 /* Decision register */

@@ -66,6 +66,9 @@ const en = {
   'case.code': 'View source code',
   'case.app': 'Open live app',
   'case.noVideo': 'Your browser cannot play this video.',
+  'case.enlarge': 'enlarge',
+  'case.viewer': 'Screens',
+  'case.close': 'Close',
   'lightbox.close': 'Close video',
   'footer.note': '© 2026 Ege Özel. Built with React, TypeScript and Vite.',
 } as const;
@@ -137,6 +140,9 @@ const tr: Record<UiKey, string> = {
   'case.code': 'Kaynak kodunu incele',
   'case.app': 'Canlı uygulamayı aç',
   'case.noVideo': 'Tarayıcınız bu videoyu oynatamıyor.',
+  'case.enlarge': 'büyüt',
+  'case.viewer': 'Ekranlar',
+  'case.close': 'Kapat',
   'lightbox.close': 'Videoyu kapat',
   'footer.note': '© 2026 Ege Özel. React, TypeScript ve Vite ile geliştirildi.',
 };

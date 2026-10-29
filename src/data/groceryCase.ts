@@ -4,7 +4,7 @@ import type { Shot, Text } from '../types';
  * Copy for /projects/grocery/ and /tr/projects/grocery/.
  *
  * Every figure here was checked against the Grocery repository (github.com/ozan-ozel/grocery)
- * on 28 October 2026: commit counts from `git log`, decision counts from
+ * on 29 October 2026: commit counts from `git log`, decision counts from
  * nutrition-curriculum/DEC_REGISTER.md, formulas from src/lib/mealPersonalization.ts, open
  * problems from docs/product-relaunch/00-current-state.md. Re-check them before changing a number.
  */
@@ -227,6 +227,10 @@ export const architecture = {
     database: { en: 'Supabase Postgres', tr: 'Supabase Postgres' },
     databaseDetail: { en: 'Row Level Security on every table', tr: 'Her tabloda satır düzeyi güvenlik' },
     google: { en: 'Google OAuth', tr: 'Google OAuth' },
+    googleNote: { en: 'sign-in only', tr: 'yalnızca girişte' },
+    browserRole: { en: 'Holds no keys', tr: 'Anahtar tutmaz' },
+    functionsRole: { en: 'Check 1', tr: '1. denetim' },
+    databaseRole: { en: 'Check 2', tr: '2. denetim' },
     cookie: { en: 'httpOnly cookie', tr: 'httpOnly çerez' },
     session: { en: 'caller’s own session', tr: 'kullanıcının kendi oturumu' },
     label: {
@@ -342,8 +346,8 @@ export const nutrition = {
       tr: 'Klinik olarak doğrulanmış bir yazılım ya da tıbbi tavsiye değildir.',
     },
     {
-      en: 'Protein, carbohydrate and fat ranges are calculated independently and can add up to more than the calorie target; in one test profile the minimums alone are 230 kcal over.',
-      tr: 'Protein, karbonhidrat ve yağ aralıkları birbirinden bağımsız hesaplanıyor ve toplamları kalori hedefini aşabiliyor; bir test profilinde yalnızca alt sınırlar bile hedefi 230 kcal aşıyor.',
+      en: 'Protein, carbohydrate and fat ranges are still calculated independently. The plan picks one point inside them that adds up to the calorie target; when no such point exists, it says so and makes no suggestions rather than step outside the ranges.',
+      tr: 'Protein, karbonhidrat ve yağ aralıkları hâlâ birbirinden bağımsız hesaplanıyor. Plan bu aralıkların içinden kalori hedefini tutan tek bir nokta seçiyor; böyle bir nokta yoksa aralıkların dışına çıkmak yerine bunu açıkça söylüyor ve öneri yapmıyor.',
     },
     {
       en: 'The plan does not yet separate planned meals from eaten ones, and a household shares one plan while targets are personal.',
@@ -354,8 +358,8 @@ export const nutrition = {
 
 export const ai = {
   intro: {
-    en: 'Much of Grocery’s code was written with Claude Code: 267 of the repository’s 461 commits carry a Claude co-author line. The tool works under written rules. Requirements, architecture, acceptance, security boundaries, verification and every deploy stay with the developers.',
-    tr: 'Grocery’nin kodunun önemli bir kısmı Claude Code ile yazıldı: depodaki 461 commit’in 267’sinde Claude ortak yazar satırı var. Araç yazılı kurallar altında çalışıyor. Gereksinimler, mimari, kabul ölçütleri, güvenlik sınırları, doğrulama ve her yayına alma geliştiricilerde kalıyor.',
+    en: 'Much of Grocery’s code was written with Claude Code: 267 of the repository’s 465 commits carry a Claude co-author line. The tool works under written rules. Requirements, architecture, acceptance, security boundaries, verification and every deploy stay with the developers.',
+    tr: 'Grocery’nin kodunun önemli bir kısmı Claude Code ile yazıldı: depodaki 465 commit’in 267’sinde Claude ortak yazar satırı var. Araç yazılı kurallar altında çalışıyor. Gereksinimler, mimari, kabul ölçütleri, güvenlik sınırları, doğrulama ve her yayına alma geliştiricilerde kalıyor.',
   },
   rules: [
     {
@@ -457,11 +461,10 @@ export const status = {
     tr: 'Grocery yayında ve küçük ölçekte kullanılıyor. Yerleşik bir kullanıcı kitlesi ya da paylaşılacak büyüme rakamı yok. Üzerinde çalışılanlar:',
   },
   next: [
-    { en: 'Make the macro ranges add up to the calorie target.', tr: 'Makro aralıklarını kalori hedefiyle tutarlı hâle getirmek.' },
     { en: 'Separate planned meals from eaten ones.', tr: 'Planlanan öğünleri yenenlerden ayırmak.' },
     {
-      en: 'Expand the food catalog with USDA-mapped foods and Turkish label values.',
-      tr: 'Besin kataloğunu USDA’ya eşlenmiş yiyecekler ve Türkiye etiket değerleriyle genişletmek.',
+      en: 'Expand the food catalog and its allergen mappings (35 of 103 foods so far) with USDA-mapped foods and Turkish label values.',
+      tr: 'Besin kataloğunu ve alerjen eşlemelerini (şimdilik 103 yiyecekten 35’i) USDA’ya eşlenmiş yiyecekler ve Türkiye etiket değerleriyle genişletmek.',
     },
     { en: 'Design a guest demo that works without signing in.', tr: 'Giriş yapmadan çalışan bir misafir demosu tasarlamak.' },
   ] satisfies Text[],
@@ -474,8 +477,8 @@ export const credits = {
       tr: 'Grocery iki kişilik bir proje. Ozan Özel projeyi Ağustos 2026’da başlattı: ilk web uygulaması ve alışveriş kategorileri, ilk veritabanı şeması, hane, eşitleme ve besin API’leri, ilk kimlik doğrulama koruması ve birkaç araştırma ile yol haritası belgesi.',
     },
     {
-      en: 'I built Google sign-in and sessions, the versioned sync layer, meal planning, the personal plan, most of the row-level security policies, account deletion, most of the interface and most of the nutrition curriculum, about 425 of the 461 commits.',
-      tr: 'Ben Google ile girişi ve oturumları, sürümlü eşitleme katmanını, yemek planlamayı, kişisel planı, satır düzeyi güvenlik politikalarının çoğunu, hesap silmeyi, arayüzün büyük bölümünü ve beslenme müfredatının büyük kısmını geliştirdim; 461 commit’in yaklaşık 425’i.',
+      en: 'I built Google sign-in and sessions, the versioned sync layer, meal planning, the personal plan, most of the row-level security policies, account deletion, most of the interface and most of the nutrition curriculum, about 430 of the 465 commits.',
+      tr: 'Ben Google ile girişi ve oturumları, sürümlü eşitleme katmanını, yemek planlamayı, kişisel planı, satır düzeyi güvenlik politikalarının çoğunu, hesap silmeyi, arayüzün büyük bölümünü ve beslenme müfredatının büyük kısmını geliştirdim; 465 commit’in yaklaşık 430’u.',
     },
   ] satisfies Text[],
 };
