@@ -1,5 +1,4 @@
 import {
-  ai,
   architecture,
   contact,
   credits,
@@ -278,25 +277,6 @@ export function GroceryCase({ locale }: { locale: Locale }) {
               ))}
             </ul>
           </aside>
-        </section>
-
-        <section id="ai" className="cs-section cs-dark" aria-labelledby="ai-title" tabIndex={-1}>
-          <Heading id="ai" locale={locale} />
-          <p className="cs-prose">{L(ai.intro)}</p>
-          <ul className="cs-cards">
-            {ai.rules.map((rule) => (
-              <li key={rule.title.en}>
-                <h3 className="cs-h3">{L(rule.title)}</h3>
-                <p>{L(rule.body)}</p>
-              </li>
-            ))}
-          </ul>
-          <h3 className="cs-h3">{L(ai.humanTitle)}</h3>
-          <ul className="cs-pills">
-            {ai.human.map((item) => (
-              <li key={item.en}>{L(item)}</li>
-            ))}
-          </ul>
         </section>
 
         <section id="tradeoffs" className="cs-section" aria-labelledby="tradeoffs-title" tabIndex={-1}>

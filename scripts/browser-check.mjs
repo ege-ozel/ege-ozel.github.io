@@ -369,7 +369,7 @@ for (const [locale, path] of Object.entries(casePages)) {
 {
   const { context, page } = await open('/projects/grocery/', viewports.phone, { javaScriptEnabled: false });
   const sections = await page.locator('.cs-section').count();
-  if (sections !== 9) fail('case no-JS', `${sections} sections instead of 9`);
+  if (sections !== 8) fail('case no-JS', `${sections} sections instead of 8`);
   await context.close();
 }
 

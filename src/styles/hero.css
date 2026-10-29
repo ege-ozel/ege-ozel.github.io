@@ -288,6 +288,20 @@
   object-fit: contain;
 }
 
+/* A phone recording: as tall as the window allows, and the dialog only as wide as the clip, so
+   there are no black bars beside it. 72px leaves room for the title row and a margin. */
+.lightbox--tall {
+  width: fit-content;
+  max-height: calc(100svh - 24px);
+}
+
+.lightbox--tall .lightbox__video {
+  width: auto;
+  height: calc(100svh - 72px);
+  max-width: calc(96vw - 2px);
+  max-height: none;
+}
+
 /* A photo: the dialog takes the picture's width instead of the video's. */
 .lightbox--image {
   width: fit-content;

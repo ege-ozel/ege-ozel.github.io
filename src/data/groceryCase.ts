@@ -33,7 +33,6 @@ export const sections: CaseSection[] = [
   { id: 'walkthrough', title: { en: 'Product walkthrough', tr: 'Ürün turu' } },
   { id: 'architecture', title: { en: 'Architecture', tr: 'Mimari' } },
   { id: 'nutrition', title: { en: 'Nutrition traceability', tr: 'Beslenmede izlenebilirlik' } },
-  { id: 'ai', title: { en: 'AI-assisted development', tr: 'Yapay zekâ destekli geliştirme' } },
   { id: 'tradeoffs', title: { en: 'Trade-offs', tr: 'Bilinçli ödünler' } },
   { id: 'status', title: { en: 'Status and next steps', tr: 'Durum ve sıradaki adımlar' } },
   { id: 'credits', title: { en: 'Who built what', tr: 'Kim neyi yaptı' } },
@@ -353,60 +352,6 @@ export const nutrition = {
       en: 'The plan does not yet separate planned meals from eaten ones, and a household shares one plan while targets are personal.',
       tr: 'Plan henüz planlanan öğünlerle yenenleri ayırmıyor; ayrıca hane tek bir planı paylaşırken hedefler kişisel.',
     },
-  ] satisfies Text[],
-};
-
-export const ai = {
-  intro: {
-    en: 'Much of Grocery’s code was written with Claude Code: 267 of the repository’s 465 commits carry a Claude co-author line. The tool works under written rules. Requirements, architecture, acceptance, security boundaries, verification and every deploy stay with the developers.',
-    tr: 'Grocery’nin kodunun önemli bir kısmı Claude Code ile yazıldı: depodaki 465 commit’in 267’sinde Claude ortak yazar satırı var. Araç yazılı kurallar altında çalışıyor. Gereksinimler, mimari, kabul ölçütleri, güvenlik sınırları, doğrulama ve her yayına alma geliştiricilerde kalıyor.',
-  },
-  rules: [
-    {
-      title: { en: 'Written rules', tr: 'Yazılı kurallar' },
-      body: {
-        en: 'A rules file in the repository: one branch per task, commits only on request, no deploys unless asked.',
-        tr: 'Depodaki bir kural dosyası: her iş için ayrı branch, yalnızca istendiğinde commit, istenmedikçe yayına alma yok.',
-      },
-    },
-    {
-      title: { en: 'Secrets boundary', tr: 'Gizli bilgi sınırı' },
-      body: {
-        en: 'The agent may not read, print or copy environment files by any route. For browser testing, the developer creates a one-time sign-in link in their own terminal.',
-        tr: 'Ajan ortam dosyalarını hiçbir yoldan okuyamaz, yazdıramaz ya da kopyalayamaz. Tarayıcı testi için tek kullanımlık giriş bağlantısını geliştirici kendi terminalinde oluşturur.',
-      },
-    },
-    {
-      title: { en: 'Real-browser checks', tr: 'Gerçek tarayıcıda kontrol' },
-      body: {
-        en: 'Changes that affect behavior are driven through a real browser at desktop and phone widths before they are accepted.',
-        tr: 'Davranışı etkileyen değişiklikler, kabul edilmeden önce gerçek bir tarayıcıda masaüstü ve telefon genişliklerinde denenir.',
-      },
-    },
-    {
-      title: { en: 'Documents that agree', tr: 'Birbiriyle tutarlı belgeler' },
-      body: {
-        en: 'A pre-commit check flags a nutrition change that does not update the roadmap, the scope file and the decision register together.',
-        tr: 'Commit öncesi bir kontrol, yol haritasını, kapsam dosyasını ve karar kaydını birlikte güncellemeyen bir beslenme değişikliğini işaretler.',
-      },
-    },
-    {
-      title: { en: 'Reviewable decisions', tr: 'İncelenebilir kararlar' },
-      body: {
-        en: 'Nutrition work follows the decision register, with review gates that the agent may not cross on its own.',
-        tr: 'Beslenme işleri karar kaydını izler; ajanın kendi başına geçemeyeceği inceleme kapıları vardır.',
-      },
-    },
-  ] satisfies Point[],
-  humanTitle: { en: 'What stays human', tr: 'İnsanda kalanlar' },
-  human: [
-    { en: 'Product requirements', tr: 'Ürün gereksinimleri' },
-    { en: 'Architecture', tr: 'Mimari' },
-    { en: 'Acceptance criteria', tr: 'Kabul ölçütleri' },
-    { en: 'Security boundaries', tr: 'Güvenlik sınırları' },
-    { en: 'Verification', tr: 'Doğrulama' },
-    { en: 'Deploys', tr: 'Yayına alma' },
-    { en: 'Trade-offs', tr: 'Ödünleşimler' },
   ] satisfies Text[],
 };
 

@@ -6,6 +6,8 @@ export interface LightboxItem {
   title: string;
   /** A still picture instead of a video; the alt text describes it. */
   image?: { alt: string; width: number; height: number };
+  /** A portrait clip, such as a phone recording: the dialog takes the video's width. */
+  tall?: boolean;
 }
 
 interface Props {
@@ -32,7 +34,7 @@ export function Lightbox({ item, onClose, labels }: Props) {
   return (
     <dialog
       ref={dialog}
-      className={item?.image ? 'lightbox lightbox--image' : 'lightbox'}
+      className={item?.image ? 'lightbox lightbox--image' : item?.tall ? 'lightbox lightbox--tall' : 'lightbox'}
       aria-label={item?.title}
       onClose={() => {
         video.current?.pause();

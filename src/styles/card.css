@@ -38,22 +38,6 @@
   background: var(--surface-2);
 }
 
-.media__bar {
-  display: flex;
-  align-items: center;
-  height: 30px;
-  padding: 0 var(--s-3);
-  border-bottom: 1px solid var(--line);
-  color: var(--text-2);
-  font-size: var(--fs-small);
-}
-
-.media__bar span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .media__screen {
   position: relative;
   aspect-ratio: 16 / 10;
@@ -319,11 +303,16 @@
   aspect-ratio: 16 / 5;
 }
 
-/* Narrow screens: move the phone to the right so the watch button on the left doesn't cover it. */
+/* Narrow screens: a taller frame, so the phone is large enough to read. It sits between the
+   progress bar and the watch button, which keeps its own row below the phone. */
 @media (max-width: 640px) {
   .media--mobile .media__screen {
-    justify-items: end;
-    padding-right: 10%;
+    aspect-ratio: 2 / 3;
+    padding: 28px 0 68px;
+  }
+
+  .media__phone {
+    height: 100%;
   }
 }
 

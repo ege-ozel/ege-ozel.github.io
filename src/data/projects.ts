@@ -15,8 +15,8 @@ export const projects: Project[] = [
       tr: 'Türk hanelerinin ne pişireceğine karar vermesine, öğünleri beslenme hedeflerine göre planlamasına ve ortak alışveriş listesini her cihazda güncel tutmasına yardım eder. Arkasında sunucu tarafında Google ile giriş, iki katmanlı yetkilendirme (fonksiyon kontrolleri ve Postgres satır düzeyi güvenliği), sürümlü eşitleme ve ders kitabı tabanlı bir karar kaydına bağlanan beslenme kuralları var.',
     },
     myPart: {
-      en: 'Co-developed with Ozan Özel, who started the project. My part: Google sign-in and sessions, the versioned sync layer, meal planning, the personal nutrition plan, most of the row-level security policies, account deletion, most of the interface and most of the nutrition curriculum. Built with Claude Code under written rules.',
-      tr: 'Projeyi başlatan Ozan Özel ile birlikte geliştirildi. Benim payım: Google ile giriş ve oturumlar, sürümlü eşitleme katmanı, yemek planlama, kişisel beslenme planı, satır düzeyi güvenlik politikalarının çoğu, hesap silme, arayüzün büyük bölümü ve beslenme müfredatının büyük kısmı. Yazılı kurallar altında Claude Code ile geliştirildi.',
+      en: 'Co-developed with Ozan Özel, who started the project. My part: Google sign-in and sessions, the versioned sync layer, meal planning, the personal nutrition plan, most of the row-level security policies, account deletion, most of the interface and most of the nutrition curriculum.',
+      tr: 'Projeyi başlatan Ozan Özel ile birlikte geliştirildi. Benim payım: Google ile giriş ve oturumlar, sürümlü eşitleme katmanı, yemek planlama, kişisel beslenme planı, satır düzeyi güvenlik politikalarının çoğu, hesap silme, arayüzün büyük bölümü ve beslenme müfredatının büyük kısmı.',
     },
     notes: {
       challenge: {

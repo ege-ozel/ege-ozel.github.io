@@ -135,7 +135,7 @@ describe('Grocery case study', () => {
   });
 
   it('has the nine sections in order, each with a heading', () => {
-    const ids = ['problem', 'walkthrough', 'architecture', 'nutrition', 'ai', 'tradeoffs', 'status', 'credits', 'contact'];
+    const ids = ['problem', 'walkthrough', 'architecture', 'nutrition', 'tradeoffs', 'status', 'credits', 'contact'];
     const positions = ids.map((id) => caseEn.html.indexOf(`<section id="${id}"`));
     expect(positions.every((p) => p > 0)).toBe(true);
     expect([...positions].sort((a, b) => a - b)).toEqual(positions);

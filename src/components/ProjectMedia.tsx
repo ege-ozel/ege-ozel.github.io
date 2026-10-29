@@ -10,12 +10,6 @@ const POSTER = {
   mobile: { widths: [400, 800], width: 800, height: 1733, sizes: '(min-width: 960px) 240px, 45vw' },
 } as const;
 
-/** "https://ege-ozel.github.io/metronome/" → "ege-ozel.github.io/metronome" */
-export function displayUrl(href: string): string {
-  const url = new URL(href);
-  return `${url.host}${url.pathname}`.replace(/\/$/, '');
-}
-
 function Poster({ poster, device, alt, eager }: { poster: PosterData; device: Device; alt: string; eager: boolean }) {
   const spec = POSTER[device];
   const srcSet = (ext: string) => spec.widths.map((w) => `${poster.base}-${w}.${ext} ${w}w`).join(', ');
@@ -48,17 +42,11 @@ export function ProjectMedia({ project, locale, eager }: Props) {
   // The watch button only works after hydration, so it stays hidden in the prerendered page.
   const [ready, setReady] = useState(false);
   useEffect(() => setReady(true), []);
-  const demo = project.links.find((link) => link.kind === 'demo');
   const video = project.poster ? project.video : undefined;
   const preview = video && <PreviewVideo src={video} labels={{ play: t('media.play'), pause: t('media.pause') }} />;
   return (
     <div className={`media media--${project.device}`}>
       <div className="media__frame">
-        {demo && project.device === 'desktop' && (
-          <div className="media__bar" aria-hidden="true">
-            <span>{displayUrl(demo.href)}</span>
-          </div>
-        )}
         <div className="media__screen">
           {project.poster ? (
             project.device === 'mobile' ? (
@@ -86,7 +74,7 @@ export function ProjectMedia({ project, locale, eager }: Props) {
               type="button"
               className="watch"
               hidden={!ready}
-              onClick={() => openLightbox({ src: video, title: project.title })}
+              onClick={() => openLightbox({ src: video, title: project.title, tall: project.device === 'mobile' })}
             >
               <Icon name="play" />
               {t('media.watch')}
