@@ -215,6 +215,12 @@ html {
 /* Page changes and the theme and language switches use view transitions (the head script in
    index.html starts them and marks <html> with the kind). */
 @media (prefers-reduced-motion: no-preference) {
+  /* A link to a part of the page (the case study's contents, "skip to projects") glides there
+     instead of jumping, so the reader keeps their place. */
+  html {
+    scroll-behavior: smooth;
+  }
+
   /* Moving between pages of the site cross-fades instead of flashing white. */
   @view-transition {
     navigation: auto;

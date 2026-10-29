@@ -168,7 +168,7 @@ for (const [locale, path] of Object.entries(pages)) {
     await page.screenshot({ path: join(shots, `${locale}-${name}-fold.png`) });
     const hidden = [];
     for (const card of await page.locator('.card').all()) {
-      await card.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+      await card.evaluate((el) => el.scrollIntoView({ block: 'center', behavior: 'instant' }));
       await page.waitForTimeout(150);
       const opacity = await card.evaluate((el) => Number(getComputedStyle(el).opacity));
       if (opacity < 0.99) hidden.push(await card.locator('h3').textContent());
@@ -189,7 +189,7 @@ for (const [locale, path] of Object.entries(pages)) {
   if ((await page.evaluate(() => document.activeElement?.className)) !== 'skip') fail(where, 'first Tab is not the skip link');
   await page.keyboard.press('Enter');
   if ((await page.evaluate(() => document.activeElement?.id)) !== 'work') fail(where, 'skip link does not focus #work');
-  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
 
   const js = await page.evaluate(() =>
     performance.getEntriesByType('resource').filter((r) => r.name.endsWith('.js')).reduce((sum, r) => sum + r.encodedBodySize, 0),
@@ -225,7 +225,7 @@ for (const [locale, path] of Object.entries(pages)) {
   await page.locator('.notes summary').first().click();
   if (!(await page.locator('.notes').first().evaluate((el) => el.open))) fail(where, 'technical notes did not open');
 
-  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
   await page.click('.lang a[hreflang="tr"]');
   // The switch swaps the language in place (no page load): wait for the new language.
   await page.waitForFunction(() => document.documentElement.lang === 'tr', null, { timeout: 5000 }).catch(() => {});
@@ -241,7 +241,7 @@ for (const [locale, path] of Object.entries(pages)) {
   const { context, page, errors } = await open('/', viewports.phone, { hasTouch: true, isMobile: true });
   const cards = await page.locator('.card:has(.media__video)').all();
   for (const card of cards) {
-    await card.locator('.media__video').evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    await card.locator('.media__video').evaluate((el) => el.scrollIntoView({ block: 'center', behavior: 'instant' }));
     await page.waitForTimeout(1200);
     const playing = await page.evaluate(() => [...document.querySelectorAll('.media__video')].filter((v) => !v.paused).length);
     const own = await card.evaluate((el) => !el.querySelector('.media__video').paused);
@@ -318,7 +318,7 @@ for (const [locale, path] of Object.entries(casePages)) {
     // Scroll through so the lazy screens load, then check every one did.
     await page.evaluate(async () => {
       for (let y = 0; y < document.body.scrollHeight; y += 500) {
-        window.scrollTo(0, y);
+        window.scrollTo({ top: y, behavior: 'instant' });
         await new Promise((r) => setTimeout(r, 60));
       }
     });
@@ -345,7 +345,8 @@ for (const [locale, path] of Object.entries(casePages)) {
   await page.keyboard.press('Enter');
   if ((await page.evaluate(() => document.activeElement?.id)) !== 'case') fail(where, 'skip link does not focus #case');
   await page.click('.cs-toc a[href="#nutrition"]');
-  await page.waitForTimeout(300);
+  // The page glides there (scroll-behavior: smooth); wait for it to arrive.
+  await page.waitForFunction(() => Math.abs(document.getElementById('nutrition').getBoundingClientRect().top) < 40, null, { timeout: 3000 }).catch(() => {});
   const top = await page.evaluate(() => document.getElementById('nutrition').getBoundingClientRect().top);
   if (Math.abs(top) > 40) fail(where, `table of contents left #nutrition at ${Math.round(top)}px`);
   const video = page.locator('.cs-video video');
@@ -353,7 +354,7 @@ for (const [locale, path] of Object.entries(casePages)) {
   await video.evaluate((el) => el.play());
   await page.waitForTimeout(1500);
   if ((await video.evaluate((el) => el.currentTime)) < 0.5) fail(where, 'the recording does not play');
-  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
   await page.click('.cs-top .lang a[hreflang="tr"]');
   // The switch swaps the language in place (no page load): wait for the new language.
   await page.waitForFunction(() => document.documentElement.lang === 'tr', null, { timeout: 5000 }).catch(() => {});

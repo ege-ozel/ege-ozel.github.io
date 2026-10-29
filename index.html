@@ -61,11 +61,22 @@
 
         // Theme: the new theme opens as a circle from the pressed button, over the old one, so
         // nothing passes through a half-way grey; the pill slides to its new place meanwhile.
+        function shown(choice) {
+          if (choice === 'dark' || choice === 'light') return choice;
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
         function setTheme(choice, button) {
+          // The colours stay the same (system to dark on a dark system, say): only the pill
+          // slides, with no snapshot of the page and no circle over an unchanged picture.
+          var same = shown(saved()) === shown(choice);
           try {
             if (choice === 'system') localStorage.removeItem('theme');
             else localStorage.setItem('theme', choice);
           } catch (e) {}
+          if (same) {
+            apply(choice);
+            return;
+          }
           if (!document.startViewTransition && !still()) {
             root.classList.add('theme-fade');
             window.clearTimeout(fadeTimer);
@@ -320,7 +331,7 @@
           };
           // After stepping through, the screen to return to may be off the window.
           var box = pic.getBoundingClientRect();
-          if (box.bottom < 0 || box.top > innerHeight) pic.scrollIntoView({ block: 'center' });
+          if (box.bottom < 0 || box.top > innerHeight) pic.scrollIntoView({ block: 'center', behavior: 'instant' });
           if (still()) {
             chrome(dialog, false, 120);
             setTimeout(done, 120);
