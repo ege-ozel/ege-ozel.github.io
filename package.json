@@ -10,7 +10,8 @@
     "check": "node scripts/browser-check.mjs",
     "video": "node scripts/build-video.mjs",
     "og": "node scripts/og-image.mjs",
-    "case-media": "node scripts/case-media.mjs"
+    "case-media": "node scripts/case-media.mjs",
+    "activity": "node scripts/activity.mjs"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.5",

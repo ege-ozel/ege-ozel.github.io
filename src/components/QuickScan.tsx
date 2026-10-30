@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { profile } from '../data/profile';
 import { createT, localePath } from '../i18n';
 import { locales, type Locale } from '../types';
@@ -5,15 +6,20 @@ import { CopyEmail } from './CopyEmail';
 import { useLightbox } from '../lightbox';
 import { ExternalLink } from './ExternalLink';
 import { ThemeSwitch } from './ThemeSwitch';
+import { Arrangement, kinds, type Kind } from './Arrangement';
 
-/** The first screen: everything a recruiter checks, before any project. */
+/**
+ * The first screen: who I am and what I build. The three words are also a filter: each dims the
+ * projects in the arrangement below that do not run there.
+ */
 export function QuickScan({ locale }: { locale: Locale }) {
   const t = createT(locale);
   const newTab = ` (${t('link.newTab')})`;
   const openLightbox = useLightbox();
+  const [kind, setKind] = useState<Kind | null>(null);
 
   return (
-    <header className="quick">
+    <header id="top" className="quick">
       <div className="quick__id">
         {profile.portrait ? (
           // Without script the link still opens the whole photo; with it, the photo opens in the lightbox.
@@ -60,6 +66,20 @@ export function QuickScan({ locale }: { locale: Locale }) {
         </div>
       </div>
 
+      <p className="quick__words" role="group" aria-label={t('arr.words')}>
+        {kinds.map((word) => (
+          <button
+            key={word}
+            type="button"
+            className="quick__word"
+            aria-pressed={kind === word}
+            onClick={() => setKind(kind === word ? null : word)}
+          >
+            {t(`arr.${word}`)}
+          </button>
+        ))}
+      </p>
+
       <div className="quick__meta">
         {profile.openToWork && (
           <span className="open">
@@ -97,6 +117,7 @@ export function QuickScan({ locale }: { locale: Locale }) {
           </ExternalLink>
         </li>
       </ul>
+      <Arrangement locale={locale} kind={kind} />
       <p className="quick__intro">{profile.intro[locale]}</p>
 
       <dl className="stats" aria-label={t('profile.stats')}>

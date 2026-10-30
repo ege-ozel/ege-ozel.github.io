@@ -15,7 +15,7 @@ export function FeaturedHero({ locale }: { locale: Locale }) {
   const hint = `: ${project?.title ?? ''} (${t('link.newTab')})`;
 
   return (
-    <section className="hero" aria-labelledby="hero-title">
+    <section id="hero" className="hero" aria-labelledby="hero-title">
       <div className="hero__text">
         <h2 id="hero-title" className="hero__title">
           {hero.title[locale]}

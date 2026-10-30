@@ -1,0 +1,301 @@
+/* The three words under the name: a statement, and a filter for the arrangement below. */
+.quick__words {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 0.24em;
+  margin: 0;
+  font-size: var(--fs-display);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
+}
+
+.quick__word {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  letter-spacing: inherit;
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 0.07em;
+  text-underline-offset: 0.14em;
+  cursor: pointer;
+  transition:
+    color var(--t-fast) var(--ease),
+    text-decoration-color var(--t-fast) var(--ease);
+}
+
+/* One word chosen: it keeps the ink and an accent line, the other two step back. */
+.quick__words:has([aria-pressed='true']) .quick__word {
+  color: var(--text-2);
+}
+
+.quick__words .quick__word[aria-pressed='true'] {
+  color: var(--text);
+  text-decoration-color: var(--accent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .quick__word:hover {
+    text-decoration-color: var(--line-strong);
+  }
+}
+
+/* The arrangement: a lane per project, a clip per stretch of work, a bar per week. */
+.arr {
+  --label: 0px;
+  display: grid;
+  gap: var(--s-4);
+  margin-top: var(--s-4);
+  padding: var(--s-4);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.arr__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-4);
+}
+
+.arr__title {
+  font-size: var(--fs-subhead);
+  font-weight: var(--fw-semibold);
+}
+
+.arr__note {
+  flex: 1 1 260px;
+  color: var(--text-2);
+  font-size: var(--fs-small);
+}
+
+.arr__play {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 44px;
+  padding: 0 var(--s-4);
+  border: 0;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  transition: background-color var(--t-fast) var(--ease);
+}
+
+.arr__play .icon {
+  width: 12px;
+  height: 12px;
+  color: var(--accent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .arr__play:hover {
+    background: var(--line-strong);
+  }
+}
+
+.arr__body {
+  position: relative;
+  display: grid;
+  gap: var(--s-2);
+}
+
+/* The ruler: drag it (or use the arrow keys) to move the playhead. Vertical swipes still scroll
+   the page on phones. */
+.arr__ruler {
+  position: relative;
+  height: 32px;
+  margin-left: var(--label);
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: var(--fs-small);
+  line-height: 32px;
+  cursor: ew-resize;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.arr__ruler:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.arr__ruler span {
+  position: absolute;
+  left: calc(var(--at) * 100%);
+  padding-left: 6px;
+}
+
+.arr__lanes {
+  display: grid;
+  gap: var(--s-2);
+}
+
+.arr__lane {
+  transition: opacity var(--t-base) var(--ease);
+}
+
+.arr__lane.is-dim {
+  opacity: 0.28;
+}
+
+/* Phones: the name sits above its lane. From 720px it takes a column on the left. */
+.arr__link {
+  display: grid;
+  gap: var(--s-1);
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--r-sm);
+}
+
+/* On phones the count follows the name, so the playhead near the right edge crosses no text. */
+.arr__name {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: var(--s-2);
+  min-width: 0;
+  font-size: var(--fs-small);
+}
+
+.arr__name strong {
+  max-width: 100%;
+  overflow: hidden;
+  font-weight: var(--fw-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.arr__name span {
+  flex: none;
+  color: var(--text-2);
+}
+
+.arr__track {
+  position: relative;
+  display: block;
+  height: 40px;
+  border-radius: 6px;
+  background: var(--surface-2);
+}
+
+.arr__clip {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: calc(var(--from) * 100%);
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  width: calc(var(--span) * 100%);
+  min-width: 6px;
+  padding: 4px 3px 3px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--c) 18%, transparent);
+  transition: background-color var(--t-fast) var(--ease);
+}
+
+.arr__bar {
+  flex: 1;
+  height: calc(var(--h) * 100%);
+  border-radius: 1px;
+  background: var(--c);
+  transform-origin: bottom;
+}
+
+.arr__bar--quiet {
+  opacity: 0.35;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .arr__link:hover .arr__clip {
+    background: color-mix(in srgb, var(--c) 30%, transparent);
+  }
+
+  .arr__link:hover .arr__name strong {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+}
+
+/* The playhead: an element as wide as the rail, moved by a transform (a share of its own width,
+   so of the rail), with the line drawn on its left edge. It stands where the counts were taken. */
+.arr__rail {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: var(--label);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.arr__head-line {
+  position: absolute;
+  inset: 0;
+  transform: translateX(calc(var(--pos) * 100%));
+}
+
+.arr__head-line::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: var(--text);
+}
+
+.arr__head-line::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -5px;
+  width: 12px;
+  height: 10px;
+  background: var(--text);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+/* Moved or playing: the weeks up to the playhead are lit, the ones after it wait. */
+.arr.is-live .arr__bar {
+  opacity: clamp(0.18, (var(--cur) - var(--w) + 1) * 10, 1);
+  transition: opacity 160ms var(--ease);
+}
+
+.arr.is-live .arr__bar--quiet {
+  opacity: clamp(0.12, (var(--cur) - var(--w) + 1) * 10, 0.35);
+}
+
+@media (min-width: 720px) {
+  .arr {
+    --label: 200px;
+    padding: var(--s-5);
+  }
+
+  .arr__link {
+    grid-template-columns: var(--label) 1fr;
+    gap: 0;
+    align-items: center;
+  }
+
+  .arr__name {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    padding-right: var(--s-4);
+  }
+
+  .arr__track {
+    height: 48px;
+  }
+}

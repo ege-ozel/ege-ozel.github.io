@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { cssVars } from '../css';
 import { createT } from '../i18n';
+import { useLightbox } from '../lightbox';
 import type { Locale, Shot as ShotData } from '../types';
 import { Icon } from './Icon';
 import { Shot } from './Shot';
@@ -37,10 +38,20 @@ export function HeroScreens({ shots, locale }: { shots: ShotData[]; locale: Loca
   const ring = useRef<HTMLDivElement>(null);
   const items = useRef<(HTMLDivElement | null)[]>([]);
   const api = useRef<{ step: (by: number) => void } | null>(null);
+  // A tap on the screen in front opens it large; the effect below reads these through refs.
+  const openLightbox = useLightbox();
+  const enlarge = useRef<(i: number) => void>(() => {});
+  enlarge.current = (i: number) => {
+    const shot = shots[i];
+    if (shot) openLightbox({ src: `${shot.base}-390.webp`, title: 'Grocery', image: { alt: shot.alt[locale], width: 390, height: 844 } });
+  };
 
   useEffect(() => {
     const el = ring.current;
     if (!el) return;
+    // Pointer and wheel events are taken on the flat box around the ring: in the ring's 3D space
+    // its own plane can sit in front of the screen in front and catch the tap meant for it.
+    const surface = el.parentElement ?? el;
     const still = window.matchMedia('(prefers-reduced-motion: reduce)');
     let pos = START;
     let vel = 0;
@@ -132,7 +143,7 @@ export function HeroScreens({ shots, locale }: { shots: ShotData[]; locale: Loca
         drag.on = true;
         drag.x = event.clientX;
         drag.from = pos;
-        el.setPointerCapture(event.pointerId);
+        surface.setPointerCapture(event.pointerId);
         el.classList.add('is-dragging');
         stop();
         return;
@@ -160,6 +171,8 @@ export function HeroScreens({ shots, locale }: { shots: ShotData[]; locale: Loca
         if (by > n / 2) by -= n;
         if (by < -n / 2) by += n;
         api.current?.step(by);
+      } else if (event.type === 'pointerup' && was.item >= 0) {
+        enlarge.current(was.item);
       }
     };
 
@@ -215,22 +228,22 @@ export function HeroScreens({ shots, locale }: { shots: ShotData[]; locale: Loca
       }
     };
 
-    el.addEventListener('pointerdown', down);
-    el.addEventListener('pointermove', move);
-    el.addEventListener('pointerup', up);
-    el.addEventListener('pointercancel', up);
-    el.addEventListener('wheel', wheel, { passive: false });
+    surface.addEventListener('pointerdown', down);
+    surface.addEventListener('pointermove', move);
+    surface.addEventListener('pointerup', up);
+    surface.addEventListener('pointercancel', up);
+    surface.addEventListener('wheel', wheel, { passive: false });
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', update);
     update();
     return () => {
       stop();
       window.clearTimeout(wheelTimer);
-      el.removeEventListener('pointerdown', down);
-      el.removeEventListener('pointermove', move);
-      el.removeEventListener('pointerup', up);
-      el.removeEventListener('pointercancel', up);
-      el.removeEventListener('wheel', wheel);
+      surface.removeEventListener('pointerdown', down);
+      surface.removeEventListener('pointermove', move);
+      surface.removeEventListener('pointerup', up);
+      surface.removeEventListener('pointercancel', up);
+      surface.removeEventListener('wheel', wheel);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', update);
       nearby.disconnect();
@@ -254,6 +267,16 @@ export function HeroScreens({ shots, locale }: { shots: ShotData[]; locale: Loca
               // The place at load; from then on the script above writes --a directly.
               style={cssVars({ '--a': `${((i - START) * 360) / n}deg` })}
               aria-hidden={!isFront}
+              // The screen in front opens large, from the keyboard too.
+              role={isFront ? 'button' : undefined}
+              tabIndex={isFront ? 0 : undefined}
+              aria-label={isFront ? `${shot.alt[locale]} (${t('case.enlarge')})` : undefined}
+              onKeyDown={(event) => {
+                if (isFront && (event.key === 'Enter' || event.key === ' ')) {
+                  event.preventDefault();
+                  enlarge.current(i);
+                }
+              }}
             >
               {/* The screen in front at load is the one image fetched with high priority. */}
               <Shot shot={shot} locale={locale} eager priority={i === START} />

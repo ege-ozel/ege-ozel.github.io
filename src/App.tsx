@@ -1,5 +1,6 @@
 import { FeaturedHero } from './components/FeaturedHero';
 import { Contact, EducationList, ExperienceList, MoreWork } from './components/Lists';
+import { PageNav } from './components/PageNav';
 import { ProjectCard } from './components/ProjectCard';
 import { QuickScan } from './components/QuickScan';
 import { Section } from './components/Section';
@@ -16,6 +17,7 @@ export function App({ locale }: { locale: Locale }) {
       <a className="skip" href="#work">
         {t('skip')}
       </a>
+      <PageNav locale={locale} />
       <div className="shell">
         <QuickScan locale={locale} />
         <main className="content">

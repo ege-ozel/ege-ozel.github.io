@@ -68,6 +68,8 @@
   width: 100%;
   perspective: 1100px;
   transform-style: preserve-3d;
+  /* The screens take the taps, never the ring's own plane (see HeroScreens.tsx). */
+  pointer-events: none;
   touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
@@ -79,12 +81,18 @@
   max-width: 240px;
   transform: translateX(calc(sin(var(--a)) * 105%)) translateZ(calc((cos(var(--a)) - 1) * 160px))
     rotateY(calc(sin(var(--a)) * -28deg));
+  pointer-events: auto;
   cursor: pointer;
 }
 
-.ring__item.is-front,
-.ring.is-dragging .ring__item {
-  cursor: grab;
+/* The screen in front opens large on a tap; it can still be dragged. */
+.ring__item.is-front {
+  cursor: zoom-in;
+}
+
+.ring__item.is-front:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
 }
 
 .ring.is-dragging .ring__item {

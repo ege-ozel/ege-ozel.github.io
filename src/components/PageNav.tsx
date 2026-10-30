@@ -1,0 +1,67 @@
+import { useEffect, useState } from 'react';
+import { profile } from '../data/profile';
+import { createT, type UiKey } from '../i18n';
+import type { Locale } from '../types';
+
+/** Each link and the sections it stands for (More work belongs to Projects, Education to Experience). */
+const links: { id: string; label: UiKey; covers: string[] }[] = [
+  { id: 'work', label: 'nav.work', covers: ['work', 'more'] },
+  { id: 'experience', label: 'nav.experience', covers: ['experience', 'education'] },
+  { id: 'contact', label: 'nav.contact', covers: ['contact'] },
+];
+
+/**
+ * A bar that slides in at the top once the header has scrolled away: the name takes you back to
+ * the top, the links to each part of the page, and the part you are reading is marked. It moves by
+ * a transform only, and is inert while hidden so the keyboard skips it.
+ */
+export function PageNav({ locale }: { locale: Locale }) {
+  const t = createT(locale);
+  const [shown, setShown] = useState(false);
+  const [current, setCurrent] = useState<string | null>(null);
+
+  useEffect(() => {
+    const header = document.getElementById('top');
+    if (!header) return;
+    const away = new IntersectionObserver(([entry]) => setShown(!entry.isIntersecting), { rootMargin: '-120px 0px 0px 0px' });
+    away.observe(header);
+    // The part being read is the one crossing the middle of the window.
+    const reading = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const link = links.find((l) => l.covers.includes(entry.target.id));
+          setCurrent(link ? link.id : null);
+        }
+      },
+      { rootMargin: '-50% 0px -50% 0px' },
+    );
+    for (const id of ['hero', ...links.flatMap((l) => l.covers)]) {
+      const section = document.getElementById(id);
+      if (section) reading.observe(section);
+    }
+    return () => {
+      away.disconnect();
+      reading.disconnect();
+    };
+  }, []);
+
+  return (
+    <nav className={shown ? 'pagenav is-shown' : 'pagenav'} aria-label={t('nav.label')} inert={!shown}>
+      <div className="pagenav__inner">
+        <a className="pagenav__top" href="#top" aria-label={t('nav.top')}>
+          <span aria-hidden="true">↑</span> {profile.name}
+        </a>
+        <ul className="pagenav__links">
+          {links.map((link) => (
+            <li key={link.id}>
+              <a href={`#${link.id}`} aria-current={current === link.id ? 'location' : undefined}>
+                {t(link.label)}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </nav>
+  );
+}

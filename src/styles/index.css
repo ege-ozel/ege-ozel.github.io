@@ -3,6 +3,8 @@
 @import './base.css';
 @import './layout.css';
 @import './quickscan.css';
+@import './arrangement.css';
+@import './nav.css';
 @import './card.css';
 @import './hero.css';
 @import './sections.css';

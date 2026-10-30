@@ -78,7 +78,7 @@ describe('prerendered page', () => {
     expect(en.html).toContain('href="/projects/grocery/"');
     expect(tr.html).toContain('href="/tr/projects/grocery/"');
     expect(en.html).not.toContain('TrackMesh: DAW projects');
-    expect(en.html.match(/<article class="card"/g)?.length).toBe(featuredProjects.length);
+    expect(en.html.match(/<article id="[^"]+" class="card"/g)?.length).toBe(featuredProjects.length);
     expect(en.html.indexOf('id="grocery-title"')).toBeLessThan(en.html.indexOf('id="trackmesh-title"'));
   });
 
@@ -116,8 +116,8 @@ describe('prerendered page', () => {
   });
 
   it('has a skip link to the projects', () => {
-    expect(en.html.indexOf('class="skip" href="#work"')).toBeLessThan(en.html.indexOf('<header class="quick"'));
-    expect(en.html.indexOf('<header class="quick"')).toBeGreaterThan(-1);
+    expect(en.html.indexOf('class="skip" href="#work"')).toBeLessThan(en.html.indexOf('<header id="top" class="quick"'));
+    expect(en.html.indexOf('<header id="top" class="quick"')).toBeGreaterThan(-1);
     expect(en.html).toContain('<section id="work"');
   });
 });

@@ -385,12 +385,12 @@ for (const [where, path] of [['theme home', '/'], ['theme case', '/projects/groc
     if ((await pressed()) !== 'system') fail(at, `switch shows ${await pressed()} instead of system`);
     await page.screenshot({ path: join(shots, `light-${where.split(' ')[1]}-${name}-fold.png`) });
     await page.click('[data-theme-choice="dark"]');
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(1000);
     if ((await bg()) !== 'rgb(13, 15, 18)') fail(at, `dark choice shows ${await bg()}`);
     await page.reload({ waitUntil: 'networkidle' });
     if ((await bg()) !== 'rgb(13, 15, 18)' || (await pressed()) !== 'dark') fail(at, 'the dark choice is not kept after a reload');
     await page.click('[data-theme-choice="system"]');
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(1000);
     if ((await bg()) !== 'rgb(246, 247, 249)') fail(at, 'system choice does not return to light');
     if (errors.length) fail(at, `console errors: ${errors.join(' | ')}`);
     await context.close();

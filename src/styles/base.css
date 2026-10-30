@@ -249,34 +249,20 @@ html {
     }
   }
 
-  /* Theme: no cross-fade, which would pass through a muddy half-way grey. The new theme stays
-     whole and opens as a circle from the pressed button (the script animates its clip). */
-  :root.vt-theme::view-transition-old(root),
-  :root.vt-theme::view-transition-new(root) {
-    animation: none;
-    mix-blend-mode: normal;
-  }
-
   /* The pill moves with the transition, so its own CSS slide waits. */
-  .vt-lang .switch__pill,
-  .vt-theme .switch__pill {
+  .vt-lang .switch__pill {
     transition: none;
   }
+}
 
-  /* Theme change without view transitions: colours ease over instead of snapping. The head
-     script adds the class for one transition's length; the pill keeps its slide. */
-  .theme-fade,
-  .theme-fade *,
-  .theme-fade *::before,
-  .theme-fade *::after {
-    transition:
-      background-color 320ms ease,
-      border-color 320ms ease,
-      color 320ms ease,
-      fill 320ms ease,
-      stroke 320ms ease,
-      translate 220ms cubic-bezier(0.22, 1, 0.36, 1) !important;
-  }
+/* Theme change: a disc of the new background, grown from the pressed button by the head script
+   in index.html, covers the window while the page takes its new colours. */
+.theme-wipe {
+  position: fixed;
+  z-index: 2147483000;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: scale(0);
 }
 
 .btn--small {

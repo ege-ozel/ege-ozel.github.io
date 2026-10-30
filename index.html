@@ -13,7 +13,6 @@
       (function () {
         var root = document.documentElement;
         var colors = { dark: '#0D0F12', light: '#F6F7F9' };
-        var fadeTimer = 0;
         function still() {
           return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         }
@@ -59,47 +58,57 @@
           });
         }
 
-        // Theme: the new theme opens as a circle from the pressed button, over the old one, so
-        // nothing passes through a half-way grey; the pill slides to its new place meanwhile.
+        // Theme: a disc of the new background grows from the pressed button until it covers the
+        // window (a transform, which the compositor runs), the page takes the new colours under it
+        // in one go, and the disc fades away. Restyling the whole page is the one expensive step,
+        // and it happens while nothing on screen moves, so the change cannot stutter.
         function shown(choice) {
           if (choice === 'dark' || choice === 'light') return choice;
           return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
+        var wipe = null;
         function setTheme(choice, button) {
-          // The colours stay the same (system to dark on a dark system, say): only the pill
-          // slides, with no snapshot of the page and no circle over an unchanged picture.
+          // The colours stay the same (system to dark on a dark system, say): only the pill slides.
           var same = shown(saved()) === shown(choice);
           try {
             if (choice === 'system') localStorage.removeItem('theme');
             else localStorage.setItem('theme', choice);
           } catch (e) {}
-          if (same) {
+          if (same || still() || !document.body.animate) {
             apply(choice);
             return;
           }
-          if (!document.startViewTransition && !still()) {
-            root.classList.add('theme-fade');
-            window.clearTimeout(fadeTimer);
-            fadeTimer = window.setTimeout(function () {
-              root.classList.remove('theme-fade');
-            }, 400);
-          }
+          if (wipe) wipe.remove();
           var box = button.getBoundingClientRect();
           var x = box.left + box.width / 2;
           var y = box.top + box.height / 2;
-          var r = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
-          transition(
-            'vt-theme',
-            function () {
+          var r = Math.ceil(Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y)));
+          var disc = document.createElement('div');
+          disc.className = 'theme-wipe';
+          disc.style.left = x - r + 'px';
+          disc.style.top = y - r + 'px';
+          disc.style.width = disc.style.height = 2 * r + 'px';
+          disc.style.background = colors[shown(choice)];
+          document.body.appendChild(disc);
+          wipe = disc;
+          var done = function () {
+            disc.remove();
+            if (wipe === disc) wipe = null;
+          };
+          disc
+            .animate({ transform: ['scale(0)', 'scale(1)'] }, { duration: 520, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', fill: 'forwards' })
+            .finished.then(function () {
               apply(choice);
-            },
-            function () {
-              root.animate(
-                { clipPath: ['circle(0px at ' + x + 'px ' + y + 'px)', 'circle(' + r + 'px at ' + x + 'px ' + y + 'px)'] },
-                { duration: 650, easing: 'cubic-bezier(0.7, 0, 0.3, 1)', pseudoElement: '::view-transition-new(root)' },
-              );
-            },
-          );
+              // Two frames: the new colours paint under the disc before it starts to fade.
+              requestAnimationFrame(function () {
+                requestAnimationFrame(function () {
+                  disc.animate({ opacity: [1, 0] }, { duration: 280, easing: 'ease-out', fill: 'forwards' }).finished.then(done, done);
+                });
+              });
+            }, function () {
+              apply(choice);
+              done();
+            });
         }
 
         // Language: the other page is fetched (already on hover) and swapped in place, so the page

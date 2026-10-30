@@ -234,24 +234,6 @@
   view-transition-name: lang-pill;
 }
 
-/* During a theme change the pill slides over the circle instead of appearing inside it; the
-   icons are named too, so they stay above the pill, as on the page. */
-.switch--theme .switch__pill {
-  view-transition-name: theme-pill;
-}
-
-[data-theme-choice='system'] {
-  view-transition-name: theme-system;
-}
-
-[data-theme-choice='dark'] {
-  view-transition-name: theme-dark;
-}
-
-[data-theme-choice='light'] {
-  view-transition-name: theme-light;
-}
-
 .lang a[hreflang='en'] {
   view-transition-name: lang-en;
 }

@@ -27,7 +27,7 @@ export function ProjectCard({ project, locale, eager }: Props) {
   const hint = `: ${project.title} (${t('link.newTab')})`;
 
   return (
-    <article className="card" aria-labelledby={titleId} style={cssVars({ '--accent-project': project.accent })}>
+    <article id={project.id} className="card" aria-labelledby={titleId} style={cssVars({ '--accent-project': project.accent })}>
       <ProjectMedia project={project} locale={locale} eager={eager} />
       <div className="card__body">
         <div className="card__head">

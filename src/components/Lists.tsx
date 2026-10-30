@@ -10,7 +10,7 @@ export function MoreWork({ locale }: { locale: Locale }) {
   return (
     <ul className="more">
       {moreProjects.map((project) => (
-        <li key={project.id} className="more__item">
+        <li key={project.id} id={project.id} className="more__item">
           <h3 className="more__title">{project.title}</h3>
           <p className="more__summary">{project.summary[locale]}</p>
           <p className="more__tags">{project.tags.join(', ')}</p>
