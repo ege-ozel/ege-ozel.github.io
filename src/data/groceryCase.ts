@@ -46,7 +46,7 @@ export const meta = {
   },
   description: {
     en: 'Case study: a live full-stack app that helps Turkish households decide what to cook, plan meals around nutrition goals and keep one shared shopping list in sync. Preact, Vercel Functions, Supabase with row-level security.',
-    tr: 'Vaka çalışması: Türk hanelerinin ne pişireceğine karar vermesine, öğünleri beslenme hedeflerine göre planlamasına ve ortak alışveriş listesini her cihazda güncel tutmasına yardım eden, yayındaki full-stack uygulama. Preact, Vercel Functions, satır düzeyi güvenlikli Supabase.',
+    tr: 'Vaka çalışması: Türkiye’deki hanelerin ne pişireceğine karar vermesine, öğünleri beslenme hedeflerine göre planlamasına ve ortak alışveriş listesini her cihazda güncel tutmasına yardım eden, yayındaki full-stack uygulama. Preact, Vercel Functions, satır düzeyi güvenlikli Supabase.',
   },
 };
 
@@ -54,7 +54,7 @@ export const intro = {
   title: { en: 'Grocery', tr: 'Grocery' },
   lead: {
     en: 'A full-stack app helping Turkish households decide what to cook, plan meals around nutrition goals and keep one shared shopping list in sync.',
-    tr: 'Türk hanelerinin ne pişireceğine karar vermesine, öğünleri beslenme hedeflerine göre planlamasına ve ortak alışveriş listesini her cihazda güncel tutmasına yardım eden full-stack bir uygulama.',
+    tr: 'Türkiye’deki hanelerin ne pişireceğine karar vermesine, öğünleri beslenme hedeflerine göre planlamasına ve ortak alışveriş listesini her cihazda güncel tutmasına yardım eden full-stack bir uygulama.',
   },
   facts: [
     { label: { en: 'Role', tr: 'Rol' }, value: { en: 'Co-developer: product and full stack', tr: 'Ortak geliştirici: ürün ve full-stack' } },
@@ -64,7 +64,7 @@ export const intro = {
   ],
   signIn: {
     en: 'The live app needs a Google sign-in. Everything on this page is public: real screens and a screen recording with sample data.',
-    tr: 'Canlı uygulama Google ile giriş ister. Bu sayfadaki her şey herkese açık: örnek verili gerçek ekranlar ve bir ekran kaydı.',
+    tr: 'Canlı uygulamaya Google ile giriş yapmak gerekiyor. Bu sayfada ise örnek verilerle hazırlanmış gerçek ekranları ve ekran kaydını giriş yapmadan inceleyebilirsiniz.',
   },
   shot: shot(
     'plan',
@@ -88,8 +88,8 @@ export const problem = {
     },
   ] satisfies Text[],
   jobs: [
-    { title: { en: 'Decide', tr: 'Karar ver' }, body: { en: 'What can I cook tonight that fits my day?', tr: 'Bu akşam günüme uyan ne pişirebilirim?' } },
-    { title: { en: 'Plan', tr: 'Planla' }, body: { en: 'What does today add up to?', tr: 'Bugün toplamda ne ediyor?' } },
+    { title: { en: 'Decide', tr: 'Karar ver' }, body: { en: 'What can I cook tonight that fits my day?', tr: 'Bugünkü hedeflerime uygun olarak bu akşam ne pişirebilirim?' } },
+    { title: { en: 'Plan', tr: 'Planla' }, body: { en: 'What does today add up to?', tr: 'Bugün toplamda ne kadar aldım?' } },
     { title: { en: 'Buy', tr: 'Al' }, body: { en: 'What do we need, and who is buying it?', tr: 'Neye ihtiyacımız var, kim alıyor?' } },
   ] satisfies Point[],
 };
@@ -148,7 +148,7 @@ export const walkthrough = {
             en: 'Food picker searching for salmon: 142 kcal per 100 g with protein and fat, a 100 g portion field and an Add button.',
             tr: 'Somon aranan yiyecek seçici: 100 g’da 142 kcal, protein ve yağ değerleri, 100 g porsiyon alanı ve Ekle düğmesi.',
           },
-          { en: 'Adding salmon by weight.', tr: 'Somonu gram olarak ekleme.' },
+          { en: 'Adding salmon by weight.', tr: 'Somonu miktarına göre ekleme.' },
         ),
         shot(
           'undo',
@@ -156,7 +156,7 @@ export const walkthrough = {
             en: 'Meal plan with a “salmon added” message and an Undo link at the bottom of the screen.',
             tr: 'Ekranın altında “somon eklendi” mesajı ve Geri al bağlantısıyla yemek planı.',
           },
-          { en: 'Every change can be undone.', tr: 'Her değişiklik geri alınabilir.' },
+          { en: 'Every change can be undone.', tr: 'Değişiklikleri geri alma.' },
         ),
       ],
     },
@@ -174,7 +174,7 @@ export const walkthrough = {
             en: 'Evening suggestions under the day’s meals: minced beef with rice, 25 minutes, 763 kcal and 29 g protein, with buttons to add it to the list, mark it as being prepared or log it as eaten.',
             tr: 'Günün öğünlerinin altında akşam önerileri: dana kıyma ve pirinç, 25 dakika, 763 kcal ve 29 g protein; listeye ekleme, hazırlanıyor ve yedim düğmeleriyle.',
           },
-          { en: 'Evening suggestions with calories and protein.', tr: 'Kalori ve proteinle akşam önerileri.' },
+          { en: 'Evening suggestions with calories and protein.', tr: 'Kalori ve protein değerleriyle akşam yemeği önerileri.' },
         ),
       ],
     },
@@ -208,7 +208,7 @@ export const walkthrough = {
     title: { en: 'The 15-second recording', tr: '15 saniyelik kayıt' },
     caption: {
       en: 'Real screen recording with sample data, no sound: the shopping list, then building a meal in the plan.',
-      tr: 'Örnek verili gerçek ekran kaydı, sessiz: önce alışveriş listesi, sonra planda bir öğün oluşturma.',
+      tr: 'Örnek verilerle alınmış sessiz ekran kaydı: önce alışveriş listesi, ardından yemek planına bir öğün ekleniyor.',
     },
   },
 };
@@ -263,7 +263,7 @@ export const architecture = {
       title: { en: 'Performance', tr: 'Performans' },
       body: {
         en: 'The nutrition, meal plan, personal plan and settings views load on demand, and so does the categorization engine. Cached data paints first. The boot sequence was restructured to remove a request waterfall, and a duplicate request was found and removed through browser testing.',
-        tr: 'Besin, yemek planı, kişisel plan ve ayarlar görünümleri ihtiyaç anında yüklenir; kategorilendirme motoru da öyle. Önce önbellekteki veri çizilir. Açılış akışı bir istek şelalesini kaldıracak şekilde yeniden düzenlendi; tekrarlanan bir istek de tarayıcı testiyle bulunup kaldırıldı.',
+        tr: 'Besin, yemek planı, kişisel plan ve ayarlar görünümleri ihtiyaç anında yüklenir; kategorilendirme motoru da öyle. Önce önbellekteki veriler gösterilir. Açılış akışı bir istek şelalesini kaldıracak şekilde yeniden düzenlendi; tekrarlanan bir istek de tarayıcı testiyle bulunup kaldırıldı.',
       },
     },
     {
@@ -360,28 +360,28 @@ export const tradeoffs: Point[] = [
     title: { en: 'Polling, not WebSockets', tr: 'WebSocket değil, sorgulama' },
     body: {
       en: 'Fits households of two to four people; costs a few seconds of delay between devices.',
-      tr: 'İki ila dört kişilik hanelere uyar; cihazlar arasında birkaç saniyelik gecikmeye mal olur.',
+      tr: 'İki ila dört kişilik haneler için uygundur; cihazlar arasında birkaç saniyelik gecikme oluşur.',
     },
   },
   {
     title: { en: 'Last write wins', tr: 'Son yazan kazanır' },
     body: {
       en: 'Simple and predictable. Two people editing the same list at the same moment can overwrite each other.',
-      tr: 'Basit ve öngörülebilir. Aynı listeyi aynı anda düzenleyen iki kişi birbirinin değişikliğini ezebilir.',
+      tr: 'Basit ve öngörülebilir. Aynı listeyi aynı anda düzenleyen iki kişinin değişikliklerinden biri diğerinin üzerine yazılabilir.',
     },
   },
   {
     title: { en: 'No session refresh', tr: 'Oturum yenileme yok' },
     body: {
       en: 'A session lasts as long as its access token, then the user signs in again. Documented as a decision, not forgotten.',
-      tr: 'Oturum, erişim belirteci geçerli olduğu sürece sürer; sonra kullanıcı yeniden giriş yapar. Unutulmadı, karar olarak belgelendi.',
+      tr: 'Oturum, erişim belirteci geçerli olduğu sürece sürer; ardından kullanıcının yeniden giriş yapması gerekir. Bu sınırlama tasarım kararı olarak belgelendi.',
     },
   },
   {
     title: { en: 'No test framework', tr: 'Test framework’ü yok' },
     body: {
       en: 'Strict TypeScript is the automated gate, and behavior is checked in a real browser. Removing the unit tests was deliberate; it means catching regressions depends on that discipline.',
-      tr: 'Otomatik kapı katı TypeScript; davranış gerçek tarayıcıda kontrol ediliyor. Birim testlerini kaldırmak bilinçli bir karardı; gerilemeleri yakalamak bu disipline bağlı.',
+      tr: 'Otomatik kontrol için katı TypeScript kullanılıyor; uygulamanın davranışı gerçek tarayıcıda kontrol ediliyor. Birim testlerini kaldırmak bilinçli bir karardı; yeni değişikliklerin eski işlevleri bozmamasını sağlamak bu kontrollere bağlı.',
     },
   },
   {

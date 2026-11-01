@@ -20,7 +20,7 @@
   font: inherit;
   letter-spacing: inherit;
   text-decoration-line: underline;
-  text-decoration-color: transparent;
+  text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
   text-decoration-thickness: 0.07em;
   text-underline-offset: 0.14em;
   cursor: pointer;
@@ -35,7 +35,7 @@
 }
 
 .quick__words .quick__word[aria-pressed='true'] {
-  color: var(--text);
+  color: var(--accent);
   text-decoration-color: var(--accent);
 }
 

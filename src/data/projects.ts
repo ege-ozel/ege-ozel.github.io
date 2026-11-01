@@ -12,11 +12,11 @@ export const projects: Project[] = [
     caseStudy: 'grocery',
     summary: {
       en: 'Helps Turkish households decide what to cook, plan meals around nutrition goals and keep one shared shopping list in sync. Behind it: server-side Google sign-in, two authorization layers (function checks and Postgres row-level security), versioned sync and nutrition rules traced to a textbook-based decision register.',
-      tr: 'Türk hanelerinin ne pişireceğine karar vermesine, öğünleri beslenme hedeflerine göre planlamasına ve ortak alışveriş listesini her cihazda güncel tutmasına yardım eder. Arkasında sunucu tarafında Google ile giriş, iki katmanlı yetkilendirme (fonksiyon kontrolleri ve Postgres satır düzeyi güvenliği), sürümlü eşitleme ve ders kitabı tabanlı bir karar kaydına bağlanan beslenme kuralları var.',
+      tr: 'Türkiye’deki hanelerin ne pişireceğine karar vermesine, öğünleri beslenme hedeflerine göre planlamasına ve ortak alışveriş listesini her cihazda güncel tutmasına yardım eder. Arkasında sunucu tarafında Google ile giriş, iki katmanlı yetkilendirme (fonksiyon kontrolleri ve Postgres satır düzeyi güvenliği), sürümlü eşitleme ve ders kitabı tabanlı bir karar kaydına bağlanan beslenme kuralları var.',
     },
     myPart: {
       en: 'Co-developed with Ozan Özel, who started the project. My part: Google sign-in and sessions, the versioned sync layer, meal planning, the personal nutrition plan, most of the row-level security policies, account deletion, most of the interface and most of the nutrition curriculum.',
-      tr: 'Projeyi başlatan Ozan Özel ile birlikte geliştirildi. Benim payım: Google ile giriş ve oturumlar, sürümlü eşitleme katmanı, yemek planlama, kişisel beslenme planı, satır düzeyi güvenlik politikalarının çoğu, hesap silme, arayüzün büyük bölümü ve beslenme müfredatının büyük kısmı.',
+      tr: 'Projeyi başlatan Ozan Özel ile birlikte geliştirildi. Benim katkım: Google ile giriş ve oturumlar, sürümlü eşitleme katmanı, yemek planlama, kişisel beslenme planı, satır düzeyi güvenlik politikalarının çoğu, hesap silme, arayüzün büyük bölümü ve beslenme müfredatının büyük kısmı.',
     },
     notes: {
       challenge: {
@@ -179,7 +179,7 @@ export const projects: Project[] = [
     notes: {
       challenge: {
         en: 'Browser timers drift. A metronome cannot.',
-        tr: 'Tarayıcı zamanlayıcıları kayar; metronom kayamaz.',
+        tr: 'Tarayıcı zamanlayıcıları gecikebilir; metronomun ritmini koruması gerekir.',
       },
       approach: {
         en: 'Clicks are scheduled ahead on the AudioContext clock from a worker tick, and beat times are accumulated instead of re-measured. After a stall it skips missed beats rather than playing a burst. Visuals are a pure function of the heard time, drawn on canvas from cached sprites. One TypeScript codebase without a UI framework ships to web, PWA and Tauri.',
@@ -269,7 +269,7 @@ export const projects: Project[] = [
     status: 'prototype',
     summary: {
       en: 'A browser-based woodworking modeler: build furniture from typed wood parts that snap together at connection points.',
-      tr: 'Tarayıcıda çalışan ahşap modelleme aracı: türleri belli ahşap parçalar bağlantı noktalarından birbirine oturarak mobilyaya dönüşür.',
+      tr: 'Tarayıcıda çalışan ahşap modelleme aracı: farklı ahşap parçaları bağlantı noktalarından birleştirerek mobilya tasarlanabilir.',
     },
     myPart: {
       en: 'Solo project: engine choice, data model, snapping logic, the React Three Fiber scene and the UI.',

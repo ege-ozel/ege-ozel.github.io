@@ -1,7 +1,7 @@
 import { renderToString } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { ProjectCard } from '../src/components/ProjectCard';
-import { featuredProjects } from '../src/data/projects';
+import { featuredProjects, moreProjects } from '../src/data/projects';
 import { renderPage } from '../src/entry-server';
 
 const en = renderPage('en');
@@ -82,6 +82,14 @@ describe('prerendered page', () => {
     expect(en.html.indexOf('id="grocery-title"')).toBeLessThan(en.html.indexOf('id="trackmesh-title"'));
   });
 
+  it('includes every project in the page navigation', () => {
+    const navigation = en.html.match(/<nav class="wayfinder__menu"[\s\S]*?<\/nav>/)?.[0] ?? '';
+    for (const project of [...featuredProjects, ...moreProjects]) {
+      expect(navigation).toContain(`href="#${project.id}"`);
+      expect(en.html).toContain(`id="${project.id}"`);
+    }
+  });
+
   it('marks the current language and links to the other', () => {
     expect(en.html).toMatch(/<a href="\/" hrefLang="en" lang="en" aria-current="page">EN<\/a>/);
     expect(en.html).toMatch(/<a href="\/tr\/" hrefLang="tr" lang="tr">TR<\/a>/);
@@ -153,7 +161,7 @@ describe('Grocery case study', () => {
 
   it('says the live app needs a sign-in and does not offer a demo that does not exist', () => {
     expect(caseEn.html).toContain('needs a Google sign-in');
-    expect(caseTr.html).toContain('Google ile giriş ister');
+    expect(caseTr.html).toContain('Google ile giriş yapmak gerekiyor');
     expect(caseEn.html).not.toMatch(/Explore demo|Live demo/);
   });
 

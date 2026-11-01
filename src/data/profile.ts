@@ -8,7 +8,7 @@ const stats: Stat[] = [
   },
   {
     value: { en: '1 SaaS', tr: '1 SaaS' },
-    label: { en: 'frontend built on my own', tr: 'ürünün frontend’ini tek başıma geliştirdim' },
+    label: { en: 'frontend built on my own', tr: 'frontend’ini tek başıma geliştirdiğim ürün' },
   },
   {
     value: { en: String(shippedCount), tr: String(shippedCount) },
@@ -26,11 +26,11 @@ export const profile = {
   openToWork: true,
   tagline: {
     en: 'React and TypeScript developer who ships complete products.',
-    tr: 'Uçtan uca ürün çıkaran React ve TypeScript geliştiricisi.',
+    tr: 'Uçtan uca ürün geliştiren React ve TypeScript geliştiricisi.',
   } satisfies Text,
   intro: {
     en: 'Two years of professional React and Angular work, including the complete frontend of a released security platform. On my own I build and ship products across web, desktop and audio, from first idea to installer.',
-    tr: 'React ve Angular ile iki yıllık profesyonel deneyim; buna yayına alınan bir güvenlik platformunun frontend’inin tamamı dahil. Kendi başıma web, masaüstü ve ses alanında, ilk fikirden kurulum dosyasına kadar ürünler geliştirip yayınlıyorum.',
+    tr: 'React ve Angular ile iki yıllık profesyonel deneyimim var. Yayına alınan bir güvenlik platformunun frontend’ini baştan sona geliştirdim. Ayrıca web, masaüstü ve ses alanlarında ilk fikirden kurulum dosyasına kadar kendi ürünlerimi geliştirip yayınlıyorum.',
   } satisfies Text,
   stats,
   /** Public CVs without phone number or address; the application CVs stay private. */
