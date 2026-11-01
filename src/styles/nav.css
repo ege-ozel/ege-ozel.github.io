@@ -89,3 +89,12 @@
 .wayfinder__menu a:hover, .wayfinder__menu a:focus-visible { background: var(--surface-2); }
 .wayfinder__menu .wayfinder__project { padding-left: 20px; color: var(--text-2); }
 @media (max-width: 599px) { .quick { padding-top: 64px; } }
+
+/* Leave space for the menu on the left and the fixed preferences on the right. */
+.pagenav__inner { padding-left: 64px; padding-right: 250px; }
+@media (max-width: 800px) {
+  .pagenav__links { display: none; }
+}
+@media (max-width: 400px) {
+  .pagenav__top { visibility: hidden; }
+}

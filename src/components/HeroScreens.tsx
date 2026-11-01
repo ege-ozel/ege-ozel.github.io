@@ -11,11 +11,10 @@ const START = 1;
 /** Movement under this many pixels is a tap, not a drag. */
 const TAP = 6;
 /**
- * The spring that settles the ring, in Apple's terms: a 0.55s response with a damping ratio of
- * 0.86, a barely felt overshoot. As mass-spring constants: stiffness (2π/0.55)², damping 4π·0.86/0.55.
+ * The spring that settles the ring, in Apple's terms: a 0.37s response with a near-critical damping ratio. The ring settles quickly without bouncing.
  */
-const STIFFNESS = 130;
-const DAMPING = 19.6;
+const STIFFNESS = 285;
+const DAMPING = 32;
 /** How far ahead a released drag's speed carries the snap, in seconds of travel. */
 const THROW = 0.18;
 /** A sideways trackpad gesture snaps once its events stop for this long. */
@@ -56,8 +55,8 @@ export function HeroScreens({ shots, locale }: { shots: ShotData[]; locale: Loca
     let pos = START;
     let vel = 0;
     let target = START;
-    let scroll = 0;
     let scrollTimer = 0;
+    let scrollFrame = 0;
     let frame = 0;
     let last = 0;
     let shown = START;
@@ -66,7 +65,7 @@ export function HeroScreens({ shots, locale }: { shots: ShotData[]; locale: Loca
     const stepPx = () => (items.current[0]?.offsetWidth ?? 200) * 0.91;
 
     const paint = () => {
-      const turn = pos + scroll;
+      const turn = pos;
       items.current.forEach((item, i) => item?.style.setProperty('--a', `${((i - turn) * 360) / n}deg`));
       const now = mod(Math.round(turn), n);
       if (now !== shown) setFront((shown = now));
@@ -114,7 +113,7 @@ export function HeroScreens({ shots, locale }: { shots: ShotData[]; locale: Loca
 
     api.current = {
       step(by) {
-        target = Math.round(target) + by;
+        target = Math.round(frame ? target : pos) + by;
         settle();
       },
     };
@@ -126,6 +125,8 @@ export function HeroScreens({ shots, locale }: { shots: ShotData[]; locale: Loca
     const down = (event: PointerEvent) => {
       if (drag || (event.pointerType === 'mouse' && event.button !== 0)) return;
       const item = (event.target as Element).closest<HTMLElement>('.ring__item');
+      if (!item) return;
+      window.clearTimeout(scrollTimer);
       drag = {
         id: event.pointerId,
         x: event.clientX,
@@ -142,8 +143,10 @@ export function HeroScreens({ shots, locale }: { shots: ShotData[]; locale: Loca
       if (!drag.on) {
         if (Math.abs(dx) < TAP) return;
         drag.on = true;
-        drag.x = event.clientX;
         drag.from = pos;
+        drag.lastX = event.clientX;
+        drag.lastT = event.timeStamp;
+        vel = 0;
         surface.setPointerCapture(event.pointerId);
         el.classList.add('is-dragging');
         stop();
@@ -195,45 +198,43 @@ export function HeroScreens({ shots, locale }: { shots: ShotData[]; locale: Loca
       wheelTimer = window.setTimeout(release, WHEEL_IDLE);
     };
 
-    // Scrolling the page turns the ring by one screen, from when its middle passes the middle of
-    // the window to when it has left at the top. Far from the window it skips the work; the
-    // observer runs it once more on leaving, so the ring settles at the end of its turn.
+    // Page scrolling contributes to the same position as dragging and buttons. After scrolling
+    // stops, the nearest whole position is restored, so a phone always faces the viewer.
     let near = true;
-    const nearby = new IntersectionObserver(
-      ([entry]) => {
-        near = entry.isIntersecting;
-        update();
-      },
-      { rootMargin: '50% 0px' },
-    );
-    nearby.observe(el);
-    const onScroll = () => {
-      if (!near) return;
-      update();
-      window.clearTimeout(scrollTimer);
-      scrollTimer = window.setTimeout(() => {
-        if (drag || still.matches) return;
-        target = Math.round(pos + scroll) - scroll;
-        settle();
-      }, 140);
-    };
-    const update = () => {
-      if (still.matches) {
-        if (scroll) {
-          scroll = 0;
-          paint();
-        }
-        return;
-      }
+    let from = 0;
+    let distance = 1;
+    let previousProgress = 0;
+    const measure = () => {
       const box = el.getBoundingClientRect();
       const middle = box.top + window.scrollY + box.height / 2;
-      const from = Math.max(0, middle - innerHeight / 2);
-      const to = middle + box.height / 2;
-      const next = Math.min(1, Math.max(0, (window.scrollY - from) / (to - from)));
-      if (next !== scroll) {
-        scroll = next;
-        if (!frame) paint();
-      }
+      from = Math.max(0, middle - innerHeight / 2);
+      distance = Math.max(1, Math.min(innerHeight * 0.55, box.height * 0.8));
+      previousProgress = Math.min(1, Math.max(0, (window.scrollY - from) / distance));
+    };
+    const nearby = new IntersectionObserver(([entry]) => { near = entry.isIntersecting; }, { rootMargin: '50% 0px' });
+    nearby.observe(el);
+    measure();
+    const onScroll = () => {
+      if (!near || still.matches) return;
+      if (!scrollFrame) scrollFrame = requestAnimationFrame(() => {
+        scrollFrame = 0;
+        const progress = Math.min(1, Math.max(0, (window.scrollY - from) / distance));
+        const delta = progress - previousProgress;
+        previousProgress = progress;
+        if (!delta || drag?.on) return;
+        stop();
+        vel = 0;
+        pos += delta;
+        target = pos;
+        paint();
+      });
+      window.clearTimeout(scrollTimer);
+      scrollTimer = window.setTimeout(() => {
+        if (drag?.on) return;
+        target = Math.round(pos);
+        vel = 0;
+        settle();
+      }, 100);
     };
 
     surface.addEventListener('pointerdown', down);
@@ -242,19 +243,19 @@ export function HeroScreens({ shots, locale }: { shots: ShotData[]; locale: Loca
     surface.addEventListener('pointercancel', up);
     surface.addEventListener('wheel', wheel, { passive: false });
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', update);
-    update();
+    window.addEventListener('resize', measure);
     return () => {
       stop();
       window.clearTimeout(wheelTimer);
       window.clearTimeout(scrollTimer);
+      cancelAnimationFrame(scrollFrame);
       surface.removeEventListener('pointerdown', down);
       surface.removeEventListener('pointermove', move);
       surface.removeEventListener('pointerup', up);
       surface.removeEventListener('pointercancel', up);
       surface.removeEventListener('wheel', wheel);
       window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', update);
+      window.removeEventListener('resize', measure);
       nearby.disconnect();
       api.current = null;
     };

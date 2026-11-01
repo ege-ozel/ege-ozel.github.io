@@ -51,7 +51,7 @@ export function PageNav({ locale }: { locale: Locale }) {
     <>
     <details className="wayfinder">
       <summary aria-label={t('nav.menu')} title={t('nav.menu')}>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M6 3.5h12v17l-6-4-6 4z" /></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M4 6h16M4 12h12M4 18h8" strokeLinecap="round" /></svg>
       </summary>
       <nav className="wayfinder__menu" aria-label={t('nav.menu')} onClick={(event) => {
         if ((event.target as HTMLElement).closest('a')) event.currentTarget.closest('details')?.removeAttribute('open');

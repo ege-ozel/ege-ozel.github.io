@@ -277,3 +277,16 @@
     align-items: baseline;
   }
 }
+
+/* Theme and language stay at the top right while reading the portfolio. */
+.quick__id .prefs {
+  position: fixed;
+  z-index: 31;
+  top: 6px;
+  right: max(8px, env(safe-area-inset-right));
+  flex-wrap: nowrap;
+}
+.quick__id .prefs .switch { border: 1px solid var(--line-strong); }
+@media (max-width: 599px) {
+  .quick__id .prefs { grid-column: auto; grid-row: auto; }
+}
