@@ -294,7 +294,7 @@ export function HeroScreens({ shots, locale }: { shots: ShotData[]; locale: Loca
           );
         })}
       </div>
-      <p className="ring__hint">{t('hero.hint')}</p>
+      <p className="ring__hint">{t('hero.hintDrag')} · <span>{t('hero.hintOpen')}</span></p>
       {/* Back, where we are, forward: the dots say there are three screens and which is in front,
           which the arrows alone left open. Screen readers get the same as "2 / 3". */}
       <div className="ring__controls">

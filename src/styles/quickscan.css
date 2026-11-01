@@ -244,6 +244,7 @@
 
 @media (max-width: 599px) {
   .quick {
+    position: relative;
     padding-top: var(--s-6);
   }
 
@@ -251,11 +252,12 @@
     grid-template-columns: auto 1fr;
   }
 
-  /* On a phone the switches get their own row, lined up with everything else on the left. */
+  /* Align the preferences with the menu button without pinning them during scroll. */
   .quick__id .prefs {
-    grid-column: 1 / -1;
-    grid-row: 1;
-    justify-self: end;
+    position: absolute;
+    top: 8px;
+    right: 0;
+    flex-wrap: nowrap;
     justify-content: flex-end;
   }
 

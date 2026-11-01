@@ -111,6 +111,10 @@
   margin: 0;
 }
 
+.ring__hint span {
+  color: var(--accent);
+}
+
 /* Back and forward, with the dots for where the ring is between them. */
 .ring__controls {
   display: flex;
