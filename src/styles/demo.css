@@ -13,7 +13,8 @@
 .demo-meals { display: grid; gap: var(--s-3); grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .demo-meal { display: grid; align-content: start; gap: var(--s-2); padding: var(--s-4); border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface-2); }
 .demo-meal__top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-2); }
-.demo-meal h4 { margin: 0; font-size: var(--fs-body); font-weight: var(--fw-semibold); }
+.demo-meal__top span { flex: none; white-space: nowrap; }
+.demo-meal h4 { min-width: 0; margin: 0; font-size: var(--fs-body); font-weight: var(--fw-semibold); }
 .demo-meal p { color: var(--text-2); font-size: var(--fs-small); }
 .demo-meal__macros { color: var(--text) !important; }
 .demo-meal .btn { justify-self: start; }
@@ -27,11 +28,12 @@
 .demo-plan li, .demo-shopping li { padding: var(--s-3); background: var(--surface-2); border-radius: var(--r-sm); }
 .demo-plan li { display: flex; align-items: center; justify-content: space-between; gap: var(--s-2); }
 .demo-plan p, .demo-shopping small { color: var(--text-2); font-size: var(--fs-small); }
-.demo-stepper { display: flex; align-items: center; gap: var(--s-2); }
+.demo-stepper { flex: none; display: flex; align-items: center; gap: var(--s-2); }
 .demo-stepper button { width: 40px; height: 40px; border: 1px solid var(--line-strong); border-radius: var(--r-sm); color: var(--text); background: var(--surface); font: inherit; cursor: pointer; }
 .demo-shopping label { display: flex; align-items: center; gap: var(--s-3); cursor: pointer; }
 .demo-shopping input { width: 20px; height: 20px; accent-color: var(--accent); }
-.demo-shopping label > span { flex: 1; }
+.demo-shopping label > span { flex: 1; min-width: 0; }
+.demo-shopping label > strong { flex: none; white-space: nowrap; }
 .demo-shopping small { display: block; }
 .demo-shopping input:checked + span { text-decoration: line-through; color: var(--text-2); }
 .demo-actions { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-4); }
