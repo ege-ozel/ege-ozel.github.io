@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { Arrangement, type Kind } from './components/Arrangement';
 import { FeaturedHero } from './components/FeaturedHero';
 import { Contact, EducationList, ExperienceList, MoreWork } from './components/Lists';
 import { PageNav } from './components/PageNav';
@@ -12,6 +14,7 @@ import type { Locale } from './types';
 /** The portfolio page. Case studies render on their own (see entry-server.tsx). */
 export function App({ locale }: { locale: Locale }) {
   const t = createT(locale);
+  const [kind, setKind] = useState<Kind | null>(null);
   return (
     <LightboxProvider closeLabel={t('lightbox.close')}>
       <a className="skip" href="#work">
@@ -19,7 +22,7 @@ export function App({ locale }: { locale: Locale }) {
       </a>
       <PageNav locale={locale} />
       <div className="shell">
-        <QuickScan locale={locale} />
+        <QuickScan locale={locale} kind={kind} setKind={setKind} />
         <main className="content">
           <FeaturedHero locale={locale} />
           <Section id="work" title={t('work.title')}>
@@ -30,6 +33,7 @@ export function App({ locale }: { locale: Locale }) {
               ))}
             </div>
           </Section>
+          <Arrangement locale={locale} kind={kind} />
           <Section id="more" split title={t('more.title')}>
             <MoreWork locale={locale} />
           </Section>

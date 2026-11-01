@@ -81,7 +81,7 @@ export const projects: Project[] = [
   {
     id: 'interval-timer',
     title: 'Interval Timer',
-    placement: 'featured',
+    placement: 'more',
     device: 'desktop',
     accent: '#F08A5D',
     status: 'live',
@@ -207,7 +207,7 @@ export const projects: Project[] = [
   {
     id: 'desktuk',
     title: 'DeskTuk',
-    placement: 'featured',
+    placement: 'more',
     device: 'desktop',
     accent: '#E8B86B',
     status: 'inDevelopment',

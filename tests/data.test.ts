@@ -31,11 +31,11 @@ describe('project data', () => {
   });
 
   it('features Grocery first, then the session manager and the timer, with TrackMesh after them', () => {
-    expect(featuredProjects.map((p) => p.id)).toEqual(['grocery', 'wsm', 'interval-timer', 'trackmesh', 'metronome', 'desktuk']);
+    expect(featuredProjects.map((p) => p.id)).toEqual(['grocery', 'wsm', 'trackmesh', 'metronome']);
   });
 
   it('lists the smaller projects in the agreed order and drops World of Cards', () => {
-    expect(moreProjects.map((p) => p.id)).toEqual(['pdf-reader', 'woodcraft', 'voice-type', 'mert-ozkan', 'trackmesh-film']);
+    expect(moreProjects.map((p) => p.id)).toEqual(['interval-timer', 'desktuk', 'pdf-reader', 'woodcraft', 'voice-type', 'mert-ozkan', 'trackmesh-film']);
     expect(projects.some((p) => p.id === 'world-of-cards')).toBe(false);
   });
 

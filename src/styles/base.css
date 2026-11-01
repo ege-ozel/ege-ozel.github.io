@@ -255,16 +255,6 @@ html {
   }
 }
 
-/* Theme change: a disc of the new background, grown from the pressed button by the head script
-   in index.html, covers the window while the page takes its new colours. */
-.theme-wipe {
-  position: fixed;
-  z-index: 2147483000;
-  border-radius: 50%;
-  pointer-events: none;
-  transform: scale(0);
-}
-
 .btn--small {
   min-height: 40px;
   padding: 0 var(--s-3);

@@ -14,7 +14,7 @@ describe('prerendered page', () => {
     expect(en.html).toMatch(/<h1 class="quick__name">Ege Özel<\/h1>/);
     expect(en.html).toContain('Software Developer · React &amp; TypeScript');
     expect(en.html).toContain('Open to work');
-    expect(tr.html).toContain('İşe açık');
+    expect(tr.html).toContain('İş fırsatlarına açık');
     expect(en.title).toBe('Ege Özel, Software Developer');
   });
 

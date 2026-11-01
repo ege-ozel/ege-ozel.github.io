@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { featuredProjects } from '../data/projects';
 import { profile } from '../data/profile';
 import { createT, type UiKey } from '../i18n';
 import type { Locale } from '../types';
@@ -47,6 +48,25 @@ export function PageNav({ locale }: { locale: Locale }) {
   }, []);
 
   return (
+    <>
+    <details className="wayfinder">
+      <summary aria-label={t('nav.menu')} title={t('nav.menu')}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M6 3.5h12v17l-6-4-6 4z" /></svg>
+      </summary>
+      <nav className="wayfinder__menu" aria-label={t('nav.menu')} onClick={(event) => {
+        if ((event.target as HTMLElement).closest('a')) event.currentTarget.closest('details')?.removeAttribute('open');
+      }}>
+        <p>{t('nav.here')}: {current ? t(`nav.${current}` as UiKey) : t('nav.topLabel')}</p>
+        <a href="#top">{t('nav.top')}</a>
+        <a href="#hero">Grocery</a>
+        <a href="#work">{t('nav.work')}</a>
+        {featuredProjects.filter((project) => project.id !== 'grocery').map((project) => <a className="wayfinder__project" key={project.id} href={`#${project.id}`}>{project.title}</a>)}
+        <a href="#more">{t('more.title')}</a>
+        <a href="#experience">{t('nav.experience')}</a>
+        <a href="#education">{t('education.title')}</a>
+        <a href="#contact">{t('nav.contact')}</a>
+      </nav>
+    </details>
     <nav className={shown ? 'pagenav is-shown' : 'pagenav'} aria-label={t('nav.label')} inert={!shown}>
       <div className="pagenav__inner">
         <a className="pagenav__top" href="#top" aria-label={t('nav.top')}>
@@ -63,5 +83,6 @@ export function PageNav({ locale }: { locale: Locale }) {
         </ul>
       </div>
     </nav>
+    </>
   );
 }

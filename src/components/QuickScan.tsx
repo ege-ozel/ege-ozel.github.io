@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { profile } from '../data/profile';
 import { createT, localePath } from '../i18n';
 import { locales, type Locale } from '../types';
@@ -6,17 +5,16 @@ import { CopyEmail } from './CopyEmail';
 import { useLightbox } from '../lightbox';
 import { ExternalLink } from './ExternalLink';
 import { ThemeSwitch } from './ThemeSwitch';
-import { Arrangement, kinds, type Kind } from './Arrangement';
+import { kinds, type Kind } from './Arrangement';
 
 /**
  * The first screen: who I am and what I build. The three words are also a filter: each dims the
  * projects in the arrangement below that do not run there.
  */
-export function QuickScan({ locale }: { locale: Locale }) {
+export function QuickScan({ locale, kind, setKind }: { locale: Locale; kind: Kind | null; setKind: (kind: Kind | null) => void }) {
   const t = createT(locale);
   const newTab = ` (${t('link.newTab')})`;
   const openLightbox = useLightbox();
-  const [kind, setKind] = useState<Kind | null>(null);
 
   return (
     <header id="top" className="quick">
@@ -73,7 +71,10 @@ export function QuickScan({ locale }: { locale: Locale }) {
             type="button"
             className="quick__word"
             aria-pressed={kind === word}
-            onClick={() => setKind(kind === word ? null : word)}
+            onClick={() => {
+              setKind(kind === word ? null : word);
+              document.getElementById('activity')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+            }}
           >
             {t(`arr.${word}`)}
           </button>
@@ -117,7 +118,6 @@ export function QuickScan({ locale }: { locale: Locale }) {
           </ExternalLink>
         </li>
       </ul>
-      <Arrangement locale={locale} kind={kind} />
       <p className="quick__intro">{profile.intro[locale]}</p>
 
       <dl className="stats" aria-label={t('profile.stats')}>
