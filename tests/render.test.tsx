@@ -90,6 +90,14 @@ describe('prerendered page', () => {
     }
   });
 
+  it('offers a clearly labelled sample demo in both languages', () => {
+    expect(en.html).toContain('id="grocery-demo"');
+    expect(en.html).toContain('does not run the app');
+    expect(tr.html).toContain('Gerçek uygulamanın öneri motorunu çalıştırmaz');
+    expect(tr.html).toContain('Plana ekle');
+    expect(tr.html).toContain('Örnek plan');
+  });
+
   it('marks the current language and links to the other', () => {
     expect(en.html).toMatch(/<a href="\/" hrefLang="en" lang="en" aria-current="page">EN<\/a>/);
     expect(en.html).toMatch(/<a href="\/tr\/" hrefLang="tr" lang="tr">TR<\/a>/);

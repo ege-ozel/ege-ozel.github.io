@@ -56,7 +56,7 @@ export function ProjectCard({ project, locale, eager }: Props) {
                 </a>
               </li>
             )}
-            {project.links.map((link) => (
+            {project.links.filter((link) => project.id !== 'grocery' || (link.kind !== 'app' && link.kind !== 'code')).map((link) => (
               <li key={link.href}>
                 <ExternalLink className="btn btn--small" href={link.href} hint={hint}>
                   {t(linkLabel[link.kind])}
@@ -65,7 +65,7 @@ export function ProjectCard({ project, locale, eager }: Props) {
             ))}
           </ul>
         )}
-        {project.links.some((link) => link.kind === 'app') && (
+        {project.id !== 'grocery' && project.links.some((link) => link.kind === 'app') && (
           <p className="card__note">
             {t('link.app')}: {t('link.signIn')}
           </p>

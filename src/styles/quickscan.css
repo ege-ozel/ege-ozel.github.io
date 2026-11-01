@@ -279,3 +279,5 @@
     align-items: baseline;
   }
 }
+
+.quick__experience { width: fit-content; color: var(--accent); font-size: var(--fs-small); font-weight: var(--fw-medium); }

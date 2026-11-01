@@ -8,6 +8,10 @@ export function PageNav({ locale }: { locale: Locale }) {
   const t = createT(locale);
   const menu = useRef<HTMLDetailsElement>(null);
   const [current, setCurrent] = useState('top');
+  const [moreOpen, setMoreOpen] = useState(false);
+  useEffect(() => {
+    if (current === 'more' || moreProjects.some((p) => p.id === current)) setMoreOpen(true);
+  }, [current]);
 
   useEffect(() => {
     const ids = ['top', 'hero', 'work', ...featuredProjects.map((p) => p.id), 'activity', 'more', ...moreProjects.map((p) => p.id), 'experience', 'education', 'contact'];
@@ -68,7 +72,7 @@ export function PageNav({ locale }: { locale: Locale }) {
           {featuredProjects.map((p) => <span key={p.id}>{item(p.id, p.title, true)}</span>)}
         </details>
         {item('activity', t('arr.title'))}
-        <details className="wayfinder__group" open>
+        <details className="wayfinder__group" open={moreOpen} onToggle={(event) => setMoreOpen(event.currentTarget.open)}>
           <summary className={current === 'more' || moreProjects.some((p) => p.id === current) ? 'is-current' : undefined}>{t('more.title')}</summary>
           {item('more', t('nav.overview'), true)}
           {moreProjects.map((p) => <span key={p.id}>{item(p.id, p.title, true)}</span>)}

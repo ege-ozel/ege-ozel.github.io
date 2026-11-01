@@ -7,12 +7,12 @@ const stats: Stat[] = [
     label: { en: 'professional frontend work', tr: 'profesyonel frontend deneyimi' },
   },
   {
-    value: { en: '1 SaaS', tr: '1 SaaS' },
-    label: { en: 'frontend built on my own', tr: 'frontend’ini tek başıma geliştirdiğim ürün' },
+    value: { en: 'SaaS', tr: 'SaaS' },
+    label: { en: 'frontend built independently for a released product', tr: 'yayındaki ürünün frontend’ini tek başıma geliştirdim' },
   },
   {
     value: { en: String(shippedCount), tr: String(shippedCount) },
-    label: { en: 'projects you can open or download', tr: 'açıp deneyebileceğiniz ya da indirebileceğiniz proje' },
+    label: { en: 'projects to try or download', tr: 'deneyebileceğiniz veya indirebileceğiniz proje' },
   },
 ];
 

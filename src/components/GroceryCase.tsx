@@ -78,8 +78,9 @@ export function GroceryCase({ locale }: { locale: Locale }) {
             </h1>
             <p className="cs-lead">{L(intro.lead)}</p>
             <ul className="actions cs-actions">
+              <li><a className="btn btn--primary" href={`${pagePath('home', locale)}#grocery-demo`}>{t('link.sample')}</a></li>
               <li>
-                <ExternalLink className="btn btn--primary" href={links.code} hint={newTab}>
+                <ExternalLink className="btn" href={links.code} hint={newTab}>
                   {t('case.code')}
                 </ExternalLink>
               </li>
@@ -105,6 +106,15 @@ export function GroceryCase({ locale }: { locale: Locale }) {
             </Zoom>
             <figcaption>{L(intro.shot.caption)}</figcaption>
           </figure>
+        </section>
+
+        <section className="cs-section" aria-label={locale === 'tr' ? 'Kısa özet' : 'At a glance'}>
+          <dl className="cs-facts">
+            <div><dt>{locale === 'tr' ? 'Sorun' : 'Problem'}</dt><dd>{locale === 'tr' ? 'Yemek planı, beslenme hedefleri ve alışveriş ayrı yerlerde.' : 'Meal planning, nutrition goals and shopping live in separate places.'}</dd></div>
+            <div><dt>{locale === 'tr' ? 'Katkım' : 'My role'}</dt><dd>{locale === 'tr' ? 'Giriş, eşitleme, yemek planı, arayüz ve güvenlik politikaları.' : 'Sign-in, sync, meal planning, interface and security policies.'}</dd></div>
+            <div><dt>{locale === 'tr' ? 'Zor karar' : 'Key decision'}</dt><dd>{locale === 'tr' ? 'Hane verilerine erişimi iki katmanda denetlemek; eşitlemede sürüm kullanmak.' : 'Check household access at two layers and use versioned sync.'}</dd></div>
+            <div><dt>{locale === 'tr' ? 'Durum' : 'Status'}</dt><dd>{locale === 'tr' ? 'Yayında, küçük ölçekte kullanımda.' : 'Live, with small-scale use.'}</dd></div>
+          </dl>
         </section>
 
         <nav className="cs-toc" aria-label={t('case.toc')}>

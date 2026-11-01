@@ -22,8 +22,12 @@ export function FeaturedHero({ locale }: { locale: Locale }) {
         </h2>
         <p className="hero__summary">{hero.summary[locale]}</p>
         <ul className="actions hero__actions">
+          <li><a className="btn btn--primary" href="#grocery-demo" onClick={() => {
+            const panel = document.getElementById('grocery-demo');
+            if (panel instanceof HTMLDetailsElement) panel.open = true;
+          }}>{t('link.sample')}</a></li>
           <li>
-            <a className="btn btn--primary" href={pagePath('grocery', locale)}>
+            <a className="btn" href={pagePath('grocery', locale)}>
               {t('link.case')}
             </a>
           </li>

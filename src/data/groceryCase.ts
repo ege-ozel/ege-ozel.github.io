@@ -411,7 +411,7 @@ export const status = {
       en: 'Expand the food catalog and its allergen mappings (35 of 103 foods so far) with USDA-mapped foods and Turkish label values.',
       tr: 'Besin kataloğunu ve alerjen eşlemelerini (şimdilik 103 yiyecekten 35’i) USDA’ya eşlenmiş yiyecekler ve Türkiye etiket değerleriyle genişletmek.',
     },
-    { en: 'Design a guest demo that works without signing in.', tr: 'Giriş yapmadan çalışan bir misafir demosu tasarlamak.' },
+    { en: 'Develop a guest mode in the full application; the portfolio offers a small interactive example.', tr: 'Tam uygulamada misafir modu geliştirmek; portfolyoda küçük bir etkileşimli örnek bulunuyor.' },
   ] satisfies Text[],
 };
 

@@ -142,7 +142,7 @@ function playWeek(week: number, at: number, bus: AudioNode, ctx: AudioContext, k
  * today; the ruler can be dragged (or stepped with the arrow keys) to hear and read any week.
  * The words above (in QuickScan) dim, and silence, the projects that do not run there.
  */
-export function Arrangement({ locale, kind }: { locale: Locale; kind: Kind | null }) {
+export function Arrangement({ locale, kind, setKind }: { locale: Locale; kind: Kind | null; setKind: (kind: Kind | null) => void }) {
   const t = createT(locale);
   const [playing, setPlaying] = useState(false);
   const [week, setWeek] = useState(lastWeek);
@@ -311,6 +311,13 @@ export function Arrangement({ locale, kind }: { locale: Locale; kind: Kind | nul
           <Icon name={playing ? 'pause' : 'play'} />
           {playing ? t('arr.stop') : t('arr.play')}
         </button>
+      </div>
+      <div className="arr__filters" role="group" aria-label={t('arr.words')}>
+        {kinds.map((word) => (
+          <button key={word} type="button" aria-pressed={kind === word} onClick={() => setKind(kind === word ? null : word)}>
+            {t(`arr.${word}`).replace(/[,.]$/, '')}
+          </button>
+        ))}
       </div>
       <div className="arr__body">
         <div

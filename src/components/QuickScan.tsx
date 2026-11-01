@@ -5,13 +5,12 @@ import { CopyEmail } from './CopyEmail';
 import { useLightbox } from '../lightbox';
 import { ExternalLink } from './ExternalLink';
 import { ThemeSwitch } from './ThemeSwitch';
-import { kinds, type Kind } from './Arrangement';
 
 /**
  * The first screen: who I am and what I build. The three words are also a filter: each dims the
  * projects in the arrangement below that do not run there.
  */
-export function QuickScan({ locale, kind, setKind }: { locale: Locale; kind: Kind | null; setKind: (kind: Kind | null) => void }) {
+export function QuickScan({ locale }: { locale: Locale }) {
   const t = createT(locale);
   const newTab = ` (${t('link.newTab')})`;
   const openLightbox = useLightbox();
@@ -64,22 +63,7 @@ export function QuickScan({ locale, kind, setKind }: { locale: Locale; kind: Kin
         </div>
       </div>
 
-      <p className="quick__words" role="group" aria-label={t('arr.words')}>
-        {kinds.map((word) => (
-          <button
-            key={word}
-            type="button"
-            className="quick__word"
-            aria-pressed={kind === word}
-            onClick={() => {
-              setKind(kind === word ? null : word);
-              document.getElementById('activity')?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-            }}
-          >
-            {t(`arr.${word}`)}
-          </button>
-        ))}
-      </p>
+      <p className="quick__words">{t('arr.web')} {t('arr.desktop')} {t('arr.audio')}</p>
 
       <div className="quick__meta">
         {profile.openToWork && (
@@ -118,6 +102,7 @@ export function QuickScan({ locale, kind, setKind }: { locale: Locale; kind: Kin
           </ExternalLink>
         </li>
       </ul>
+      <a className="quick__experience" href="#experience">{t('profile.viewExperience')} →</a>
       <p className="quick__intro">{profile.intro[locale]}</p>
 
       <dl className="stats" aria-label={t('profile.stats')}>

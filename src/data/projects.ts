@@ -11,12 +11,12 @@ export const projects: Project[] = [
     status: 'live',
     caseStudy: 'grocery',
     summary: {
-      en: 'Helps Turkish households decide what to cook, plan meals around nutrition goals and keep one shared shopping list in sync. Behind it: server-side Google sign-in, two authorization layers (function checks and Postgres row-level security), versioned sync and nutrition rules traced to a textbook-based decision register.',
-      tr: 'Türkiye’deki hanelerin ne pişireceğine karar vermesine, öğünleri beslenme hedeflerine göre planlamasına ve ortak alışveriş listesini her cihazda güncel tutmasına yardım eder. Arkasında sunucu tarafında Google ile giriş, iki katmanlı yetkilendirme (fonksiyon kontrolleri ve Postgres satır düzeyi güvenliği), sürümlü eşitleme ve ders kitabı tabanlı bir karar kaydına bağlanan beslenme kuralları var.',
+      en: 'A full-stack app bringing shared shopping, meal planning and nutrition targets together.',
+      tr: 'Ortak alışveriş, yemek planı ve beslenme hedeflerini bir araya getiren full-stack uygulama.',
     },
     myPart: {
-      en: 'Co-developed with Ozan Özel, who started the project. My part: Google sign-in and sessions, the versioned sync layer, meal planning, the personal nutrition plan, most of the row-level security policies, account deletion, most of the interface and most of the nutrition curriculum.',
-      tr: 'Projeyi başlatan Ozan Özel ile birlikte geliştirildi. Benim katkım: Google ile giriş ve oturumlar, sürümlü eşitleme katmanı, yemek planlama, kişisel beslenme planı, satır düzeyi güvenlik politikalarının çoğu, hesap silme, arayüzün büyük bölümü ve beslenme müfredatının büyük kısmı.',
+      en: 'Co-developed with Ozan Özel. My work includes sign-in, sync, meal planning, security policies and most of the interface.',
+      tr: 'Ozan Özel ile birlikte geliştirdik. Katkım: giriş, eşitleme, yemek planlama, güvenlik politikaları ve arayüzün büyük bölümü.',
     },
     notes: {
       challenge: {

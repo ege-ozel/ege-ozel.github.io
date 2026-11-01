@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Arrangement, type Kind } from './components/Arrangement';
+import { GroceryDemo } from './components/GroceryDemo';
 import { FeaturedHero } from './components/FeaturedHero';
 import { Contact, EducationList, ExperienceList, MoreWork } from './components/Lists';
 import { PageNav } from './components/PageNav';
@@ -22,9 +23,10 @@ export function App({ locale }: { locale: Locale }) {
       </a>
       <PageNav locale={locale} />
       <div className="shell">
-        <QuickScan locale={locale} kind={kind} setKind={setKind} />
+        <QuickScan locale={locale} />
         <main className="content">
           <FeaturedHero locale={locale} />
+          <GroceryDemo locale={locale} />
           <Section id="work" title={t('work.title')}>
             <div className="cards">
               {featuredProjects.map((project) => (
@@ -33,7 +35,7 @@ export function App({ locale }: { locale: Locale }) {
               ))}
             </div>
           </Section>
-          <Arrangement locale={locale} kind={kind} />
+          <Arrangement locale={locale} kind={kind} setKind={setKind} />
           <Section id="more" split title={t('more.title')}>
             <MoreWork locale={locale} />
           </Section>

@@ -1,60 +1,9 @@
 .arr { margin-bottom: var(--s-8); }
 
-/* The three words under the name: a statement, and a filter for the arrangement below. */
-.quick__words {
-  display: flex;
-  flex-wrap: wrap;
-  column-gap: 0.24em;
-  margin: 0;
-  font-size: var(--fs-display);
-  font-weight: var(--fw-bold);
-  line-height: var(--lh-display);
-  letter-spacing: var(--tr-display);
-}
-
-.quick__word {
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--text);
-  font: inherit;
-  letter-spacing: inherit;
-  text-decoration-line: underline;
-  text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent);
-  text-decoration-thickness: 0.07em;
-  text-underline-offset: 0.14em;
-  cursor: pointer;
-  transition:
-    color var(--t-fast) var(--ease),
-    text-decoration-color var(--t-fast) var(--ease);
-}
-
-/* One word chosen: it keeps the ink and an accent line, the other two step back. */
-.quick__words:has([aria-pressed='true']) .quick__word {
-  color: var(--text-2);
-}
-
-.quick__words .quick__word[aria-pressed='true'] {
-  color: var(--accent);
-  text-decoration-color: var(--accent);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .quick__word:hover {
-    text-decoration-color: var(--line-strong);
-  }
-}
-
-/* The arrangement: a lane per project, a clip per stretch of work, a bar per week. */
-.arr {
-  --label: 0px;
-  display: grid;
-  gap: var(--s-4);
-  margin-top: var(--s-4);
-  padding: var(--s-4);
-  border-radius: var(--r-lg);
-  background: var(--surface);
-}
+.quick__words { display: block; margin: 0; font-size: var(--fs-display); font-weight: var(--fw-bold); line-height: var(--lh-display); letter-spacing: var(--tr-display); }
+.arr__filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+.arr__filters button { min-height: 40px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface); color: var(--text-2); font: inherit; font-size: var(--fs-small); cursor: pointer; }
+.arr__filters button[aria-pressed='true'] { border-color: var(--accent); color: var(--accent); }
 
 .arr__head {
   display: flex;
@@ -301,3 +250,5 @@
     height: 48px;
   }
 }
+
+.arr { --label: 0px; display: grid; gap: var(--s-4); margin-top: var(--s-4); padding: var(--s-4); border-radius: var(--r-lg); background: var(--surface); }
