@@ -1,3 +1,5 @@
+.arr { margin-bottom: var(--s-8); }
+
 /* The three words under the name: a statement, and a filter for the arrangement below. */
 .quick__words {
   display: flex;

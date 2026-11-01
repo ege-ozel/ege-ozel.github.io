@@ -6,7 +6,7 @@ export const hero: Hero = {
   title: { en: 'Grocery', tr: 'Grocery' },
   summary: {
     en: 'A full-stack app for Turkish households: decide what to cook, plan meals around nutrition goals and keep one shared shopping list in sync. Live, built with a co-developer, with nutrition logic traced back to textbooks.',
-    tr: 'Türk haneleri için full-stack bir uygulama: ne pişireceğine karar ver, öğünleri beslenme hedeflerine göre planla, ortak alışveriş listesini her cihazda güncel tut. Yayında; bir ortak geliştiriciyle yapıldı ve beslenme mantığı ders kitaplarına dayanıyor.',
+    tr: 'Türkiye’deki hanelerin ne pişireceğine karar vermesine, öğünleri beslenme hedeflerine göre planlamasına ve ortak alışveriş listesini güncel tutmasına yardımcı olan bir uygulama. Bir ortak geliştiriciyle hazırladık; uygulama yayında ve beslenme kuralları ders kitaplarına dayanıyor.',
   },
   shots: [
     {

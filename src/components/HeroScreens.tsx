@@ -57,6 +57,7 @@ export function HeroScreens({ shots, locale }: { shots: ShotData[]; locale: Loca
     let vel = 0;
     let target = START;
     let scroll = 0;
+    let scrollTimer = 0;
     let frame = 0;
     let last = 0;
     let shown = START;
@@ -207,7 +208,14 @@ export function HeroScreens({ shots, locale }: { shots: ShotData[]; locale: Loca
     );
     nearby.observe(el);
     const onScroll = () => {
-      if (near) update();
+      if (!near) return;
+      update();
+      window.clearTimeout(scrollTimer);
+      scrollTimer = window.setTimeout(() => {
+        if (drag || still.matches) return;
+        target = Math.round(pos + scroll) - scroll;
+        settle();
+      }, 140);
     };
     const update = () => {
       if (still.matches) {
@@ -239,6 +247,7 @@ export function HeroScreens({ shots, locale }: { shots: ShotData[]; locale: Loca
     return () => {
       stop();
       window.clearTimeout(wheelTimer);
+      window.clearTimeout(scrollTimer);
       surface.removeEventListener('pointerdown', down);
       surface.removeEventListener('pointermove', move);
       surface.removeEventListener('pointerup', up);
@@ -284,6 +293,7 @@ export function HeroScreens({ shots, locale }: { shots: ShotData[]; locale: Loca
           );
         })}
       </div>
+      <p className="ring__hint">{t('hero.hint')}</p>
       {/* Back, where we are, forward: the dots say there are three screens and which is in front,
           which the arrows alone left open. Screen readers get the same as "2 / 3". */}
       <div className="ring__controls">

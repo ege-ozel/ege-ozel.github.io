@@ -92,95 +92,45 @@ function months(locale: Locale) {
   return out;
 }
 
-/** Whether a new month begins in this week: the metronome accents it. */
-function monthStarts(week: number) {
-  if (week === 0) return true;
-  return new Date(start + (week - 1) * WEEK).getUTCMonth() !== new Date(start + week * WEEK).getUTCMonth();
-}
-
-/**
- * The metronome is Chronobeat's acoustic kit: a closed hi-hat every week and a rimshot where a
- * month begins. Both samples are CC0 (VCSL, and Freesound sound 404856), copied from the app.
- */
-const KIT = { normal: '/media/sounds/hihat.wav', accent: '/media/sounds/rimshot.wav' };
-type Kit = { normal: AudioBuffer; accent: AudioBuffer };
-
-/** The sound: one shared audio graph, made on the first press (browsers allow sound only then). */
-type Audio = { ctx: AudioContext; out: GainNode; kit: Kit | null; loading: Promise<Kit | null> };
+/** A quiet, warm synth: each project plays a long note in a shared pentatonic scale. */
+type Audio = { ctx: AudioContext; out: GainNode };
 let audio: Audio | null = null;
 function sound() {
   if (!audio) {
-    const Context =
-      window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    const Context = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
     if (!Context) return null;
     const ctx = new Context();
-    const warm = ctx.createBiquadFilter();
-    warm.type = 'lowpass';
-    warm.frequency.value = 9000;
     const out = ctx.createGain();
-    out.gain.value = 0.7;
-    out.connect(warm).connect(ctx.destination);
-    const load = (url: string) =>
-      fetch(url)
-        .then((response) => response.arrayBuffer())
-        .then((data) => ctx.decodeAudioData(data));
-    const made: Audio = { ctx, out, kit: null, loading: Promise.resolve(null) };
-    made.loading = Promise.all([load(KIT.normal), load(KIT.accent)]).then(
-      ([normal, accent]) => (made.kit = { normal, accent }),
-      () => null,
-    );
-    audio = made;
+    const limiter = ctx.createDynamicsCompressor();
+    out.gain.value = 0.65;
+    limiter.threshold.value = -12;
+    out.connect(limiter).connect(ctx.destination);
+    audio = { ctx, out };
   }
   if (audio.ctx.state === 'suspended') void audio.ctx.resume();
   return audio;
 }
 
-/** A synthesised click, for the moment before the kit's samples have loaded (or if they fail). */
-function playTick(accent: boolean, at: number, bus: AudioNode, ctx: AudioContext) {
-  const tick = ctx.createOscillator();
-  const tickLevel = ctx.createGain();
-  tick.frequency.value = accent ? 2400 : 1800;
-  tickLevel.gain.setValueAtTime(0.0001, at);
-  tickLevel.gain.exponentialRampToValueAtTime(accent ? 0.08 : 0.04, at + 0.002);
-  tickLevel.gain.exponentialRampToValueAtTime(0.0001, at + 0.03);
-  tick.connect(tickLevel).connect(bus);
-  tick.start(at);
-  tick.stop(at + 0.04);
-}
-
-/** One week's sound at time `at`: the kit's beat, and each active project's note, louder for more commits. */
-function playWeek(week: number, at: number, bus: AudioNode, ctx: AudioContext, kind: Kind | null, kit: Kit | null) {
-  const accent = monthStarts(week);
-  if (kit) {
-    const hit = ctx.createBufferSource();
-    hit.buffer = accent ? kit.accent : kit.normal;
-    const hitLevel = ctx.createGain();
-    hitLevel.gain.value = accent ? 0.5 : 0.35;
-    hit.connect(hitLevel).connect(bus);
-    hit.start(at);
-  } else playTick(accent, at, bus, ctx);
+function playWeek(week: number, at: number, bus: AudioNode, ctx: AudioContext, kind: Kind | null) {
   for (const lane of activity) {
     const count = lane.counts[week] ?? 0;
     if (!count || (kind && !(runsOn[lane.id] ?? []).includes(kind))) continue;
-    const level = 0.03 + 0.16 * Math.sqrt(count / peak);
+    const level = 0.012 + 0.018 * Math.sqrt(count / peak);
     const voice = ctx.createGain();
     voice.gain.setValueAtTime(0.0001, at);
-    voice.gain.exponentialRampToValueAtTime(level, at + 0.006);
-    voice.gain.exponentialRampToValueAtTime(0.0001, at + 0.5);
+    voice.gain.exponentialRampToValueAtTime(level, at + 0.09);
+    voice.gain.exponentialRampToValueAtTime(0.0001, at + 1.15);
     voice.connect(bus);
     const body = ctx.createOscillator();
     body.type = 'triangle';
     body.frequency.value = notes[lane.id] ?? 440;
-    const shine = ctx.createOscillator();
-    shine.frequency.value = (notes[lane.id] ?? 440) * 2;
-    const shineLevel = ctx.createGain();
-    shineLevel.gain.value = 0.25;
+    const overtone = ctx.createOscillator();
+    overtone.frequency.value = body.frequency.value * 2;
+    const overtoneLevel = ctx.createGain();
+    overtoneLevel.gain.value = 0.22;
     body.connect(voice);
-    shine.connect(shineLevel).connect(voice);
-    for (const osc of [body, shine]) {
-      osc.start(at);
-      osc.stop(at + 0.52);
-    }
+    overtone.connect(overtoneLevel).connect(voice);
+    for (const osc of [body, overtone]) { osc.start(at); osc.stop(at + 1.17); }
   }
 }
 
@@ -188,7 +138,7 @@ function playWeek(week: number, at: number, bus: AudioNode, ctx: AudioContext, k
  * My projects as an arrangement in a music app: a lane per project, a clip for each stretch of
  * work, and inside each clip one bar per week, as tall as that week's commits. The timeline is
  * also an instrument. Each project has a note; a week sounds the notes of the projects worked on
- * that week, louder for more commits, over Chronobeat's acoustic kit keeping the beat. Play sweeps the playhead to
+ * that week, louder for more commits, with a soft sustained tone. Play sweeps the playhead to
  * today; the ruler can be dragged (or stepped with the arrow keys) to hear and read any week.
  * The words above (in QuickScan) dim, and silence, the projects that do not run there.
  */
@@ -217,7 +167,7 @@ export function Arrangement({ locale, kind }: { locale: Locale; kind: Kind | nul
 
   const hear = (w: number) => {
     const a = sound();
-    if (a) playWeek(w, a.ctx.currentTime + 0.005, a.out, a.ctx, kindRef.current, a.kit);
+    if (a) playWeek(w, a.ctx.currentTime + 0.005, a.out, a.ctx, kindRef.current);
   };
 
   const stop = (ended = false) => {
@@ -229,21 +179,7 @@ export function Arrangement({ locale, kind }: { locale: Locale; kind: Kind | nul
   const play = () => {
     if (playing) return stop();
     setTouched(true);
-    // The first press waits for the kit's two small samples, so the beat starts with them.
-    const a = sound();
-    if (a && !a.kit) {
-      let cancelled = false;
-      run.current = {
-        stop() {
-          cancelled = true;
-        },
-      };
-      setPlaying(true);
-      void a.loading.then(() => {
-        if (!cancelled) begin();
-      });
-      return;
-    }
+    sound();
     begin();
   };
 
@@ -268,7 +204,7 @@ export function Arrangement({ locale, kind }: { locale: Locale; kind: Kind | nul
     if (a && bus) {
       bus.connect(a.out);
       const t0 = a.ctx.currentTime + 0.05;
-      for (let w = from; w <= lastWeek; w++) playWeek(w, t0 + ((w - from) * BEAT) / 1000, bus, a.ctx, kindRef.current, a.kit);
+      for (let w = from; w <= lastWeek; w++) playWeek(w, t0 + ((w - from) * BEAT) / 1000, bus, a.ctx, kindRef.current);
     }
     // The lit weeks and the readout follow the beat.
     const timers: number[] = [];
@@ -300,7 +236,7 @@ export function Arrangement({ locale, kind }: { locale: Locale; kind: Kind | nul
           // At the end the last notes ring out; a stop part-way fades in a few milliseconds
           // instead of cutting off with a click.
           if (!ended) bus.gain.setTargetAtTime(0, a.ctx.currentTime, 0.015);
-          window.setTimeout(() => bus.disconnect(), ended ? 700 : 120);
+          window.setTimeout(() => bus.disconnect(), ended ? 1400 : 120);
         }
       },
     };
@@ -358,6 +294,7 @@ export function Arrangement({ locale, kind }: { locale: Locale; kind: Kind | nul
 
   return (
     <section
+      id="activity"
       ref={box}
       className={['arr', playing && 'is-playing', live && 'is-live'].filter(Boolean).join(' ')}
       aria-labelledby="arr-title"

@@ -58,57 +58,13 @@
           });
         }
 
-        // Theme: a disc of the new background grows from the pressed button until it covers the
-        // window (a transform, which the compositor runs), the page takes the new colours under it
-        // in one go, and the disc fades away. Restyling the whole page is the one expensive step,
-        // and it happens while nothing on screen moves, so the change cannot stutter.
-        function shown(choice) {
-          if (choice === 'dark' || choice === 'light') return choice;
-          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
-        var wipe = null;
-        function setTheme(choice, button) {
-          // The colours stay the same (system to dark on a dark system, say): only the pill slides.
-          var same = shown(saved()) === shown(choice);
+        // Apply immediately: keep the page visible and avoid a full-screen color wipe.
+        function setTheme(choice) {
           try {
             if (choice === 'system') localStorage.removeItem('theme');
             else localStorage.setItem('theme', choice);
           } catch (e) {}
-          if (same || still() || !document.body.animate) {
-            apply(choice);
-            return;
-          }
-          if (wipe) wipe.remove();
-          var box = button.getBoundingClientRect();
-          var x = box.left + box.width / 2;
-          var y = box.top + box.height / 2;
-          var r = Math.ceil(Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y)));
-          var disc = document.createElement('div');
-          disc.className = 'theme-wipe';
-          disc.style.left = x - r + 'px';
-          disc.style.top = y - r + 'px';
-          disc.style.width = disc.style.height = 2 * r + 'px';
-          disc.style.background = colors[shown(choice)];
-          document.body.appendChild(disc);
-          wipe = disc;
-          var done = function () {
-            disc.remove();
-            if (wipe === disc) wipe = null;
-          };
-          disc
-            .animate({ transform: ['scale(0)', 'scale(1)'] }, { duration: 520, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', fill: 'forwards' })
-            .finished.then(function () {
-              apply(choice);
-              // Two frames: the new colours paint under the disc before it starts to fade.
-              requestAnimationFrame(function () {
-                requestAnimationFrame(function () {
-                  disc.animate({ opacity: [1, 0] }, { duration: 280, easing: 'ease-out', fill: 'forwards' }).finished.then(done, done);
-                });
-              });
-            }, function () {
-              apply(choice);
-              done();
-            });
+          apply(choice);
         }
 
         // Language: the other page is fetched (already on hover) and swapped in place, so the page
